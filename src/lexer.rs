@@ -467,6 +467,7 @@ mod tests {
         test = do{
             foo;
             bar}
+        <eof>
         "###);
     }
 
@@ -478,6 +479,7 @@ mod tests {
         ")), @r###"
         test = do{ foo
                   bar}
+        <eof>
         "###);
     }
 
@@ -491,6 +493,7 @@ mod tests {
         test = do{
             foo bar;
             baz}
+        <eof>
         "###);
     }
 
@@ -508,6 +511,7 @@ mod tests {
               foo;
               baz};
             bar}
+        <eof>
         "###);
     }
 }
