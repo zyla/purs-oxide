@@ -91,15 +91,16 @@ impl<'a> Iterator for Lexer<'a> {
         } else {
             return Some(result);
         };
-        if let Some(&indent_level) = self.layout_stack.last() {
-            if next_token.indent_level < indent_level {
+        while let Some(&indent_level) = self.layout_stack.last() {
+            #[allow(clippy::comparison_chain)]
+            if next_token.column < indent_level {
                 self.layout_stack.pop();
-                self.enqueue(next_token);
-                return Some(self.make_token(Token::LayoutEnd));
-            }
-            if next_token.indent_level == indent_level {
-                self.enqueue(next_token);
-                return Some(self.make_token(Token::LayoutSep));
+                self.enqueue(self.make_token_info(Token::LayoutEnd));
+            } else if next_token.column == indent_level {
+                self.enqueue(self.make_token_info(Token::LayoutSep));
+                break;
+            } else {
+                break;
             }
         }
         if let Some(prev_token) = &prev_token {
@@ -107,11 +108,16 @@ impl<'a> Iterator for Lexer<'a> {
             match &prev_token.token {
                 Token::Do if next_token.column > prev_token.indent_level => {
                     self.layout_stack.push(next_token.column);
-                    self.enqueue(next_token);
-                    return Some(self.make_token(Token::LayoutStart));
+                    self.enqueue(self.make_token_info(Token::LayoutStart));
                 }
                 _ => {}
             }
+        }
+        // We may have queued some token(s) above, if so queue the current one and return
+        // the one from queue
+        if let Some(queued_token) = self.queue.pop_front() {
+            self.queue.push_back(next_token);
+            return Some(Ok(queued_token));
         }
         Some(Ok(next_token))
     }
@@ -195,7 +201,11 @@ impl<'a> Lexer<'a> {
     }
 
     fn make_token(&self, token: Token) -> LexResult {
-        Ok(TokenInfo {
+        Ok(self.make_token_info(token))
+    }
+
+    fn make_token_info(&self, token: Token) -> TokenInfo {
+        TokenInfo {
             token,
             whitespace_start: self.whitespace_start,
             start: self.token_start,
@@ -203,7 +213,7 @@ impl<'a> Lexer<'a> {
             indent_level: self.indent_level,
             newline_before: self.has_newline,
             column: self.token_start - self.line_start,
-        })
+        }
     }
 
     fn parse_string_literal(&mut self) -> Result<String, Error> {
@@ -466,6 +476,19 @@ mod tests {
     }
 
     #[test]
+    fn test_layout_do_3() {
+        assert_snapshot!(print_layout(indoc!("
+            test = do
+                foo bar
+                baz
+        ")), @r###"
+        test = do{
+            foo bar;
+            baz}
+        "###);
+    }
+
+    #[test]
     fn test_layout_do_nested() {
         assert_snapshot!(print_layout(indoc!("
             test = do
@@ -476,8 +499,8 @@ mod tests {
         ")), @r###"
         test = do{
             do{
-              foo
-              baz}
+              foo;
+              baz};
             bar}
         "###);
     }
