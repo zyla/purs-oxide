@@ -106,7 +106,9 @@ impl<'a> Iterator for Lexer<'a> {
         if let Some(prev_token) = &prev_token {
             #[allow(clippy::single_match)]
             match &prev_token.token {
-                Token::Do if next_token.column > prev_token.indent_level => {
+                Token::Do | Token::Let | Token::Where
+                    if next_token.column > prev_token.indent_level =>
+                {
                     self.layout_stack.push(next_token.column);
                     self.enqueue(self.make_token_info(Token::LayoutStart));
                 }
@@ -258,6 +260,9 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"do" => Token::Do,
         b"end" => Token::End,
         b"while" => Token::While,
+        b"let" => Token::Let,
+        b"in" => Token::In,
+        b"where" => Token::Where,
         _ => Token::Identifier(String::from_utf8(ident.to_vec()).unwrap()),
     }
 }
@@ -439,7 +444,8 @@ mod tests {
         result
             .iter()
             .flat_map(|t| print_token(input, t).chars())
-            .collect()
+            .collect::<String>()
+            + "\n<eof>"
     }
 
     fn print_token<'a>(input: &'a str, t: &TokenInfo) -> &'a str {

@@ -32,6 +32,9 @@ pub enum Token {
     Do,
     End,
     While,
+    Let,
+    In,
+    Where,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
