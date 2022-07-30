@@ -157,6 +157,17 @@ impl<'a> Lexer<'a> {
                 let s = self.parse_string_literal()?;
                 self.make_token(Token::StringLiteral(s))
             }
+            '\'' => {
+                let c = self.parse_possibly_escaped_char()?;
+                if self.peek() != '\'' {
+                    return Err(Error(format!(
+                        "Invalid end of character literal: {}",
+                        self.peek()
+                    )));
+                }
+                self.next_char();
+                self.make_token(Token::CharLiteral(c))
+            }
             ':' => match self.peek() {
                 '"' => {
                     self.next_char();
@@ -224,29 +235,35 @@ impl<'a> Lexer<'a> {
             if self.eof() {
                 return Err(Error("Unterminated string literal".to_string()));
             }
-            match self.peek() {
-                '"' => {
-                    self.next_char();
-                    break;
-                }
-                '\\' => {
-                    self.next_char();
-                    if self.eof() {
-                        return Err(Error("Unterminated string literal".to_string()));
-                    }
-                    content.push(match self.peek() {
-                        'n' => '\n',
-                        't' => '\t',
-                        c => c,
-                    });
-                }
-                c => {
-                    content.push(c);
-                }
+            if self.peek() == '"' {
+                self.next_char();
+                break;
             }
-            self.next_char();
+            content.push(self.parse_possibly_escaped_char()?);
         }
         Ok(content)
+    }
+
+    fn parse_possibly_escaped_char(&mut self) -> Result<char, Error> {
+        if self.eof() {
+            return Err(Error("Unterminated string literal".to_string()));
+        }
+        let c = match self.peek() {
+            '\\' => {
+                self.next_char();
+                if self.eof() {
+                    return Err(Error("Unterminated string literal".to_string()));
+                }
+                match self.peek() {
+                    'n' => '\n',
+                    't' => '\t',
+                    c => c,
+                }
+            }
+            c => c,
+        };
+        self.next_char();
+        Ok(c)
     }
 }
 
@@ -296,10 +313,10 @@ mod tests {
     use std::{fs::File, io::Read, path::PathBuf, str::FromStr};
 
     use indoc::indoc;
-    use insta::assert_snapshot;
+    use insta::{assert_debug_snapshot, assert_snapshot};
     use test_generator::test_resources;
 
-    use crate::lexer::*;
+    use super::{Error, Token, TokenInfo};
 
     fn try_collect<T, E>(iter: impl Iterator<Item = Result<T, E>>) -> Result<Vec<T>, E> {
         let mut result = vec![];
@@ -310,11 +327,15 @@ mod tests {
     }
 
     fn test_lex(input: &str, expected_result: Result<Vec<Token>, Error>) {
-        let result = try_collect(lex(input).map(|v| v.map(|v| v.token)));
+        let result = lex(input);
         if result != expected_result {
             panic!("Test failed.\n            input: {:?}\n  expected result: {:?}\n    actual result: {:?}\n",
                    input, expected_result, result);
         }
+    }
+
+    fn lex(input: &str) -> Result<Vec<Token>, Error> {
+        try_collect(super::lex(input).map(|v| v.map(|v| v.token)))
     }
 
     #[test]
@@ -440,7 +461,7 @@ mod tests {
     }
 
     fn print_layout(input: &str) -> String {
-        let result = try_collect(lex(input)).unwrap();
+        let result = try_collect(super::lex(input)).unwrap();
         result
             .iter()
             .flat_map(|t| print_token(input, t).chars())
@@ -512,6 +533,19 @@ mod tests {
               baz};
             bar}
         <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_character_literal() {
+        assert_debug_snapshot!(lex("'a'"), @r###"
+        Ok(
+            [
+                CharLiteral(
+                    'a',
+                ),
+            ],
+        )
         "###);
     }
 }

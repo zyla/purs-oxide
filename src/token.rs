@@ -2,6 +2,7 @@
 pub enum Token {
     IntegerLiteral(usize),
     StringLiteral(String),
+    CharLiteral(char),
     Identifier(String),
     Symbol(String),
 
