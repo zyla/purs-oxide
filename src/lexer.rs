@@ -34,7 +34,7 @@ impl<'a> Iterator for Lexer<'a> {
             let c = self.peek();
             self.has_newline = self.has_newline || c == '\n';
             match c {
-                // Eat a comment
+                // Single-line comment
                 '-' if self.can_peek2() && self.peek2() == '-' => {
                     while !self.eof() && self.peek() != '\n' {
                         self.next_char();

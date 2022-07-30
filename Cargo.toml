@@ -9,3 +9,4 @@ edition = "2021"
 
 [dev-dependencies]
 insta = "1.14.0"
+indoc = "1.0"
