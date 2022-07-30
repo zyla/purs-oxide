@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::token::{Token, TokenInfo};
 
 #[derive(PartialEq, Eq, Debug)]
@@ -8,15 +10,29 @@ pub fn lex(input: &str) -> impl Iterator<Item = LexResult> + '_ {
         input: input.as_bytes(),
         pos: 0,
         token_start: 0,
+        whitespace_start: 0,
         has_newline: false,
+        queue: Default::default(),
+        last_token: None,
+        indent_level: 0,
+        line_start: 0,
+        layout_stack: Default::default(),
     }
 }
 
 struct Lexer<'a> {
     input: &'a [u8],
     pos: usize,
+    whitespace_start: usize,
     token_start: usize,
     has_newline: bool,
+    queue: VecDeque<TokenInfo>,
+    last_token: Option<TokenInfo>,
+    /** stack of indent levels */
+    layout_stack: Vec<usize>,
+    line_start: usize,
+
+    indent_level: usize,
 }
 
 pub type LexResult = Result<TokenInfo, self::Error>;
@@ -25,13 +41,29 @@ impl<'a> Iterator for Lexer<'a> {
     type Item = LexResult;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // If we have any queued tokens (layout), return them
+        if let Some(queued_token) = self.queue.pop_front() {
+            return Some(Ok(queued_token));
+        }
+
         // Skip spaces; record if we encountered a newline.
         self.has_newline = false;
+        self.whitespace_start = self.pos;
+        let mut line_start: Option<usize> = None;
         loop {
             if self.eof() {
+                // drain layout stack
+                if self.layout_stack.pop().is_some() {
+                    self.token_start = self.pos;
+                    return Some(self.make_token(Token::LayoutEnd));
+                }
                 return None;
             }
             let c = self.peek();
+            if c == '\n' {
+                self.line_start = self.pos;
+                line_start = Some(self.pos);
+            }
             self.has_newline = self.has_newline || c == '\n';
             match c {
                 // Single-line comment
@@ -47,12 +79,49 @@ impl<'a> Iterator for Lexer<'a> {
             }
             self.next_char();
         }
+        if let Some(line_start) = line_start {
+            self.indent_level = self.pos - line_start;
+        }
 
-        Some(self.lex_token())
+        let result = self.lex_token();
+        let (prev_token, next_token) = if let Ok(next_token) = result {
+            let mut prev_token = Some(next_token.clone());
+            std::mem::swap(&mut self.last_token, &mut prev_token);
+            (prev_token, next_token)
+        } else {
+            return Some(result);
+        };
+        if let Some(&indent_level) = self.layout_stack.last() {
+            if next_token.indent_level < indent_level {
+                self.layout_stack.pop();
+                self.enqueue(next_token);
+                return Some(self.make_token(Token::LayoutEnd));
+            }
+            if next_token.indent_level == indent_level {
+                self.enqueue(next_token);
+                return Some(self.make_token(Token::LayoutSep));
+            }
+        }
+        if let Some(prev_token) = &prev_token {
+            #[allow(clippy::single_match)]
+            match &prev_token.token {
+                Token::Do if next_token.column > prev_token.indent_level => {
+                    self.layout_stack.push(next_token.column);
+                    self.enqueue(next_token);
+                    return Some(self.make_token(Token::LayoutStart));
+                }
+                _ => {}
+            }
+        }
+        Some(Ok(next_token))
     }
 }
 
 impl<'a> Lexer<'a> {
+    fn enqueue(&mut self, token: TokenInfo) {
+        self.queue.push_back(token);
+    }
+
     fn lex_token(&mut self) -> LexResult {
         let c = self.peek();
         self.token_start = self.pos;
@@ -112,6 +181,7 @@ impl<'a> Lexer<'a> {
         self.pos >= self.input.len()
     }
     fn peek(&self) -> char {
+        // FIXME: we should handle utf8 (using char_indices iterator)
         self.input[self.pos] as char
     }
     fn can_peek2(&self) -> bool {
@@ -123,12 +193,16 @@ impl<'a> Lexer<'a> {
     fn next_char(&mut self) {
         self.pos += 1;
     }
+
     fn make_token(&self, token: Token) -> LexResult {
         Ok(TokenInfo {
             token,
+            whitespace_start: self.whitespace_start,
             start: self.token_start,
             end: self.pos,
+            indent_level: self.indent_level,
             newline_before: self.has_newline,
+            column: self.token_start - self.line_start,
         })
     }
 
@@ -204,6 +278,12 @@ fn is_integer_literal_char(c: char) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use std::{fs::File, io::Read, path::PathBuf, str::FromStr};
+
+    use indoc::indoc;
+    use insta::assert_snapshot;
+    use test_generator::test_resources;
+
     use crate::lexer::*;
 
     fn try_collect<T, E>(iter: impl Iterator<Item = Result<T, E>>) -> Result<Vec<T>, E> {
@@ -322,5 +402,83 @@ mod tests {
     #[test]
     fn test_comment_start_at_eof() {
         test_lex("-", Ok(vec![Token::Minus]));
+    }
+
+    #[test_resources("purescript/tests/purs/layout/*.purs")]
+    fn layout_example(input_filename: &str) {
+        let output_filename = PathBuf::from_str(input_filename)
+            .unwrap()
+            .with_extension("out");
+        println!("{:?}", output_filename);
+        let mut input = String::new();
+        File::open(input_filename)
+            .unwrap()
+            .read_to_string(&mut input)
+            .unwrap();
+        let mut expected_output = String::new();
+        File::open(output_filename)
+            .unwrap()
+            .read_to_string(&mut expected_output)
+            .unwrap();
+        let output = print_layout(&input);
+        pretty_assertions::assert_eq!(output, expected_output);
+    }
+
+    fn print_layout(input: &str) -> String {
+        let result = try_collect(lex(input)).unwrap();
+        result
+            .iter()
+            .flat_map(|t| print_token(input, t).chars())
+            .collect()
+    }
+
+    fn print_token<'a>(input: &'a str, t: &TokenInfo) -> &'a str {
+        match &t.token {
+            Token::LayoutStart => "{",
+            Token::LayoutSep => ";",
+            Token::LayoutEnd => "}",
+            _ => &input[t.whitespace_start..t.end],
+        }
+    }
+
+    #[test]
+    fn test_layout_do_1() {
+        assert_snapshot!(print_layout(indoc!("
+            test = do
+                foo
+                bar
+        ")), @r###"
+        test = do{
+            foo;
+            bar}
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_2() {
+        assert_snapshot!(print_layout(indoc!("
+            test = do foo
+                      bar
+        ")), @r###"
+        test = do{ foo
+                  bar}
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_nested() {
+        assert_snapshot!(print_layout(indoc!("
+            test = do
+                do
+                  foo
+                  baz
+                bar
+        ")), @r###"
+        test = do{
+            do{
+              foo
+              baz}
+            bar}
+        "###);
     }
 }

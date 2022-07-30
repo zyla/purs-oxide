@@ -8,7 +8,7 @@ fn main() -> std::io::Result<()> {
     stdin().lock().read_to_string(&mut input)?;
     for tok_info in lexer::lex(&input) {
         match tok_info {
-            Ok(tok_info) => println!("{:?}", tok_info.token),
+            Ok(tok_info) => println!("{:?}", tok_info),
             Err(err) => println!("{:?}", err),
         }
     }

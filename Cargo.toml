@@ -10,3 +10,5 @@ edition = "2021"
 [dev-dependencies]
 insta = "1.14.0"
 indoc = "1.0"
+test-generator = "0.3.0"
+pretty_assertions = "1.2.1"

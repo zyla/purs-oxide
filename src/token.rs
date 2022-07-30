@@ -5,6 +5,11 @@ pub enum Token {
     Identifier(String),
     Symbol(String),
 
+    // Layout
+    LayoutStart,
+    LayoutSep,
+    LayoutEnd,
+
     // Operators
     LParen,
     RParen,
@@ -29,10 +34,17 @@ pub enum Token {
     While,
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct TokenInfo {
     pub token: Token,
+    /** Position where the whitespace before the token starts */
+    pub whitespace_start: usize,
+    /** Position where the token itself starts */
     pub start: usize,
     pub end: usize,
+    /** Indentation level, i.e. column number of the first non-whitespace token on the line */
+    pub indent_level: usize,
+    /** Zero-based column number (offset since line start) */
+    pub column: usize,
     pub newline_before: bool,
 }
