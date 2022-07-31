@@ -101,6 +101,13 @@ impl<'a> Iterator for Lexer<'a> {
                 self.layout_stack.pop();
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
+            } else if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
+                // `in` ends `let` and `ado` blocks
+                self.layout_stack.pop();
+                let token = self.make_token_info(Token::LayoutEnd);
+                self.enqueue(token);
+                // Use it only once, otherwise it ends all nested ado/let blocks
+                break;
             } else if next_token.column == entry.indent_level {
                 // Operator or where in a do or case block at the same indent level ends the block
                 if let (
@@ -124,7 +131,7 @@ impl<'a> Iterator for Lexer<'a> {
         if let Some(prev_token) = &prev_token {
             #[allow(clippy::single_match)]
             match &prev_token.token {
-                Token::Do | Token::Let | Token::Where | Token::Of
+                Token::Do | Token::Let | Token::Where | Token::Of | Token::Ado
                     if next_token.column > prev_token.indent_level =>
                 {
                     self.layout_stack.push(LayoutEntry {
@@ -133,6 +140,15 @@ impl<'a> Iterator for Lexer<'a> {
                     });
                     let token = self.make_token_info(Token::LayoutStart);
                     self.enqueue(token);
+
+                    // Annoying edge case: empty let/ado blocks
+                    if let (Token::Let | Token::Ado, Token::In) =
+                        (&prev_token.token, &next_token.token)
+                    {
+                        self.layout_stack.pop();
+                        let token = self.make_token_info(Token::LayoutEnd);
+                        self.enqueue(token);
+                    }
                 }
                 _ => {}
             }
@@ -556,7 +572,7 @@ mod tests {
             test = do foo
                       bar
         ")), @r###"
-        test = do{ foo
+        test = do {foo
                   bar}
         <eof>
         "###);
