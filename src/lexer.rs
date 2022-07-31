@@ -11,7 +11,6 @@ pub fn lex(input: &str) -> impl Iterator<Item = LexResult> + '_ {
         pos: 0,
         token_start: 0,
         whitespace_start: 0,
-        has_newline: false,
         queue: Default::default(),
         last_token: None,
         indent_level: 0,
@@ -25,7 +24,6 @@ struct Lexer<'a> {
     pos: usize,
     whitespace_start: usize,
     token_start: usize,
-    has_newline: bool,
     queue: VecDeque<TokenInfo>,
     last_token: Option<TokenInfo>,
     layout_stack: Vec<LayoutEntry>,
@@ -50,8 +48,8 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(Ok(queued_token));
         }
 
-        // Skip spaces; record if we encountered a newline.
-        self.has_newline = false;
+        // Skip whitespace and comments.
+        // Reset indentation state on line breaks.
         self.whitespace_start = self.pos;
         let mut line_start: Option<usize> = None;
         loop {
@@ -66,7 +64,6 @@ impl<'a> Iterator for Lexer<'a> {
                 return None;
             }
             let c = self.peek();
-            self.has_newline = self.has_newline || c == '\n';
             match c {
                 // Single-line comment
                 '-' if self.can_peek2() && self.peek2() == '-' => {
@@ -333,7 +330,6 @@ impl<'a> Lexer<'a> {
             end: token_end,
             trailing_space_end,
             indent_level: self.indent_level,
-            newline_before: self.has_newline,
             column: self.token_start - self.line_start,
         }
     }

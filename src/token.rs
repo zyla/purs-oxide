@@ -57,5 +57,4 @@ pub struct TokenInfo {
     pub indent_level: usize,
     /** Zero-based column number (offset since line start) */
     pub column: usize,
-    pub newline_before: bool,
 }
