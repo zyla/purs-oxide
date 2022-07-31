@@ -57,9 +57,11 @@ impl<'a> Iterator for Lexer<'a> {
         loop {
             if self.eof() {
                 // drain layout stack
-                if self.layout_stack.pop().is_some() {
-                    self.token_start = self.pos;
-                    return Some(self.make_token(Token::LayoutEnd));
+                while let Some(entry) = self.layout_stack.pop() {
+                    if is_indented(&entry.token) {
+                        self.token_start = self.pos;
+                        return Some(self.make_token(Token::LayoutEnd));
+                    }
                 }
                 return None;
             }
@@ -97,27 +99,36 @@ impl<'a> Iterator for Lexer<'a> {
         };
         while let Some(entry) = self.layout_stack.last() {
             #[allow(clippy::comparison_chain)]
-            if next_token.column < entry.indent_level {
-                self.layout_stack.pop();
+            if next_token.column < entry.indent_level && is_indented(&entry.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
+                self.layout_stack.pop();
             } else if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
                 // `in` ends `let` and `ado` blocks
-                self.layout_stack.pop();
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
+                self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested ado/let blocks
                 break;
-            } else if next_token.column == entry.indent_level {
+            } else if let (Token::LeftParen, Token::RightParen)
+            | (Token::LeftBrace, Token::RightBrace)
+            | (Token::LeftBracket, Token::RightBracket) =
+                (&entry.token, &next_token.token)
+            {
+                // End paren pairs
+                self.layout_stack.pop();
+                // Use it only once, otherwise it ends all nested pairs
+                break;
+            } else if next_token.column == entry.indent_level && is_indented(&entry.token) {
                 // Operator or where in a do or case block at the same indent level ends the block
                 if let (
                     Token::Do | Token::Of,
                     Token::Operator(_) | Token::Backtick | Token::Where,
                 ) = (&entry.token, &next_token.token)
                 {
-                    self.layout_stack.pop();
                     let token = self.make_token_info(Token::LayoutEnd);
                     self.enqueue(token);
+                    self.layout_stack.pop();
                     continue;
                 }
                 let token = self.make_token_info(Token::LayoutSep);
@@ -150,6 +161,13 @@ impl<'a> Iterator for Lexer<'a> {
                         self.enqueue(token);
                     }
                 }
+                // Various parens introduce a stack entry, but not layout tokens.
+                Token::LeftBrace | Token::LeftParen | Token::LeftBracket => {
+                    self.layout_stack.push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                    });
+                }
                 _ => {}
             }
         }
@@ -161,6 +179,13 @@ impl<'a> Iterator for Lexer<'a> {
         }
         Some(Ok(next_token))
     }
+}
+
+fn is_indented(token: &Token) -> bool {
+    !matches!(
+        token,
+        Token::LeftBrace | Token::LeftParen | Token::LeftBracket
+    )
 }
 
 impl<'a> Lexer<'a> {
@@ -606,6 +631,56 @@ mod tests {
               foo;
               baz};
             bar}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_module_item_sep() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            x = 1
+            y = 2
+        ")), @r###"
+        module Foo where{
+        x = 1;
+        y = 2}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_module_item_sep_2() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            x =
+                foo
+                bar
+            y = 2
+        ")), @r###"
+        module Foo where{
+        x =
+            foo
+            bar;
+        y = 2}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_module_item_sep_3() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            x = {
+                foo
+            }
+            y = 2
+        ")), @r###"
+        module Foo where{
+        x = {
+            foo
+        };
+        y = 2}
         <eof>
         "###);
     }
