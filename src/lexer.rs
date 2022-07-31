@@ -121,6 +121,13 @@ impl<'a> Iterator for Lexer<'a> {
                 self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested pairs
                 break;
+            } else if let (Token::Do, Token::Where) = (&entry.token, &next_token.token) {
+                // Where ends `do` blocks
+                let token = self.make_token_info(Token::LayoutEnd);
+                self.enqueue(token);
+                self.layout_stack.pop();
+                // Recursively
+                continue;
             } else if next_token.column == entry.indent_level && is_indented(&entry.token) {
                 // Operator or where in a do or case block at the same indent level ends the block
                 if let (
@@ -615,6 +622,16 @@ mod tests {
         test = do{
             foo bar;
             baz}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_where() {
+        assert_snapshot!(print_layout(indoc!("
+            test = do foo bar where x = 1
+        ")), @r###"
+        test = do {foo bar }where {x = 1}
         <eof>
         "###);
     }
