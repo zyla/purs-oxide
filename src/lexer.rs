@@ -168,31 +168,22 @@ impl<'a> Lexer<'a> {
                 self.next_char();
                 self.make_token(Token::CharLiteral(c))
             }
-            ':' => match self.peek() {
-                '"' => {
-                    self.next_char();
-                    let s = self.parse_string_literal()?;
-                    self.make_token(Token::Symbol(s))
-                }
-                _ => {
-                    while !self.eof() && is_symbol_char(self.peek()) {
-                        self.next_char();
-                    }
-                    self.make_token(Token::Symbol(
-                        String::from_utf8(self.input[(self.token_start + 1)..self.pos].to_vec())
-                            .unwrap(),
-                    ))
-                }
-            },
-            '(' => self.make_token(Token::LParen),
-            ')' => self.make_token(Token::RParen),
-            '=' => self.make_token(Token::Equal),
-            '|' => self.make_token(Token::Pipe),
-            '@' => self.make_token(Token::At),
+            '(' => self.make_token(Token::LeftParen),
+            ')' => self.make_token(Token::RightParen),
+            '{' => self.make_token(Token::LeftBrace),
+            '}' => self.make_token(Token::RightBrace),
+            '[' => self.make_token(Token::LeftBracket),
+            ']' => self.make_token(Token::RightBracket),
+            '`' => self.make_token(Token::Backtick),
             ',' => self.make_token(Token::Comma),
             ';' => self.make_token(Token::Semicolon),
-            '.' => self.make_token(Token::Dot),
-            '-' => self.make_token(Token::Minus),
+            c if is_operator_char(c) => {
+                while !self.eof() && is_operator_char(self.peek()) {
+                    self.next_char();
+                }
+                self.make_token(operator_to_token(&self.input[self.token_start..self.pos]))
+            }
+
             _ => Err(Error(format!("Unknown character: {}", c))),
         }
     }
@@ -269,18 +260,30 @@ impl<'a> Lexer<'a> {
 
 fn ident_to_token(ident: &[u8]) -> Token {
     match ident {
-        b"nil" => Token::Nil,
-        b"self" => Token::Self_,
         b"if" => Token::If,
         b"then" => Token::Then,
         b"else" => Token::Else,
+        b"ado" => Token::Ado,
         b"do" => Token::Do,
-        b"end" => Token::End,
-        b"while" => Token::While,
         b"let" => Token::Let,
         b"in" => Token::In,
         b"where" => Token::Where,
         _ => Token::Identifier(String::from_utf8(ident.to_vec()).unwrap()),
+    }
+}
+
+fn operator_to_token(s: &[u8]) -> Token {
+    match s {
+        b"=" => Token::Equal,
+        b"|" => Token::Pipe,
+        b";" => Token::Semicolon,
+        b":" => Token::Colon,
+        b"." => Token::Dot,
+        b"->" => Token::Arrow,
+        b"=>" => Token::FatArrow,
+        b"::" => Token::TypeOf,
+        b"<-" => Token::Bind,
+        _ => Token::Operator(String::from_utf8(s.into()).unwrap()),
     }
 }
 
@@ -293,11 +296,11 @@ fn is_ident_start(c: char) -> bool {
 }
 
 fn is_ident_char(c: char) -> bool {
-    is_ident_start(c) || is_digit(c) || c == '?' || c == '!'
+    is_ident_start(c) || is_digit(c)
 }
 
-fn is_symbol_char(c: char) -> bool {
-    is_ident_char(c) || c == '='
+fn is_operator_char(c: char) -> bool {
+    ":!#$%&*+./<=>?@\\^|-~".contains(c)
 }
 
 fn is_digit(c: char) -> bool {
@@ -350,21 +353,7 @@ mod tests {
             "asdzASDZ_09",
             Ok(vec![Token::Identifier("asdzASDZ_09".to_string())]),
         );
-        test_lex(
-            "exists?",
-            Ok(vec![Token::Identifier("exists?".to_string())]),
-        );
-        test_lex("send!", Ok(vec![Token::Identifier("send!".to_string())]));
-    }
-
-    #[test]
-    fn test_symbol() {
-        test_lex(
-            ":asdzASDZ_09=",
-            Ok(vec![Token::Symbol("asdzASDZ_09=".to_string())]),
-        );
-        test_lex(":then", Ok(vec![Token::Symbol("then".to_string())]));
-        test_lex(r#"  :"foo"  "#, Ok(vec![Token::Symbol("foo".to_string())]));
+        test_lex("dont", Ok(vec![Token::Identifier("dont".to_string())]));
     }
 
     #[test]
@@ -402,25 +391,54 @@ mod tests {
     fn test_keywords() {
         test_lex("then", Ok(vec![Token::Then]));
         test_lex("do", Ok(vec![Token::Do]));
-        test_lex("self", Ok(vec![Token::Self_]));
+        test_lex("ado", Ok(vec![Token::Ado]));
     }
 
     #[test]
     fn test_operators() {
-        test_lex(
-            "( ) = | @ , ; . -",
-            Ok(vec![
-                Token::LParen,
-                Token::RParen,
-                Token::Equal,
-                Token::Pipe,
-                Token::At,
-                Token::Comma,
-                Token::Semicolon,
-                Token::Dot,
-                Token::Minus,
-            ]),
-        );
+        assert_debug_snapshot!(
+        lex(            "()  {} = , ; . + - <$> .= := =. ^|. (<$>)"),
+        @r###"
+        Ok(
+            [
+                LeftParen,
+                RightParen,
+                LeftBrace,
+                RightBrace,
+                Equal,
+                Comma,
+                Semicolon,
+                Dot,
+                Operator(
+                    "+",
+                ),
+                Operator(
+                    "-",
+                ),
+                Operator(
+                    "<$>",
+                ),
+                Operator(
+                    ".=",
+                ),
+                Operator(
+                    ":=",
+                ),
+                Operator(
+                    "=.",
+                ),
+                Operator(
+                    "^|.",
+                ),
+                LeftParen,
+                Operator(
+                    "<$>",
+                ),
+                RightParen,
+            ],
+        )
+        "###
+                );
     }
 
     #[test]
@@ -437,7 +455,18 @@ mod tests {
 
     #[test]
     fn test_comment_start_at_eof() {
-        test_lex("-", Ok(vec![Token::Minus]));
+        assert_debug_snapshot!(
+        lex("-"),
+        @r###"
+        Ok(
+            [
+                Operator(
+                    "-",
+                ),
+            ],
+        )
+        "###
+                );
     }
 
     #[test_resources("purescript/tests/purs/layout/*.purs")]

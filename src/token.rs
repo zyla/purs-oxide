@@ -4,7 +4,6 @@ pub enum Token {
     StringLiteral(String),
     CharLiteral(char),
     Identifier(String),
-    Symbol(String),
 
     // Layout
     LayoutStart,
@@ -12,27 +11,33 @@ pub enum Token {
     LayoutEnd,
 
     // Operators
-    LParen,
-    RParen,
+    LeftParen,
+    RightParen,
+    LeftBrace,
+    RightBrace,
+    LeftBracket,
+    RightBracket,
+    Backtick,
     Equal,
     Pipe,
     Comma,
+    Colon,
     Semicolon,
     Dot,
-    Minus,
 
-    // Not technically operators, but parsed the same way
-    At,
+    Arrow,    // ->
+    FatArrow, // =>
+    TypeOf,   // ::
+    Bind,     // <-
+
+    Operator(String),
 
     // Keywords
-    Nil,
-    Self_,
     If,
     Then,
     Else,
+    Ado,
     Do,
-    End,
-    While,
     Let,
     In,
     Where,
