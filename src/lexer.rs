@@ -66,10 +66,6 @@ impl<'a> Iterator for Lexer<'a> {
                 return None;
             }
             let c = self.peek();
-            if c == '\n' {
-                self.line_start = self.pos;
-                line_start = Some(self.pos);
-            }
             self.has_newline = self.has_newline || c == '\n';
             match c {
                 // Single-line comment
@@ -82,6 +78,12 @@ impl<'a> Iterator for Lexer<'a> {
                     break;
                 }
                 _ => {}
+            }
+            // Update line position
+            // Note: has to be done after single-line comment not to miss its newline
+            if !self.eof() && self.peek() == '\n' {
+                self.line_start = self.pos;
+                line_start = Some(self.pos);
             }
             self.next_char();
         }
@@ -695,6 +697,58 @@ mod tests {
                 ),
             ],
         )
+        "###);
+    }
+
+    #[test]
+    fn test_layout_data_1() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            data Foo =
+                Foo
+                | Bar
+            y = 2
+        ")), @r###"
+        module Foo where{
+        data Foo =
+            Foo
+            | Bar;
+        y = 2}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_data_2() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            data Foo
+                = Foo
+                | Bar
+            y = 2
+        ")), @r###"
+        module Foo where{
+        data Foo
+            = Foo
+            | Bar;
+        y = 2}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_item_comment() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            -- test
+            y = foo
+                bar
+        ")), @r###"
+        module Foo where{
+        -- test
+        y = foo
+            bar}
+        <eof>
         "###);
     }
 }
