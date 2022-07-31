@@ -28,11 +28,15 @@ struct Lexer<'a> {
     has_newline: bool,
     queue: VecDeque<TokenInfo>,
     last_token: Option<TokenInfo>,
-    /** stack of indent levels */
-    layout_stack: Vec<usize>,
+    layout_stack: Vec<LayoutEntry>,
     line_start: usize,
 
     indent_level: usize,
+}
+
+struct LayoutEntry {
+    indent_level: usize,
+    token: Token,
 }
 
 pub type LexResult = Result<TokenInfo, self::Error>;
@@ -91,25 +95,37 @@ impl<'a> Iterator for Lexer<'a> {
         } else {
             return Some(result);
         };
-        while let Some(&indent_level) = self.layout_stack.last() {
+        while let Some(entry) = self.layout_stack.last() {
             #[allow(clippy::comparison_chain)]
-            if next_token.column < indent_level {
+            if next_token.column < entry.indent_level {
                 self.layout_stack.pop();
                 self.enqueue(self.make_token_info(Token::LayoutEnd));
-            } else if next_token.column == indent_level {
+            } else if next_token.column == entry.indent_level {
+                // Operator a do or case block at the same indent level ends the block
+                if let (Token::Do | Token::Of, Token::Operator(_) | Token::Backtick) =
+                    (&entry.token, &next_token.token)
+                {
+                    self.layout_stack.pop();
+                    self.enqueue(self.make_token_info(Token::LayoutEnd));
+                    continue;
+                }
                 self.enqueue(self.make_token_info(Token::LayoutSep));
                 break;
             } else {
                 break;
             }
         }
+        // Starting a new layout block
         if let Some(prev_token) = &prev_token {
             #[allow(clippy::single_match)]
             match &prev_token.token {
-                Token::Do | Token::Let | Token::Where
+                Token::Do | Token::Let | Token::Where | Token::Of
                     if next_token.column > prev_token.indent_level =>
                 {
-                    self.layout_stack.push(next_token.column);
+                    self.layout_stack.push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                    });
                     self.enqueue(self.make_token_info(Token::LayoutStart));
                 }
                 _ => {}
@@ -265,6 +281,7 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"else" => Token::Else,
         b"ado" => Token::Ado,
         b"do" => Token::Do,
+        b"of" => Token::Of,
         b"let" => Token::Let,
         b"in" => Token::In,
         b"where" => Token::Where,
