@@ -114,15 +114,17 @@ impl<'a> Iterator for Lexer<'a> {
                 break;
             } else if let (Token::LeftParen, Token::RightParen)
             | (Token::LeftBrace, Token::RightBrace)
-            | (Token::LeftBracket, Token::RightBracket) =
-                (&entry.token, &next_token.token)
+            | (Token::LeftBracket, Token::RightBracket)
+            | (Token::Case, Token::Of) = (&entry.token, &next_token.token)
             {
                 // End paren pairs
                 self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested pairs
                 break;
-            } else if let (Token::Do, Token::Where) = (&entry.token, &next_token.token) {
-                // Where ends `do` blocks
+            } else if let (Token::Do, Token::Where | Token::Of | Token::Comma) =
+                (&entry.token, &next_token.token)
+            {
+                // where, of and commas end `do` blocks
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
                 self.layout_stack.pop();
@@ -180,7 +182,8 @@ impl<'a> Iterator for Lexer<'a> {
                     }
                 }
                 // Various parens introduce a stack entry, but not layout tokens.
-                Token::LeftBrace | Token::LeftParen | Token::LeftBracket => {
+                // Also: case..of pair
+                Token::LeftBrace | Token::LeftParen | Token::LeftBracket | Token::Case => {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
@@ -352,6 +355,7 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"else" => Token::Else,
         b"ado" => Token::Ado,
         b"do" => Token::Do,
+        b"case" => Token::Case,
         b"of" => Token::Of,
         b"let" => Token::Let,
         b"in" => Token::In,
@@ -807,6 +811,36 @@ mod tests {
         #! shebang
         module Foo where{
         y = 1}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_case_do_1() {
+        assert_snapshot!(print_layout(indoc!("
+            y = case do foo of x -> x
+        ")), @r###"
+        y = case do {foo }of {x -> x}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_case_do_2() {
+        assert_snapshot!(print_layout(indoc!("
+            y = case do foo, bar of x, y -> x
+        ")), @r###"
+        y = case do {foo}, bar of {x, y -> x}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_case_do_3() {
+        assert_snapshot!(print_layout(indoc!("
+            y = do case foo, bar of x, y -> x
+        ")), @r###"
+        y = do {case foo, bar of {x, y -> x}}
         <eof>
         "###);
     }

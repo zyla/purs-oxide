@@ -38,6 +38,7 @@ pub enum Token {
     Else,
     Ado,
     Do,
+    Case,
     Of,
     Let,
     In,
