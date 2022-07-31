@@ -115,6 +115,7 @@ impl<'a> Iterator for Lexer<'a> {
             } else if let (Token::LeftParen, Token::RightParen)
             | (Token::LeftBrace, Token::RightBrace)
             | (Token::LeftBracket, Token::RightBracket)
+            | (Token::Backtick, Token::Backtick)
             | (Token::Case, Token::Of) = (&entry.token, &next_token.token)
             {
                 // End paren pairs
@@ -162,7 +163,7 @@ impl<'a> Iterator for Lexer<'a> {
                     let token = self.make_token_info(Token::LayoutStart);
                     self.enqueue(token);
                 }
-                Token::Do | Token::Let | Token::Where | Token::Of | Token::Ado
+                Token::Do | Token::Let | Token::Of | Token::Ado
                     if next_token.column > prev_token.indent_level =>
                 {
                     self.layout_stack.push(LayoutEntry {
@@ -189,6 +190,22 @@ impl<'a> Iterator for Lexer<'a> {
                         token: prev_token.token.clone(),
                     });
                 }
+                // Backticks are either starting or ending delimiter.
+                // If above all indented blocks there is a backtick, close them all.
+                // Otherwise start a new backtick block.
+                Token::Backtick => match find_parent_backtick(&self.layout_stack) {
+                    None => self.layout_stack.push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                    }),
+                    Some(num_blocks_to_drop) => {
+                        for _ in 0..num_blocks_to_drop {
+                            self.layout_stack.pop();
+                            let token = self.make_token_info(Token::LayoutEnd);
+                            self.enqueue(token);
+                        }
+                    }
+                },
                 _ => {}
             }
         }
@@ -202,10 +219,22 @@ impl<'a> Iterator for Lexer<'a> {
     }
 }
 
+fn find_parent_backtick(layout_stack: &[LayoutEntry]) -> Option<usize> {
+    for (n, entry) in layout_stack.iter().rev().enumerate() {
+        if entry.token == Token::Backtick {
+            return Some(n);
+        }
+        if !is_indented(&entry.token) {
+            return None;
+        }
+    }
+    None
+}
+
 fn is_indented(token: &Token) -> bool {
-    !matches!(
+    matches!(
         token,
-        Token::LeftBrace | Token::LeftParen | Token::LeftBracket
+        Token::Where | Token::Do | Token::Let | Token::Of | Token::Ado
     )
 }
 
