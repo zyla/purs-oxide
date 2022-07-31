@@ -82,8 +82,8 @@ impl<'a> Iterator for Lexer<'a> {
             // Update line position
             // Note: has to be done after single-line comment not to miss its newline
             if !self.eof() && self.peek() == '\n' {
-                self.line_start = self.pos;
-                line_start = Some(self.pos);
+                self.line_start = self.pos + 1;
+                line_start = Some(self.line_start);
             }
             self.next_char();
         }
@@ -151,6 +151,15 @@ impl<'a> Iterator for Lexer<'a> {
         if let Some(prev_token) = &prev_token {
             #[allow(clippy::single_match)]
             match &prev_token.token {
+                // Where doesn't need additional indentation
+                Token::Where if next_token.column >= prev_token.indent_level => {
+                    self.layout_stack.push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                    });
+                    let token = self.make_token_info(Token::LayoutStart);
+                    self.enqueue(token);
+                }
                 Token::Do | Token::Let | Token::Where | Token::Of | Token::Ado
                     if next_token.column > prev_token.indent_level =>
                 {
@@ -625,7 +634,7 @@ mod tests {
             test = do foo
                       bar
         ")), @r###"
-        test = do {foo
+        test = do {foo;
                   bar}
         <eof>
         "###);
@@ -784,6 +793,20 @@ mod tests {
         -- test
         y = foo
             bar}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_shebang() {
+        assert_snapshot!(print_layout(indoc!("
+            #! shebang
+            module Foo where
+            y = 1
+        ")), @r###"
+        #! shebang
+        module Foo where{
+        y = 1}
         <eof>
         "###);
     }
