@@ -99,17 +99,22 @@ impl<'a> Iterator for Lexer<'a> {
             #[allow(clippy::comparison_chain)]
             if next_token.column < entry.indent_level {
                 self.layout_stack.pop();
-                self.enqueue(self.make_token_info(Token::LayoutEnd));
+                let token = self.make_token_info(Token::LayoutEnd);
+                self.enqueue(token);
             } else if next_token.column == entry.indent_level {
-                // Operator a do or case block at the same indent level ends the block
-                if let (Token::Do | Token::Of, Token::Operator(_) | Token::Backtick) =
-                    (&entry.token, &next_token.token)
+                // Operator or where in a do or case block at the same indent level ends the block
+                if let (
+                    Token::Do | Token::Of,
+                    Token::Operator(_) | Token::Backtick | Token::Where,
+                ) = (&entry.token, &next_token.token)
                 {
                     self.layout_stack.pop();
-                    self.enqueue(self.make_token_info(Token::LayoutEnd));
+                    let token = self.make_token_info(Token::LayoutEnd);
+                    self.enqueue(token);
                     continue;
                 }
-                self.enqueue(self.make_token_info(Token::LayoutSep));
+                let token = self.make_token_info(Token::LayoutSep);
+                self.enqueue(token);
                 break;
             } else {
                 break;
@@ -126,7 +131,8 @@ impl<'a> Iterator for Lexer<'a> {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                     });
-                    self.enqueue(self.make_token_info(Token::LayoutStart));
+                    let token = self.make_token_info(Token::LayoutStart);
+                    self.enqueue(token);
                 }
                 _ => {}
             }
@@ -220,16 +226,22 @@ impl<'a> Lexer<'a> {
         self.pos += 1;
     }
 
-    fn make_token(&self, token: Token) -> LexResult {
+    fn make_token(&mut self, token: Token) -> LexResult {
         Ok(self.make_token_info(token))
     }
 
-    fn make_token_info(&self, token: Token) -> TokenInfo {
+    fn make_token_info(&mut self, token: Token) -> TokenInfo {
+        let token_end = self.pos;
+        while !self.eof() && self.peek() == ' ' {
+            self.next_char();
+        }
+        let trailing_space_end = self.pos;
         TokenInfo {
             token,
-            whitespace_start: self.whitespace_start,
+            leading_space_start: self.whitespace_start,
             start: self.token_start,
-            end: self.pos,
+            end: token_end,
+            trailing_space_end,
             indent_level: self.indent_level,
             newline_before: self.has_newline,
             column: self.token_start - self.line_start,
@@ -520,7 +532,7 @@ mod tests {
             Token::LayoutStart => "{",
             Token::LayoutSep => ";",
             Token::LayoutEnd => "}",
-            _ => &input[t.whitespace_start..t.end],
+            _ => &input[t.leading_space_start..t.trailing_space_end],
         }
     }
 

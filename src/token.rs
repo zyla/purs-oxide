@@ -47,8 +47,8 @@ pub enum Token {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct TokenInfo {
     pub token: Token,
-    /** Position where the whitespace before the token starts */
-    pub whitespace_start: usize,
+    pub leading_space_start: usize,
+    pub trailing_space_end: usize,
     /** Position where the token itself starts */
     pub start: usize,
     pub end: usize,
