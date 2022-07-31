@@ -570,11 +570,26 @@ mod tests {
 
     fn print_layout(input: &str) -> String {
         let result = try_collect(super::lex(input)).unwrap();
+        // We need to preserve trailing whitespace.
+        // Since layout tokens have broken positions (which arguably we could fix, but it's not
+        // done currently), we find the last "real" token and use that.
+        let last_real_token_end = result
+            .iter()
+            .rev()
+            .find(|t| {
+                !matches!(
+                    t.token,
+                    Token::LayoutStart | Token::LayoutEnd | Token::LayoutSep
+                )
+            })
+            .unwrap()
+            .trailing_space_end;
         result
             .iter()
             .flat_map(|t| print_token(input, t).chars())
             .collect::<String>()
-            + "\n<eof>"
+            + &input[last_real_token_end..]
+            + "<eof>"
     }
 
     fn print_token<'a>(input: &'a str, t: &TokenInfo) -> &'a str {
