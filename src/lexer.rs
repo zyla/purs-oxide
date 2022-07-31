@@ -375,7 +375,7 @@ fn is_ident_start(c: char) -> bool {
 }
 
 fn is_ident_char(c: char) -> bool {
-    is_ident_start(c) || is_digit(c)
+    is_ident_start(c) || is_digit(c) || c == '\''
 }
 
 fn is_operator_char(c: char) -> bool {
@@ -433,6 +433,10 @@ mod tests {
             Ok(vec![Token::Identifier("asdzASDZ_09".to_string())]),
         );
         test_lex("dont", Ok(vec![Token::Identifier("dont".to_string())]));
+        test_lex(
+            "IntType'",
+            Ok(vec![Token::Identifier("IntType'".to_string())]),
+        );
     }
 
     #[test]
