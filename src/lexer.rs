@@ -101,8 +101,7 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(result);
         };
 
-        //dbg!(&self.layout_stack);
-
+        let mut pushed_backtick = false;
         while let Some(entry) = self.layout_stack.last() {
             // dedent ends indented blocks
             if next_token.column < entry.indent_level && is_indented(&entry.token) {
@@ -216,12 +215,38 @@ impl<'a> Iterator for Lexer<'a> {
                 break;
             }
 
+            // Backtick, if there is a backtick layout stack entry above,
+            // ends all indented blocks below it. Otherwise starts a new block.
+            if !pushed_backtick && next_token.token == Token::Backtick {
+                match find_parent_backtick(&self.layout_stack) {
+                    Some(num_blocks_to_drop) => {
+                        for _ in 0..num_blocks_to_drop {
+                            self.layout_stack.pop();
+                            let token = self.make_token_info(Token::LayoutEnd);
+                            self.enqueue(token);
+                        }
+                        // Pop the backtick entry
+                        self.layout_stack.pop();
+                        break;
+                    }
+                    None => {
+                        self.layout_stack.push(LayoutEntry {
+                            indent_level: next_token.column,
+                            token: Token::Backtick,
+                            after_patterns: false,
+                        });
+                        pushed_backtick = true;
+                        continue;
+                    }
+                }
+            }
+
             // If no recursive rule triggered via `continue`, stop.
             break;
         }
+
         // Starting a new layout block
         if let Some(prev_token) = &prev_token {
-            #[allow(clippy::single_match)]
             match &prev_token.token {
                 // Where doesn't need additional indentation
                 Token::Where if next_token.column >= prev_token.indent_level => {
@@ -269,25 +294,6 @@ impl<'a> Iterator for Lexer<'a> {
                         after_patterns: false,
                     });
                 }
-                // Backticks are either starting or ending delimiter.
-                // If above all indented blocks there is a backtick, close them all.
-                // Otherwise start a new backtick block.
-                Token::Backtick => match find_parent_backtick(&self.layout_stack) {
-                    None => self.layout_stack.push(LayoutEntry {
-                        indent_level: next_token.column,
-                        token: prev_token.token.clone(),
-                        after_patterns: false,
-                    }),
-                    Some(num_blocks_to_drop) => {
-                        for _ in 0..num_blocks_to_drop {
-                            self.layout_stack.pop();
-                            let token = self.make_token_info(Token::LayoutEnd);
-                            self.enqueue(token);
-                        }
-                        // Pop the backtick entry
-                        self.layout_stack.pop();
-                    }
-                },
                 _ => {}
             }
         }
@@ -687,7 +693,7 @@ mod tests {
 
     #[test_resources("purescript/tests/purs/layout/*.purs")]
     fn layout_example(input_filename: &str) {
-        const IGNORES: &[&str] = &["CaseGuards", "Commas"];
+        const IGNORES: &[&str] = &["CaseGuards"];
         if IGNORES.iter().any(|i| input_filename.contains(i))
             && !std::env::var("INCLUDE_IGNORED")
                 .map(|x| x == "1")
@@ -1093,6 +1099,20 @@ mod tests {
         x = 1 `add` 2;
         y = 1;
         z = 1}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_case_backtick() {
+        assert_snapshot!(print_layout(indoc!(r#"
+            module Foo where
+            test = a `case _ of x | unit # \_ -> true, true -> const` b
+            foo
+        "#)), @r###"
+        module Foo where{
+        test = a `case _ of {x | unit # \_ -> true, true -> const}` b;
+        foo}
         <eof>
         "###);
     }
