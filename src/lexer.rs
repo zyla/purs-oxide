@@ -112,16 +112,18 @@ impl<'a> Iterator for Lexer<'a> {
             } else if let (Token::LeftParen, Token::RightParen)
             | (Token::LeftBrace, Token::RightBrace)
             | (Token::LeftBracket, Token::RightBracket)
-            | (Token::Case, Token::Of) = (&entry.token, &next_token.token)
+            | (Token::Case, Token::Of)
+            | (Token::If, Token::Then)
+            | (Token::Then, Token::Else) = (&entry.token, &next_token.token)
             {
                 // End paren pairs
                 self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested pairs
                 break;
-            } else if let (Token::Do, Token::Where | Token::Of | Token::Comma) =
+            } else if let (Token::Do, Token::Where | Token::Of | Token::Comma | Token::Else) =
                 (&entry.token, &next_token.token)
             {
-                // where, of and commas end `do` blocks
+                // where, of, else and commas end `do` blocks
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
                 self.layout_stack.pop();
@@ -139,8 +141,10 @@ impl<'a> Iterator for Lexer<'a> {
                     self.layout_stack.pop();
                     continue;
                 }
-                let token = self.make_token_info(Token::LayoutSep);
-                self.enqueue(token);
+                if has_separators(&entry.token) {
+                    let token = self.make_token_info(Token::LayoutSep);
+                    self.enqueue(token);
+                }
                 break;
             } else {
                 break;
@@ -179,8 +183,13 @@ impl<'a> Iterator for Lexer<'a> {
                     }
                 }
                 // Various parens introduce a stack entry, but not layout tokens.
-                // Also: case..of pair
-                Token::LeftBrace | Token::LeftParen | Token::LeftBracket | Token::Case => {
+                // Also: case..of, if..then, then..else
+                Token::LeftBrace
+                | Token::LeftParen
+                | Token::LeftBracket
+                | Token::Case
+                | Token::If
+                | Token::Then => {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
@@ -228,6 +237,14 @@ fn find_parent_backtick(layout_stack: &[LayoutEntry]) -> Option<usize> {
 }
 
 fn is_indented(token: &Token) -> bool {
+    matches!(
+        token,
+        Token::Where | Token::Do | Token::Let | Token::Of | Token::Ado | Token::Else
+    )
+}
+
+// `else` is indented, but has no separators, only a single expression inside.
+fn has_separators(token: &Token) -> bool {
     matches!(
         token,
         Token::Where | Token::Do | Token::Let | Token::Of | Token::Ado
@@ -595,10 +612,13 @@ mod tests {
             "BacktickOperator",
             "CaseGuards",
             "Commas",
-            "IfThenElseDo",
             "InstanceChainElse",
         ];
-        if IGNORES.iter().any(|i| input_filename.contains(i)) {
+        if IGNORES.iter().any(|i| input_filename.contains(i))
+            && !std::env::var("INCLUDE_IGNORED")
+                .map(|x| x == "1")
+                .unwrap_or(false)
+        {
             // Test ignored.
             // Unfortunately there seems to be no way to tell that to the test runner,
             // other than through #[ignore]. But `test_generator` doesn't support that.
@@ -879,6 +899,96 @@ mod tests {
             y = do case foo, bar of x, y -> x
         ")), @r###"
         y = do {case foo, bar of {x, y -> x}}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_if() {
+        assert_snapshot!(print_layout(indoc!("
+            y = if foo then
+                    bar
+                else
+                    baz
+        ")), @r###"
+        y = if foo then
+                bar
+            else
+                baz
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_if() {
+        assert_snapshot!(print_layout(indoc!("
+            y = do
+                if foo then
+                    bar
+                else
+                    baz
+                q
+        ")), @r###"
+        y = do{
+            if foo then
+                bar
+            else
+                baz;
+            q}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_if_2() {
+        assert_snapshot!(print_layout(indoc!("
+            y = do
+                if
+                    foo
+                    bar
+                then
+                    bar
+                    baz
+                else
+                    baz
+                    qux
+                q
+        ")), @r###"
+        y = do{
+            if
+                foo
+                bar
+            then
+                bar
+                baz
+            else
+                baz
+                qux;
+            q}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_if_3() {
+        assert_snapshot!(print_layout(indoc!("
+            y = do
+                if foo then do
+                    bar
+                    baz
+                    else do
+                        baz
+                        qux
+                q
+        ")), @r###"
+        y = do{
+            if foo then do{
+                bar;
+                baz}
+                else do{
+                    baz;
+                    qux};
+            q}
         <eof>
         "###);
     }
