@@ -96,41 +96,51 @@ impl<'a> Iterator for Lexer<'a> {
         } else {
             return Some(result);
         };
+
         while let Some(entry) = self.layout_stack.last() {
-            #[allow(clippy::comparison_chain)]
+            // dedent ends indented blocks
             if next_token.column < entry.indent_level && is_indented(&entry.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
                 self.layout_stack.pop();
-            } else if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
-                // `in` ends `let` and `ado` blocks
+                continue;
+            }
+
+            // `in` ends `let` and `ado` blocks
+            if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
                 self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested ado/let blocks
                 break;
-            } else if let (Token::LeftParen, Token::RightParen)
+            }
+
+            // End paren pairs
+            if let (Token::LeftParen, Token::RightParen)
             | (Token::LeftBrace, Token::RightBrace)
             | (Token::LeftBracket, Token::RightBracket)
             | (Token::Case, Token::Of)
             | (Token::If, Token::Then)
             | (Token::Then, Token::Else) = (&entry.token, &next_token.token)
             {
-                // End paren pairs
                 self.layout_stack.pop();
                 // Use it only once, otherwise it ends all nested pairs
                 break;
-            } else if let (Token::Do, Token::Where | Token::Of | Token::Comma | Token::Else) =
+            }
+
+            // where, of, else and commas end `do` blocks
+            if let (Token::Do, Token::Where | Token::Of | Token::Comma | Token::Else) =
                 (&entry.token, &next_token.token)
             {
-                // where, of, else and commas end `do` blocks
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
                 self.layout_stack.pop();
                 // Recursively
                 continue;
-            } else if next_token.column == entry.indent_level && is_indented(&entry.token) {
-                // Operator or where in a do or case block at the same indent level ends the block
+            }
+
+            // Operator or where in a do or case block at the same indent level ends the block
+            if next_token.column == entry.indent_level && is_indented(&entry.token) {
                 if let (
                     Token::Do | Token::Of,
                     Token::Operator(_) | Token::Backtick | Token::Where,
@@ -157,9 +167,10 @@ impl<'a> Iterator for Lexer<'a> {
                     self.enqueue(token);
                 }
                 break;
-            } else {
-                break;
             }
+
+            // If no recursive rule triggered via `continue`, stop.
+            break;
         }
         // Starting a new layout block
         if let Some(prev_token) = &prev_token {
