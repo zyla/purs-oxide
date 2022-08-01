@@ -622,7 +622,7 @@ mod tests {
 
     #[test_resources("purescript/tests/purs/layout/*.purs")]
     fn layout_example(input_filename: &str) {
-        const IGNORES: &[&str] = &["BacktickOperator", "CaseGuards", "Commas"];
+        const IGNORES: &[&str] = &["CaseGuards", "Commas"];
         if IGNORES.iter().any(|i| input_filename.contains(i))
             && !std::env::var("INCLUDE_IGNORED")
                 .map(|x| x == "1")
