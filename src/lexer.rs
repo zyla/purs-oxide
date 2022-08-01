@@ -220,6 +220,8 @@ impl<'a> Iterator for Lexer<'a> {
                             let token = self.make_token_info(Token::LayoutEnd);
                             self.enqueue(token);
                         }
+                        // Pop the backtick entry
+                        self.layout_stack.pop();
                     }
                 },
                 _ => {}
@@ -1010,6 +1012,22 @@ mod tests {
         module Foo where{
         x = [ 1, 2 ];
         y = 1}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_backtick() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            x = 1 `add` 2
+            y = 1
+            z = 1
+        ")), @r###"
+        module Foo where{
+        x = 1 `add` 2;
+        y = 1;
+        z = 1}
         <eof>
         "###);
     }
