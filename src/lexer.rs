@@ -141,7 +141,18 @@ impl<'a> Iterator for Lexer<'a> {
                     self.layout_stack.pop();
                     continue;
                 }
-                if has_separators(&entry.token) {
+                if has_separators(&entry.token)
+                    &&
+                        // exclude `else` in instance chains, which should appear at column 0
+                        !matches!(
+                        next_token,
+                        TokenInfo {
+                            column: 0,
+                            token: Token::Else,
+                            ..
+                        }
+                    )
+                {
                     let token = self.make_token_info(Token::LayoutSep);
                     self.enqueue(token);
                 }
@@ -401,6 +412,7 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"let" => Token::Let,
         b"in" => Token::In,
         b"where" => Token::Where,
+        b"instance" => Token::Instance,
         _ => Token::Identifier(String::from_utf8(ident.to_vec()).unwrap()),
     }
 }
@@ -608,12 +620,7 @@ mod tests {
 
     #[test_resources("purescript/tests/purs/layout/*.purs")]
     fn layout_example(input_filename: &str) {
-        const IGNORES: &[&str] = &[
-            "BacktickOperator",
-            "CaseGuards",
-            "Commas",
-            "InstanceChainElse",
-        ];
+        const IGNORES: &[&str] = &["BacktickOperator", "CaseGuards", "Commas"];
         if IGNORES.iter().any(|i| input_filename.contains(i))
             && !std::env::var("INCLUDE_IGNORED")
                 .map(|x| x == "1")

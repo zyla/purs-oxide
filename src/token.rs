@@ -43,6 +43,7 @@ pub enum Token {
     Let,
     In,
     Where,
+    Instance,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
