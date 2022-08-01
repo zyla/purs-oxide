@@ -101,6 +101,8 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(result);
         };
 
+        //dbg!(&next_token.token, &self.layout_stack);
+
         let mut pushed_backtick = false;
         while let Some(entry) = self.layout_stack.last() {
             // dedent ends indented blocks
@@ -286,8 +288,16 @@ impl<'a> Iterator for Lexer<'a> {
                 | Token::Case
                 | Token::If
                 | Token::Then
-                | Token::Backslash
-                | Token::Pipe => {
+                | Token::Backslash => {
+                    self.layout_stack.push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                        after_patterns: false,
+                    });
+                }
+                Token::Pipe
+                    if self.layout_stack.last().as_ref().map(|x| &x.token) == Some(&Token::Of) =>
+                {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
@@ -899,7 +909,7 @@ mod tests {
         module Foo where{
         data Foo =
             Foo
-            | Bar
+            | Bar;
         y = 2}
         <eof>
         "###);
@@ -917,7 +927,7 @@ mod tests {
         module Foo where{
         data Foo
             = Foo
-            | Bar
+            | Bar;
         y = 2}
         <eof>
         "###);
