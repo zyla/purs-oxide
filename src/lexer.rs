@@ -32,9 +32,13 @@ struct Lexer<'a> {
     indent_level: usize,
 }
 
+#[derive(Debug)]
 struct LayoutEntry {
     indent_level: usize,
     token: Token,
+
+    // For `of` blocks:
+    after_patterns: bool,
 }
 
 pub type LexResult = Result<TokenInfo, self::Error>;
@@ -97,6 +101,8 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(result);
         };
 
+        //dbg!(&self.layout_stack);
+
         while let Some(entry) = self.layout_stack.last() {
             // dedent ends indented blocks
             if next_token.column < entry.indent_level && is_indented(&entry.token) {
@@ -116,21 +122,55 @@ impl<'a> Iterator for Lexer<'a> {
             }
 
             // End paren pairs
-            if let (Token::LeftParen, Token::RightParen)
-            | (Token::LeftBrace, Token::RightBrace)
-            | (Token::LeftBracket, Token::RightBracket)
-            | (Token::Case, Token::Of)
-            | (Token::If, Token::Then)
-            | (Token::Then, Token::Else) = (&entry.token, &next_token.token)
-            {
+            if matches!(
+                (&entry.token, &next_token.token),
+                (Token::LeftParen, Token::RightParen)
+                    | (Token::LeftBrace, Token::RightBrace)
+                    | (Token::LeftBracket, Token::RightBracket)
+                    | (Token::Case, Token::Of)
+                    | (Token::If, Token::Then)
+                    | (Token::Then, Token::Else)
+                    | (Token::Backslash, Token::Arrow)
+                    | (Token::Pipe, Token::Arrow | Token::Equal)
+            ) {
                 self.layout_stack.pop();
+
+                if let Some(entry) = self.layout_stack.last() {
+                    // Keep track of arrows in case patterns
+                    if matches!((&entry.token, &next_token.token), (Token::Of, Token::Arrow))
+                        && !entry.after_patterns
+                    {
+                        self.layout_stack
+                            .last_mut()
+                            .expect("layout stack should be non-empty")
+                            .after_patterns = true;
+                    }
+                }
                 // Use it only once, otherwise it ends all nested pairs
                 break;
             }
 
-            // where, of, else and commas end `do` blocks
-            if let (Token::Do, Token::Where | Token::Of | Token::Comma | Token::Else) =
-                (&entry.token, &next_token.token)
+            // Keep track of arrows in case patterns
+            if matches!((&entry.token, &next_token.token), (Token::Of, Token::Arrow))
+                && !entry.after_patterns
+            {
+                self.layout_stack
+                    .last_mut()
+                    .expect("layout stack should be non-empty")
+                    .after_patterns = true;
+                // Use it only once, otherwise it ends all nested pairs
+                break;
+            }
+
+            // where, of, else and commas end `do` or `case` blocks
+            if matches!(
+                (&entry.token, &next_token.token),
+                (
+                    Token::Do,
+                    Token::Where | Token::Of | Token::Comma | Token::Else | Token::Arrow
+                )
+            ) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
+                && entry.after_patterns)
             {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
@@ -163,6 +203,13 @@ impl<'a> Iterator for Lexer<'a> {
                         }
                     )
                 {
+                    if entry.token == Token::Of {
+                        self.layout_stack
+                            .last_mut()
+                            .expect("layout stack should be non-empty")
+                            .after_patterns = false;
+                    }
+
                     let token = self.make_token_info(Token::LayoutSep);
                     self.enqueue(token);
                 }
@@ -181,6 +228,7 @@ impl<'a> Iterator for Lexer<'a> {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
+                        after_patterns: false,
                     });
                     let token = self.make_token_info(Token::LayoutStart);
                     self.enqueue(token);
@@ -191,6 +239,7 @@ impl<'a> Iterator for Lexer<'a> {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
+                        after_patterns: false,
                     });
                     let token = self.make_token_info(Token::LayoutStart);
                     self.enqueue(token);
@@ -205,16 +254,19 @@ impl<'a> Iterator for Lexer<'a> {
                     }
                 }
                 // Various parens introduce a stack entry, but not layout tokens.
-                // Also: case..of, if..then, then..else
+                // Also: case..of, if..then, then..else, \..->
                 Token::LeftBrace
                 | Token::LeftParen
                 | Token::LeftBracket
                 | Token::Case
                 | Token::If
-                | Token::Then => {
+                | Token::Then
+                | Token::Backslash
+                | Token::Pipe => {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
+                        after_patterns: false,
                     });
                 }
                 // Backticks are either starting or ending delimiter.
@@ -224,6 +276,7 @@ impl<'a> Iterator for Lexer<'a> {
                     None => self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
+                        after_patterns: false,
                     }),
                     Some(num_blocks_to_drop) => {
                         for _ in 0..num_blocks_to_drop {
@@ -437,6 +490,7 @@ fn operator_to_token(s: &[u8]) -> Token {
         b";" => Token::Semicolon,
         b":" => Token::Colon,
         b"." => Token::Dot,
+        b"\\" => Token::Backslash,
         b"->" => Token::Arrow,
         b"=>" => Token::FatArrow,
         b"::" => Token::TypeOf,
@@ -839,7 +893,7 @@ mod tests {
         module Foo where{
         data Foo =
             Foo
-            | Bar;
+            | Bar
         y = 2}
         <eof>
         "###);
@@ -857,7 +911,7 @@ mod tests {
         module Foo where{
         data Foo
             = Foo
-            | Bar;
+            | Bar
         y = 2}
         <eof>
         "###);

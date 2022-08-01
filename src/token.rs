@@ -24,6 +24,7 @@ pub enum Token {
     Colon,
     Semicolon,
     Dot,
+    Backslash,
 
     Arrow,    // ->
     FatArrow, // =>
