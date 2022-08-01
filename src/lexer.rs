@@ -999,4 +999,17 @@ mod tests {
         <eof>
         "###);
     }
+
+    #[test]
+    #[ignore = "not implemented yet"]
+    fn test_layout_list() {
+        assert_snapshot!(print_layout(indoc!("
+            x = [ 1, 2 ]
+            y = 1
+        ")), @r###"
+        x = [ 1, 2 ];
+        y = 1
+        <eof>
+        "###);
+    }
 }
