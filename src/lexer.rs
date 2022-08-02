@@ -376,7 +376,7 @@ impl<'a> Lexer<'a> {
                     }
                     self.next_char();
                 }
-                self.make_token(Token::IntegerLiteral(value))
+                self.make_token(Token::IntegerLiteral(value as i32)) // FIXME: handle overflow
             }
             '"' => {
                 let s = self.parse_string_literal()?;
@@ -501,6 +501,8 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"in" => Token::In,
         b"where" => Token::Where,
         b"instance" => Token::Instance,
+        b"module" => Token::Module,
+        b"import" => Token::Import,
         _ => Token::Identifier(String::from_utf8(ident.to_vec()).unwrap()),
     }
 }

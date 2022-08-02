@@ -1,6 +1,6 @@
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Token {
-    IntegerLiteral(usize),
+    IntegerLiteral(i32),
     StringLiteral(String),
     CharLiteral(char),
     Identifier(String),
@@ -45,6 +45,8 @@ pub enum Token {
     In,
     Where,
     Instance,
+    Module,
+    Import,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]

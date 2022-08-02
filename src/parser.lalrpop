@@ -1,14 +1,58 @@
 use crate::token::Token;
 use crate::lexer;
+use crate::ast::*;
+use crate::symbol::*;
 use lalrpop_util::ErrorRecovery;
 
 grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 
-pub Exprs = Comma<Expr>;
+pub Module: Module = Located<Commented<ModuleInner>>;
 
-Comma<T>: Vec<T> = {
-    <v:(<T> ",")*> <e:T?> => match e {
-        None=> v,
+pub ModuleInner: ModuleInner = {
+  "module" <name:Ident> "where" <declarations: MaybeLayoutBlock<Declaration>>
+      => ModuleInner { name, exports: None, declarations }
+};
+
+Ident: Symbol = {
+  ident => Symbol(<>)
+};
+
+Located<T>: Located<T> = {
+  <start:@L> <v:T> <end:@L> => Located(SourceSpan{start, end}, v)
+};
+
+MaybeLayoutBlock<T>: Vec<T> = {
+  LayoutBlock<T>? => <>.unwrap_or_else(|| vec![])
+}
+
+LayoutBlock<T>: Vec<T> = {
+  LayoutStart <v:SepBy<T, LayoutSep>> LayoutEnd => v
+}
+
+Declaration: Declaration = Located<Commented<DeclarationKind>>;
+
+DeclarationKind: DeclarationKind = {
+  ValueDeclaration => DeclarationKind::ValueDeclaration(<>)
+}
+
+ValueDeclaration: ValueDeclaration = {
+  <ident:Ident> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
+}
+
+Expr: Expr = Located<ExprKind>;
+
+ExprKind: ExprKind = {
+  int => ExprKind::Literal(Literal::Integer(<>))
+}
+
+// TODO: extract the comments
+Commented<T>: Commented<T> = {
+  <v:T> => Commented(vec![], v)
+};
+
+SepBy<T, Sep>: Vec<T> = {
+    <v:(<T> Sep)*> <e:T?> => match e {
+        None => v,
         Some(e) => {
             let mut v = v;
             v.push(e);
@@ -17,18 +61,12 @@ Comma<T>: Vec<T> = {
     }
 };
 
-Expr: usize = Num;
-
-Num: usize = {
-    int => <>
-};
-
 extern {
   type Location = usize;
   type Error = lexer::Error;
 
   enum Token {
-    int => Token::IntegerLiteral(<usize>),
+    int => Token::IntegerLiteral(<i32>),
     string => Token::StringLiteral(<String>),
     char => Token::CharLiteral(<char>),
     ident => Token::Identifier(<String>),
@@ -73,5 +111,7 @@ extern {
     "in" => Token::In,
     "where" => Token::Where,
     "instance" => Token::Instance,
+    "module" => Token::Module,
+    "import" => Token::Import,
   }
 }
