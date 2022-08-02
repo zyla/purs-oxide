@@ -1,0 +1,77 @@
+use crate::token::Token;
+use crate::lexer;
+use lalrpop_util::ErrorRecovery;
+
+grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
+
+pub Exprs = Comma<Expr>;
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None=> v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
+
+Expr: usize = Num;
+
+Num: usize = {
+    int => <>
+};
+
+extern {
+  type Location = usize;
+  type Error = lexer::Error;
+
+  enum Token {
+    int => Token::IntegerLiteral(<usize>),
+    string => Token::StringLiteral(<String>),
+    char => Token::CharLiteral(<char>),
+    ident => Token::Identifier(<String>),
+
+    // Layout
+    LayoutStart => Token::LayoutStart,
+    LayoutSep => Token::LayoutSep,
+    LayoutEnd => Token::LayoutEnd,
+
+    // Operators
+    "(" => Token::LeftParen,
+    ")" => Token::RightParen,
+    "{" => Token::LeftBrace,
+    "}" => Token::RightBrace,
+    "[" => Token::LeftBracket,
+    "]" => Token::RightBracket,
+    "`" => Token::Backtick,
+    "=" => Token::Equal,
+    "|" => Token::Pipe,
+    "," => Token::Comma,
+    ":" => Token::Colon,
+    ";" => Token::Semicolon,
+    "." => Token::Dot,
+    "\\" => Token::Backslash,
+
+    "->" => Token::Arrow,
+    "=>" => Token::FatArrow,
+    "::" => Token::TypeOf,
+    "<-" => Token::Bind,
+
+    operator => Token::Operator(<String>),
+
+    // Keywords
+    "if" => Token::If,
+    "then" => Token::Then,
+    "else" => Token::Else,
+    "ado" => Token::Ado,
+    "do" => Token::Do,
+    "case" => Token::Case,
+    "of" => Token::Of,
+    "let" => Token::Let,
+    "in" => Token::In,
+    "where" => Token::Where,
+    "instance" => Token::Instance,
+  }
+}

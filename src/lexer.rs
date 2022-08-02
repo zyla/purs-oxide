@@ -5,7 +5,13 @@ use crate::token::{Token, TokenInfo};
 #[derive(PartialEq, Eq, Debug)]
 pub struct Error(pub String);
 
-pub fn lex(input: &str) -> impl Iterator<Item = LexResult> + '_ {
+pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
+
+pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Error>> + '_ {
+    make_lexer(input).map(|r| r.map(|t| (t.start, t.token, t.end)))
+}
+
+fn make_lexer(input: &str) -> impl Iterator<Item = LexResult> + '_ {
     Lexer {
         input: input.as_bytes(),
         pos: 0,
@@ -566,7 +572,7 @@ mod tests {
     }
 
     fn lex(input: &str) -> Result<Vec<Token>, Error> {
-        try_collect(super::lex(input).map(|v| v.map(|v| v.token)))
+        try_collect(super::make_lexer(input).map(|v| v.map(|v| v.token)))
     }
 
     #[test]
@@ -734,7 +740,7 @@ mod tests {
     }
 
     fn print_layout(input: &str) -> String {
-        let result = try_collect(super::lex(input)).unwrap();
+        let result = try_collect(super::make_lexer(input)).unwrap();
         // We need to preserve trailing whitespace.
         // Since layout tokens have broken positions (which arguably we could fix, but it's not
         // done currently), we find the last "real" token and use that.
