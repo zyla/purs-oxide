@@ -484,7 +484,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "purr"
+name = "purs-oxide"
 version = "0.1.0"
 dependencies = [
  "indoc",
