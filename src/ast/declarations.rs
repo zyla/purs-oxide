@@ -88,7 +88,35 @@ pub enum DeclarationKind {
         params: Vec<(Symbol, Option<Type>)>,
         constructors: Vec<DataConstructorDeclaration>,
     },
+
+    // TODO: do we need this? seems internal
+    DataBindingGroup(Vec<Declaration>),
+
+    TypeSynonym {
+        name: Symbol,
+        params: Vec<(Symbol, Type)>,
+        body: Type,
+    },
+
+    KindSignature {
+        for_type: KindSignatureFor,
+        name: Symbol,
+        kind: Type,
+    },
+
+    Role(RoleDeclarationData),
+
+    TypeSignature(TypeDeclarationData),
+
     ValueDeclaration(ValueDeclaration),
+}
+
+#[derive(Debug)]
+pub enum KindSignatureFor {
+    Data,
+    Newtype,
+    TypeSynonym,
+    Class,
 }
 
 pub type DataConstructorDeclaration = Located<Commented<DataConstructorDeclarationData>>;
