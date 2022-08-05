@@ -61,8 +61,8 @@ pub enum ImportDeclarationKind {
 
 #[derive(Debug)]
 pub struct RoleDeclarationData {
-    ident: Symbol,
-    role: Vec<Role>,
+    pub ident: Symbol,
+    pub role: Vec<Role>,
 }
 
 #[derive(Debug)]
@@ -74,15 +74,37 @@ pub enum Role {
 
 #[derive(Debug)]
 pub struct TypeDeclarationData {
-    ident: Symbol,
-    r#type: Type,
+    pub ident: Symbol,
+    pub r#type: Type,
 }
 
 pub type Declaration = Located<Commented<DeclarationKind>>;
 
 #[derive(Debug)]
 pub enum DeclarationKind {
+    Data {
+        r#type: DataDeclType,
+        name: Symbol,
+        params: Vec<(Symbol, Option<Type>)>,
+        constructors: Vec<DataConstructorDeclaration>,
+    },
     ValueDeclaration(ValueDeclaration),
+}
+
+pub type DataConstructorDeclaration = Located<Commented<DataConstructorDeclarationData>>;
+
+#[derive(Debug)]
+pub struct DataConstructorDeclarationData {
+    pub name: Symbol,
+
+    // TODO: why do they have names? I thought datacon fields are unnamed in PS
+    pub fields: Vec<(Symbol, Type)>,
+}
+
+#[derive(Debug)]
+pub enum DataDeclType {
+    Data,
+    Newtype,
 }
 
 #[derive(Debug)]
