@@ -70,10 +70,22 @@ SepBy<T, Sep>: Vec<T> = {
 // Type
 ////////////////////////////////////////////////////////////////////////////////
 
-pub Type = Located<TypeKind>;
+pub Type = Located<TypeApp>;
 
-TypeKind: TypeKind = {
+TypeApp: TypeKind = {
+  <l:Located<TypeApp>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
+  AtomicType => <>
+};
 
+AtomicType: TypeKind = {
+  LowerIdent => TypeKind::Var(<>),
+  string=>TypeKind::TypeLevelString(<>),
+  int=>TypeKind::TypeLevelInt(<>.into()),
+  "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
+  // TODO: hole
+
+  UpperIdent => TypeKind::TypeConstructor(QualifiedName(<>)), // TODO: qualified
+  "(" <v:Type> ")" =>TypeKind::Parens(Box::new(v)),
 };
 
 extern {
@@ -129,5 +141,6 @@ extern {
     "instance" => Token::Instance,
     "module" => Token::Module,
     "import" => Token::Import,
+    "_" => Token::Wildcard,
   }
 }

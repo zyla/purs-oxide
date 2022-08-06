@@ -48,6 +48,9 @@ pub enum Token {
     Instance,
     Module,
     Import,
+
+    // Not exactly a keyword, but a special identifier
+    Wildcard,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
