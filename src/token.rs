@@ -3,7 +3,8 @@ pub enum Token {
     IntegerLiteral(i32),
     StringLiteral(String),
     CharLiteral(char),
-    Identifier(String),
+    LowerIdentifier(String),
+    UpperIdentifier(String),
 
     // Layout
     LayoutStart,

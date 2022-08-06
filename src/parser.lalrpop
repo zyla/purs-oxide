@@ -9,12 +9,17 @@ grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 pub Module: Module = Located<Commented<ModuleInner>>;
 
 pub ModuleInner: ModuleInner = {
-  "module" <name:Ident> "where" <declarations: MaybeLayoutBlock<Declaration>>
+  // FIXME: name should be qualified
+  "module" <name:UpperIdent> "where" <declarations: MaybeLayoutBlock<Declaration>>
       => ModuleInner { name, exports: None, declarations }
 };
 
-Ident: Symbol = {
-  ident => Symbol(<>)
+LowerIdent: Symbol = {
+  lower_ident => Symbol(<>)
+};
+
+UpperIdent: Symbol = {
+  upper_ident => Symbol(<>)
 };
 
 Located<T>: Located<T> = {
@@ -36,7 +41,7 @@ DeclarationKind: DeclarationKind = {
 }
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:Ident> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
+  <ident:LowerIdent> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
 Expr: Expr = Located<ExprKind>;
@@ -61,6 +66,16 @@ SepBy<T, Sep>: Vec<T> = {
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// Type
+////////////////////////////////////////////////////////////////////////////////
+
+pub Type = Located<TypeKind>;
+
+TypeKind: TypeKind = {
+
+};
+
 extern {
   type Location = usize;
   type Error = lexer::Error;
@@ -69,7 +84,8 @@ extern {
     int => Token::IntegerLiteral(<i32>),
     string => Token::StringLiteral(<String>),
     char => Token::CharLiteral(<char>),
-    ident => Token::Identifier(<String>),
+    lower_ident => Token::LowerIdentifier(<String>),
+    upper_ident => Token::UpperIdentifier(<String>),
 
     // Layout
     LayoutStart => Token::LayoutStart,

@@ -503,7 +503,19 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"instance" => Token::Instance,
         b"module" => Token::Module,
         b"import" => Token::Import,
-        _ => Token::Identifier(String::from_utf8(ident.to_vec()).unwrap()),
+        _ => {
+            let str = String::from_utf8(ident.to_vec()).unwrap();
+            if str
+                .chars()
+                .next()
+                .expect("identifier should be non-empty")
+                .is_uppercase()
+            {
+                Token::UpperIdentifier(str)
+            } else {
+                Token::LowerIdentifier(str)
+            }
+        }
     }
 }
 
@@ -587,12 +599,12 @@ mod tests {
     fn test_identifier() {
         test_lex(
             "asdzASDZ_09",
-            Ok(vec![Token::Identifier("asdzASDZ_09".to_string())]),
+            Ok(vec![Token::LowerIdentifier("asdzASDZ_09".to_string())]),
         );
-        test_lex("dont", Ok(vec![Token::Identifier("dont".to_string())]));
+        test_lex("dont", Ok(vec![Token::LowerIdentifier("dont".to_string())]));
         test_lex(
             "IntType'",
-            Ok(vec![Token::Identifier("IntType'".to_string())]),
+            Ok(vec![Token::UpperIdentifier("IntType'".to_string())]),
         );
     }
 
