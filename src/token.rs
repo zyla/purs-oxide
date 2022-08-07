@@ -48,6 +48,7 @@ pub enum Token {
     Instance,
     Module,
     Import,
+    Forall,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

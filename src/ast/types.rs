@@ -11,17 +11,24 @@ pub enum TypeKind {
     Wildcard(WildcardKind),
     TypeConstructor(QualifiedName),
     TypeApp(Box<Type>, Box<Type>),
+
+    /// Kind parameter application. Doesn't seem to appear in source, because kind params are
+    /// implicit?
     KindApp(Box<Type>, Box<Type>),
+
     ForAll {
-        name: Symbol,
-        kind: Option<Box<Type>>,
+        vars: Vec<(Symbol, Option<Box<Type>>)>,
         body: Box<Type>,
+
+        // TODO: figure out whether this needs to be a part of vars
         skolem_scope: Option<SkolemScope>,
     },
+
     Constrained {
         constraint: Constraint,
         body: Box<Type>,
     },
+
     // TODO: I have no idea what these parameters mean
     Skolem(Symbol, Option<Box<Type>>, u64, SkolemScope),
     REmpty,

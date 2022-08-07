@@ -70,11 +70,19 @@ SepBy<T, Sep>: Vec<T> = {
 // Type
 ////////////////////////////////////////////////////////////////////////////////
 
-pub Type = Located<TypeApp>;
+pub Type = Located<Type1>;
+
+Type1: TypeKind = {
+  // TODO: At first I put the forall in AtomicType, but it resulted in parse conflicts.
+  // Here it seems to work. I have no idea why.
+  "forall" <vars:OneOrMore<ForallVar>> "." <body:Type> =>
+    TypeKind::ForAll{vars,body:Box::new(body),skolem_scope:None},
+  TypeApp
+}
 
 TypeApp: TypeKind = {
   <l:Located<TypeApp>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
-  AtomicType => <>
+  AtomicType
 };
 
 AtomicType: TypeKind = {
@@ -87,6 +95,19 @@ AtomicType: TypeKind = {
   UpperIdent => TypeKind::TypeConstructor(QualifiedName(<>)), // TODO: qualified
   "(" <v:Type> ")" =>TypeKind::Parens(Box::new(v)),
 };
+
+ForallVar: (Symbol, Option<Box<Type>>) = {
+  <name:LowerIdent> => (name, None),
+  "(" <name:LowerIdent> "::" <kind:Type> ")" => (name, Some(Box::new(kind))),
+};
+
+OneOrMore<T>: Vec<T> = {
+  <xs:T*> <x:T> => {
+    let mut xs = xs;
+    xs.push(x);
+    xs
+  }
+}
 
 extern {
   type Location = usize;
@@ -141,6 +162,7 @@ extern {
     "instance" => Token::Instance,
     "module" => Token::Module,
     "import" => Token::Import,
+    "forall" => Token::Forall,
     "_" => Token::Wildcard,
   }
 }

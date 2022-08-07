@@ -503,6 +503,7 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"instance" => Token::Instance,
         b"module" => Token::Module,
         b"import" => Token::Import,
+        b"forall" => Token::Forall,
         b"_" => Token::Wildcard,
         _ => {
             let str = String::from_utf8(ident.to_vec()).unwrap();

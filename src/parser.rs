@@ -326,4 +326,79 @@ mod tests {
         )
         "###);
     }
+
+    #[test]
+    fn test_parse_forall() {
+        assert_debug_snapshot!(parse_type("forall x (y :: Symbol). Maybe x"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 31,
+            },
+            ForAll {
+                vars: [
+                    (
+                        Symbol(
+                            "x",
+                        ),
+                        None,
+                    ),
+                    (
+                        Symbol(
+                            "y",
+                        ),
+                        Some(
+                            Located(
+                                SourceSpan {
+                                    start: 15,
+                                    end: 21,
+                                },
+                                TypeConstructor(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Symbol",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+                body: Located(
+                    SourceSpan {
+                        start: 24,
+                        end: 31,
+                    },
+                    TypeApp(
+                        Located(
+                            SourceSpan {
+                                start: 24,
+                                end: 29,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Maybe",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 30,
+                                end: 31,
+                            },
+                            Var(
+                                Symbol(
+                                    "x",
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                skolem_scope: None,
+            },
+        )
+        "###);
+    }
 }
