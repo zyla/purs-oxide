@@ -55,6 +55,9 @@ pub enum WildcardKind {
 #[derive(Debug)]
 pub struct SkolemScope(pub u64);
 
+pub type Constraint = Box<Type>;
+/*
+ * for now just Type
 #[derive(Debug)]
 pub struct Constraint {
     pub class: QualifiedName,
@@ -62,3 +65,4 @@ pub struct Constraint {
     pub type_args: Vec<Type>,
     // TODO: PartialConstraintData - do we need it?
 }
+*/

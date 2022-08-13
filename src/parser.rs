@@ -401,4 +401,160 @@ mod tests {
         )
         "###);
     }
+
+    #[test]
+    fn test_parse_constraint() {
+        assert_debug_snapshot!(parse_type("Eq a => a"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 9,
+            },
+            Constrained {
+                constraint: Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 4,
+                    },
+                    TypeApp(
+                        Located(
+                            SourceSpan {
+                                start: 0,
+                                end: 2,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Eq",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 3,
+                                end: 4,
+                            },
+                            Var(
+                                Symbol(
+                                    "a",
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                body: Located(
+                    SourceSpan {
+                        start: 8,
+                        end: 9,
+                    },
+                    Var(
+                        Symbol(
+                            "a",
+                        ),
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_constraints() {
+        assert_debug_snapshot!(parse_type("Eq a => Show a => a"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 19,
+            },
+            Constrained {
+                constraint: Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 4,
+                    },
+                    TypeApp(
+                        Located(
+                            SourceSpan {
+                                start: 0,
+                                end: 2,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Eq",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 3,
+                                end: 4,
+                            },
+                            Var(
+                                Symbol(
+                                    "a",
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                body: Located(
+                    SourceSpan {
+                        start: 8,
+                        end: 19,
+                    },
+                    Constrained {
+                        constraint: Located(
+                            SourceSpan {
+                                start: 8,
+                                end: 14,
+                            },
+                            TypeApp(
+                                Located(
+                                    SourceSpan {
+                                        start: 8,
+                                        end: 12,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName(
+                                            Symbol(
+                                                "Show",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 13,
+                                        end: 14,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "a",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        body: Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 19,
+                            },
+                            Var(
+                                Symbol(
+                                    "a",
+                                ),
+                            ),
+                        ),
+                    },
+                ),
+            },
+        )
+        "###);
+    }
+
+    //
 }
