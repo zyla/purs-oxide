@@ -4,7 +4,9 @@ pub enum Token {
     StringLiteral(String),
     CharLiteral(char),
     LowerIdentifier(String),
+    QualifiedLowerIdentifier(String),
     UpperIdentifier(String),
+    QualifiedUpperIdentifier(String),
 
     // Layout
     LayoutStart,

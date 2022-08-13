@@ -363,10 +363,23 @@ impl<'a> Lexer<'a> {
         // Determine token type
         match c {
             c if is_ident_start(c) => {
-                while !self.eof() && is_ident_char(self.peek()) {
-                    self.next_char();
+                let mut current_segment_is_upper = c.is_uppercase();
+                while !self.eof() {
+                    if is_ident_char(self.peek()) {
+                        self.next_char();
+                        continue;
+                    } else if current_segment_is_upper && self.peek() == '.' {
+                        self.next_char();
+                        current_segment_is_upper = !self.eof() && self.peek().is_uppercase();
+                        continue;
+                    } else {
+                        break;
+                    }
                 }
-                self.make_token(ident_to_token(&self.input[self.token_start..self.pos]))
+                self.make_token(ident_to_token(
+                    &self.input[self.token_start..self.pos],
+                    current_segment_is_upper,
+                ))
             }
             c if is_digit(c) => {
                 let mut value = digit_value(c);
@@ -488,7 +501,7 @@ impl<'a> Lexer<'a> {
     }
 }
 
-fn ident_to_token(ident: &[u8]) -> Token {
+fn ident_to_token(ident: &[u8], is_upper: bool) -> Token {
     match ident {
         b"if" => Token::If,
         b"then" => Token::Then,
@@ -507,13 +520,14 @@ fn ident_to_token(ident: &[u8]) -> Token {
         b"_" => Token::Wildcard,
         _ => {
             let str = String::from_utf8(ident.to_vec()).unwrap();
-            if str
-                .chars()
-                .next()
-                .expect("identifier should be non-empty")
-                .is_uppercase()
-            {
-                Token::UpperIdentifier(str)
+            if is_upper {
+                if str.contains('.') {
+                    Token::QualifiedUpperIdentifier(str)
+                } else {
+                    Token::UpperIdentifier(str)
+                }
+            } else if str.contains('.') {
+                Token::QualifiedLowerIdentifier(str)
             } else {
                 Token::LowerIdentifier(str)
             }
@@ -1148,4 +1162,93 @@ mod tests {
         <eof>
         "###);
     }
+
+    #[test]
+    fn test_qualified_ident_1() {
+        assert_debug_snapshot!(
+        lex("Foo.Bar"),
+        @r###"
+        Ok(
+            [
+                QualifiedUpperIdentifier(
+                    "Foo.Bar",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_qualified_ident_2() {
+        assert_debug_snapshot!(
+        lex("Foo.Bar.t"),
+        @r###"
+        Ok(
+            [
+                QualifiedLowerIdentifier(
+                    "Foo.Bar.t",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_qualified_ident_3() {
+        assert_debug_snapshot!(
+        lex("Foo.Bar.t.baz"),
+        @r###"
+        Ok(
+            [
+                QualifiedLowerIdentifier(
+                    "Foo.Bar.t",
+                ),
+                Dot,
+                LowerIdentifier(
+                    "baz",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_qualified_ident_4() {
+        assert_debug_snapshot!(
+        lex("Foo.Bar.t.\"Baz\""),
+        @r###"
+        Ok(
+            [
+                QualifiedLowerIdentifier(
+                    "Foo.Bar.t",
+                ),
+                Dot,
+                StringLiteral(
+                    "Baz",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_qualified_ident_5() {
+        assert_debug_snapshot!(
+        lex("foo.bar"),
+        @r###"
+        Ok(
+            [
+                LowerIdentifier(
+                    "foo",
+                ),
+                Dot,
+                LowerIdentifier(
+                    "bar",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    //
 }
