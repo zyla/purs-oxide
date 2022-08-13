@@ -23,7 +23,7 @@ UpperIdent: Symbol = {
 };
 
 Located<T>: Located<T> = {
-  <start:@L> <v:T> <end:@L> => Located(SourceSpan{start, end}, v)
+  <start:@L> <v:T> <end:@R> => Located(SourceSpan{start, end}, v)
 };
 
 MaybeLayoutBlock<T>: Vec<T> = {
