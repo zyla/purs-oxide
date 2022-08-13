@@ -556,5 +556,217 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_row_1() {
+        assert_debug_snapshot!(parse_type("( foo :: Int, \"Bar\" :: String )"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 31,
+            },
+            Row {
+                fields: [
+                    (
+                        Symbol(
+                            "foo",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 9,
+                                end: 12,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Int",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    (
+                        Symbol(
+                            "Bar",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 23,
+                                end: 29,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "String",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+                rest: None,
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_row_2() {
+        assert_debug_snapshot!(parse_type("( foo :: Int | e )"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 18,
+            },
+            Row {
+                fields: [
+                    (
+                        Symbol(
+                            "foo",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 9,
+                                end: 12,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Int",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+                rest: Some(
+                    Located(
+                        SourceSpan {
+                            start: 15,
+                            end: 16,
+                        },
+                        Var(
+                            Symbol(
+                                "e",
+                            ),
+                        ),
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_row_3() {
+        assert_debug_snapshot!(parse_type("( | e )"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 7,
+            },
+            Row {
+                fields: [],
+                rest: Some(
+                    Located(
+                        SourceSpan {
+                            start: 4,
+                            end: 5,
+                        },
+                        Var(
+                            Symbol(
+                                "e",
+                            ),
+                        ),
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_row_4() {
+        assert_debug_snapshot!(parse_type("()"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 2,
+            },
+            Row {
+                fields: [],
+                rest: None,
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_record() {
+        assert_debug_snapshot!(parse_type("{ foo :: Int | e }"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 18,
+            },
+            TypeApp(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    TypeConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "Prim.Record",
+                            ),
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 2,
+                        end: 16,
+                    },
+                    Row {
+                        fields: [
+                            (
+                                Symbol(
+                                    "foo",
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 9,
+                                        end: 12,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName(
+                                            Symbol(
+                                                "Int",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                        rest: Some(
+                            Located(
+                                SourceSpan {
+                                    start: 15,
+                                    end: 16,
+                                },
+                                Var(
+                                    Symbol(
+                                        "e",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }

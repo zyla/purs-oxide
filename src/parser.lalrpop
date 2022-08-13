@@ -15,11 +15,11 @@ pub ModuleInner: ModuleInner = {
 };
 
 LowerIdent: Symbol = {
-  lower_ident => Symbol(<>)
+  lower_ident => Symbol::new(<>)
 };
 
 UpperIdent: Symbol = {
-  upper_ident => Symbol(<>)
+  upper_ident => Symbol::new(<>)
 };
 
 Located<T>: Located<T> = {
@@ -95,7 +95,32 @@ AtomicType: TypeKind = {
   // TODO: hole
 
   UpperIdent => TypeKind::TypeConstructor(QualifiedName(<>)), // TODO: qualified
-  "(" <v:Type> ")" =>TypeKind::Parens(Box::new(v)),
+  "(" <fields:SepBy<RowField, ",">> <rest:RowRest?> ")" => TypeKind::Row{fields,rest},
+  <record_start:@L> "{" <record_end:@R>
+  <row_start:@L> <fields:SepBy<RowField, ",">> <rest:RowRest?> <row_end:@R> "}" =>
+    TypeKind::TypeApp(
+      Box::new(
+        Located(SourceSpan{start: record_start, end: record_end}, 
+          TypeKind::TypeConstructor(QualifiedName(Symbol::new("Prim.Record".to_string()))))),
+      Box::new(
+        Located(SourceSpan{start: row_start, end: row_end}, 
+          TypeKind::Row{fields,rest}))
+    ),
+  "(" <v:Type> ")" => TypeKind::Parens(Box::new(v)),
+};
+
+RowField: (Symbol, Type) = {
+  <label:Label> "::" <ty:Type> => (label, ty)
+}
+
+RowRest: Box<Type> = {
+  "|" <ty:Type> => Box::new(ty)
+}
+
+/// A record field label
+Label: Symbol = {
+  LowerIdent,
+  string => Symbol::new(<>),
 };
 
 ForallVar: (Symbol, Option<Box<Type>>) = {

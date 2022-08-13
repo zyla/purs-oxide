@@ -31,11 +31,9 @@ pub enum TypeKind {
 
     // TODO: I have no idea what these parameters mean
     Skolem(Symbol, Option<Box<Type>>, u64, SkolemScope),
-    REmpty,
-    RCons {
-        label: Symbol,
-        r#type: Box<Type>,
-        rest: Box<Type>,
+    Row {
+        fields: Vec<(Symbol, Type)>,
+        rest: Option<Box<Type>>,
     },
     Kinded {
         r#type: Box<Type>,
