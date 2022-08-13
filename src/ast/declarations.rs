@@ -1,11 +1,12 @@
 use super::{Commented, Located, Type};
+use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
 pub type Module = Located<Commented<ModuleInner>>;
 
 #[derive(Debug)]
 pub struct ModuleInner {
-    pub name: Symbol,
+    pub name: QualifiedName,
     pub exports: Option<Vec<DeclarationRef>>,
     pub declarations: Vec<Declaration>,
 }

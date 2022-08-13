@@ -57,8 +57,36 @@ mod tests {
             Commented(
                 [],
                 ModuleInner {
-                    name: Symbol(
-                        "Foo",
+                    name: QualifiedName(
+                        Symbol(
+                            "Foo",
+                        ),
+                    ),
+                    exports: None,
+                    declarations: [],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_module_header_qualified() {
+        assert_debug_snapshot!(parse_module(indoc!("
+        module Some.Module where
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 24,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Some.Module",
+                        ),
                     ),
                     exports: None,
                     declarations: [],
@@ -82,8 +110,10 @@ mod tests {
             Commented(
                 [],
                 ModuleInner {
-                    name: Symbol(
-                        "Foo",
+                    name: QualifiedName(
+                        Symbol(
+                            "Foo",
+                        ),
                     ),
                     exports: None,
                     declarations: [
@@ -160,6 +190,36 @@ mod tests {
             },
             TypeLevelInt(
                 42,
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_type("Int"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 3,
+            },
+            TypeConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Int",
+                    ),
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_type("Prelude.Int"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 11,
+            },
+            TypeConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Prelude.Int",
+                    ),
+                ),
             ),
         )
         "###);

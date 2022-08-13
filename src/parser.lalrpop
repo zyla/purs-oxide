@@ -9,8 +9,7 @@ grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 pub Module: Module = Located<Commented<ModuleInner>>;
 
 pub ModuleInner: ModuleInner = {
-  // FIXME: name should be qualified
-  "module" <name:UpperIdent> "where" <declarations: MaybeLayoutBlock<Declaration>>
+  "module" <name:UpperQualifiedIdent> "where" <declarations: MaybeLayoutBlock<Declaration>>
       => ModuleInner { name, exports: None, declarations }
 };
 
@@ -18,9 +17,20 @@ LowerIdent: Symbol = {
   lower_ident => Symbol::new(<>)
 };
 
+LowerQualifiedIdent: QualifiedName = {
+  LowerIdent => QualifiedName(<>),
+  lower_qualified_ident => QualifiedName(Symbol::new(<>)),
+};
+
 UpperIdent: Symbol = {
   upper_ident => Symbol::new(<>)
 };
+
+UpperQualifiedIdent: QualifiedName = {
+  UpperIdent => QualifiedName(<>),
+  upper_qualified_ident => QualifiedName(Symbol::new(<>)),
+};
+
 
 Located<T>: Located<T> = {
   <start:@L> <v:T> <end:@R> => Located(SourceSpan{start, end}, v)
@@ -94,7 +104,7 @@ AtomicType: TypeKind = {
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
   // TODO: hole
 
-  UpperIdent => TypeKind::TypeConstructor(QualifiedName(<>)), // TODO: qualified
+  UpperQualifiedIdent => TypeKind::TypeConstructor(<>),
   "(" <fields:SepBy<RowField, ",">> <rest:RowRest?> ")" => TypeKind::Row{fields,rest},
   <record_start:@L> "{" <record_end:@R>
   <row_start:@L> <fields:SepBy<RowField, ",">> <rest:RowRest?> <row_end:@R> "}" =>
@@ -145,7 +155,9 @@ extern {
     string => Token::StringLiteral(<String>),
     char => Token::CharLiteral(<char>),
     lower_ident => Token::LowerIdentifier(<String>),
+    lower_qualified_ident => Token::QualifiedLowerIdentifier(<String>),
     upper_ident => Token::UpperIdentifier(<String>),
+    upper_qualified_ident => Token::QualifiedUpperIdentifier(<String>),
 
     // Layout
     LayoutStart => Token::LayoutStart,
