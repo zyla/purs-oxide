@@ -1,5 +1,4 @@
-use crate::ast::Module;
-use crate::ast::Type;
+use crate::ast::{Expr, Module, Type};
 use crate::lexer;
 use crate::token::Token;
 use lalrpop_util::ErrorRecovery;
@@ -26,6 +25,13 @@ pub fn parse_type(input: &str) -> ParseResult<Type> {
     (errors, result)
 }
 
+pub fn parse_expr(input: &str) -> ParseResult<Expr> {
+    let mut errors = vec![];
+    let lexer = lexer::lex(input);
+    let result = parser::ExprParser::new().parse(&mut errors, lexer);
+    (errors, result)
+}
+
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
@@ -42,6 +48,9 @@ mod tests {
     }
     fn parse_type(input: &str) -> crate::ast::Type {
         expect_success(super::parse_type(input))
+    }
+    fn parse_expr(input: &str) -> crate::ast::Expr {
+        expect_success(super::parse_expr(input))
     }
 
     #[test]
@@ -822,6 +831,254 @@ mod tests {
                             ),
                         ),
                     },
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_literals() {
+        assert_debug_snapshot!(parse_expr("123"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 3,
+            },
+            Literal(
+                Integer(
+                    123,
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" "hello" "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 8,
+            },
+            Literal(
+                String(
+                    "hello",
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" true "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 5,
+            },
+            Literal(
+                Boolean(
+                    true,
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_array() {
+        assert_debug_snapshot!(parse_expr(r#" [] "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 3,
+            },
+            Literal(
+                Array(
+                    [],
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" [1] "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 4,
+            },
+            Literal(
+                Array(
+                    [
+                        Located(
+                            SourceSpan {
+                                start: 2,
+                                end: 3,
+                            },
+                            Literal(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" [true, false] "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 14,
+            },
+            Literal(
+                Array(
+                    [
+                        Located(
+                            SourceSpan {
+                                start: 2,
+                                end: 6,
+                            },
+                            Literal(
+                                Boolean(
+                                    true,
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 8,
+                                end: 13,
+                            },
+                            Literal(
+                                Boolean(
+                                    false,
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_record_expr() {
+        assert_debug_snapshot!(parse_expr(r#" {} "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 3,
+            },
+            Literal(
+                Object(
+                    [],
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" { foo: 1 } "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 11,
+            },
+            Literal(
+                Object(
+                    [
+                        (
+                            Symbol(
+                                "foo",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 8,
+                                    end: 9,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" { foo } "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 8,
+            },
+            Literal(
+                Object(
+                    [
+                        (
+                            Symbol(
+                                "foo",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 3,
+                                    end: 6,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "foo",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        )
+        "###);
+        assert_debug_snapshot!(parse_expr(r#" { foo, bar: 2 } "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 16,
+            },
+            Literal(
+                Object(
+                    [
+                        (
+                            Symbol(
+                                "foo",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 3,
+                                    end: 6,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "foo",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        (
+                            Symbol(
+                                "bar",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 13,
+                                    end: 14,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
                 ),
             ),
         )

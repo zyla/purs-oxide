@@ -54,11 +54,32 @@ ValueDeclaration: ValueDeclaration = {
   <ident:LowerIdent> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
-Expr: Expr = Located<ExprKind>;
+pub Expr: Expr = Located<ExprKind>;
 
 ExprKind: ExprKind = {
-  int => ExprKind::Literal(Literal::Integer(<>))
+  int => ExprKind::Literal(Literal::Integer(<>)),
+  // float => ExprKind::Literal(Literal::Float(<>)),
+  string => ExprKind::Literal(Literal::String(<>)),
+  // char => ExprKind::Literal(Literal::Char(<>)),
+  "true" => ExprKind::Literal(Literal::Boolean(true)),
+  "false" => ExprKind::Literal(Literal::Boolean(false)),
+  "[" <SepBy<Expr, ",">> "]" => ExprKind::Literal(Literal::Array(<>)),
+  "{" <SepBy<RecordField, ",">> "}" => ExprKind::Literal(Literal::Object(<>)),
 }
+
+RecordField: (Symbol, Expr) = {
+  <label:Label> ":" <expr:Expr> => (label, expr),
+
+  // Note: string literal labels not allowed here, because they may not be a valid variable name
+  <start:@L> <label:lower_ident> <end:@R> => {
+    let label = Symbol::new(label);
+    (
+      label.clone(),
+      Located(SourceSpan{start, end},
+        ExprKind::Var(QualifiedName(label)))
+    )
+  },
+};
 
 // TODO: extract the comments
 Commented<T>: Commented<T> = {
@@ -202,6 +223,8 @@ extern {
     "module" => Token::Module,
     "import" => Token::Import,
     "forall" => Token::Forall,
+    "true" => Token::True,
+    "false" => Token::False,
     "_" => Token::Wildcard,
   }
 }

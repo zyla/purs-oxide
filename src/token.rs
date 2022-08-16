@@ -51,6 +51,8 @@ pub enum Token {
     Module,
     Import,
     Forall,
+    True,
+    False,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

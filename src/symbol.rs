@@ -1,4 +1,4 @@
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
 pub struct Symbol(pub String);
 
 impl Symbol {

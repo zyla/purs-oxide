@@ -1,4 +1,4 @@
-use super::{Commented, Located, Type};
+use super::{Commented, Expr, Located, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -157,23 +157,4 @@ pub struct GuardedExpr {
 #[derive(Debug)]
 pub enum Guard {
     // TODO
-}
-
-pub type Expr = Located<ExprKind>;
-
-#[derive(Debug)]
-pub enum ExprKind {
-    Literal(Literal<Expr>),
-    // TODO
-}
-
-#[derive(Debug)]
-pub enum Literal<T> {
-    Integer(i32),
-    Float(f64),
-    String(String),
-    Char(char),
-    Boolean(bool),
-    Array(Vec<T>),
-    Object(Vec<(Symbol, T)>),
 }
