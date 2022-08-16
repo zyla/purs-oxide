@@ -878,6 +878,19 @@ mod tests {
             ),
         )
         "###);
+        assert_debug_snapshot!(parse_expr(r#" 'a' "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 4,
+            },
+            Literal(
+                Char(
+                    'a',
+                ),
+            ),
+        )
+        "###);
     }
 
     #[test]
