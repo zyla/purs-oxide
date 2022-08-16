@@ -54,9 +54,18 @@ ValueDeclaration: ValueDeclaration = {
   <ident:LowerIdent> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
-pub Expr: Expr = Located<ExprKind>;
+pub Expr: Expr = Located<InfixExpr>;
 
-ExprKind: ExprKind = {
+InfixExpr: ExprKind = {
+  PrimaryExpr,
+  <first:Located<PrimaryExpr>> <rest:( <Operator> <Located<PrimaryExpr>> )+> => ExprKind::Infix(Box::new(first), rest),
+};
+
+Operator: Symbol = {
+  operator => Symbol::new(<>)
+};
+
+PrimaryExpr: ExprKind = {
   int => ExprKind::Literal(Literal::Integer(<>)),
   // float => ExprKind::Literal(Literal::Float(<>)),
   string => ExprKind::Literal(Literal::String(<>)),

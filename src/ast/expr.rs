@@ -7,6 +7,10 @@ pub type Expr = Located<ExprKind>;
 #[derive(Debug)]
 pub enum ExprKind {
     Literal(Literal<Expr>),
+
+    /// Infix operator sequencec with unknown precedence
+    Infix(Box<Expr>, Vec<(Symbol, Expr)>),
+
     // TODO
     Var(QualifiedName),
 }

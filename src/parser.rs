@@ -1098,5 +1098,64 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_infix_expr() {
+        assert_debug_snapshot!(parse_expr(r#" 1 %+ 2 <$> 3 "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 13,
+            },
+            Infix(
+                Located(
+                    SourceSpan {
+                        start: 1,
+                        end: 2,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+                [
+                    (
+                        Symbol(
+                            "%+",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 6,
+                                end: 7,
+                            },
+                            Literal(
+                                Integer(
+                                    2,
+                                ),
+                            ),
+                        ),
+                    ),
+                    (
+                        Symbol(
+                            "<$>",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 12,
+                                end: 13,
+                            },
+                            Literal(
+                                Integer(
+                                    3,
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
     //
 }
