@@ -54,15 +54,20 @@ ValueDeclaration: ValueDeclaration = {
   <ident:LowerIdent> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
-pub Expr: Expr = Located<InfixExpr>;
+pub Expr: Expr = Located<InfixExpr<AccessorExpr<PrimaryExpr>>>;
 
-InfixExpr: ExprKind = {
-  PrimaryExpr,
-  <first:Located<PrimaryExpr>> <rest:( <Operator> <Located<PrimaryExpr>> )+> => ExprKind::Infix(Box::new(first), rest),
+InfixExpr<Next>: ExprKind = {
+  Next,
+  <first:Located<Next>> <rest:( <Operator> <Located<Next>> )+> => ExprKind::Infix(Box::new(first), rest),
 };
 
 Operator: Symbol = {
   operator => Symbol::new(<>)
+};
+
+AccessorExpr<Next>: ExprKind = {
+  Next,
+  <obj:Located<AccessorExpr<Next>>> "." <label:Label> => ExprKind::Accessor(Box::new(obj), label),
 };
 
 PrimaryExpr: ExprKind = {
@@ -74,6 +79,7 @@ PrimaryExpr: ExprKind = {
   "false" => ExprKind::Literal(Literal::Boolean(false)),
   "[" <SepBy<Expr, ",">> "]" => ExprKind::Literal(Literal::Array(<>)),
   "{" <SepBy<RecordField, ",">> "}" => ExprKind::Literal(Literal::Object(<>)),
+  LowerQualifiedIdent => ExprKind::Var(<>),
 }
 
 RecordField: (Symbol, Expr) = {

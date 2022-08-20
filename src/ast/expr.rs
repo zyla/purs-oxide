@@ -11,6 +11,9 @@ pub enum ExprKind {
     /// Infix operator sequencec with unknown precedence
     Infix(Box<Expr>, Vec<(Symbol, Expr)>),
 
+    /// Record field accessor
+    Accessor(Box<Expr>, Symbol),
+
     // TODO
     Var(QualifiedName),
 }

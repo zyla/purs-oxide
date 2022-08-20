@@ -1157,5 +1157,106 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_accessor_1() {
+        assert_debug_snapshot!(parse_expr(r#"foo.bar"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 7,
+            },
+            Accessor(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 3,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "foo",
+                            ),
+                        ),
+                    ),
+                ),
+                Symbol(
+                    "bar",
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_accessor_2() {
+        assert_debug_snapshot!(parse_expr(r#" foo."Bar" "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 10,
+            },
+            Accessor(
+                Located(
+                    SourceSpan {
+                        start: 1,
+                        end: 4,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "foo",
+                            ),
+                        ),
+                    ),
+                ),
+                Symbol(
+                    "Bar",
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_accessor_chain() {
+        assert_debug_snapshot!(parse_expr(r#" foo.bar.baz "#), @r###"
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 12,
+            },
+            Accessor(
+                Located(
+                    SourceSpan {
+                        start: 1,
+                        end: 8,
+                    },
+                    Accessor(
+                        Located(
+                            SourceSpan {
+                                start: 1,
+                                end: 4,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "foo",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Symbol(
+                            "bar",
+                        ),
+                    ),
+                ),
+                Symbol(
+                    "baz",
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }
