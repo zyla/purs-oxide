@@ -1258,5 +1258,24 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_qualified_var() {
+        assert_debug_snapshot!(parse_expr(r#"Data.Maybe.fromJust"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 19,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "Data.Maybe.fromJust",
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }

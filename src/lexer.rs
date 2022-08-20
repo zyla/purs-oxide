@@ -1252,5 +1252,20 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_qualified_ident_6() {
+        assert_debug_snapshot!(
+        lex("Data.Maybe.fromJust"),
+        @r###"
+        Ok(
+            [
+                QualifiedLowerIdentifier(
+                    "Data.Maybe.fromJust",
+                ),
+            ],
+        )
+        "###);
+    }
+
     //
 }
