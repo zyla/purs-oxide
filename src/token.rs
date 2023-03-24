@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Token {
     IntegerLiteral(i32),
@@ -56,6 +58,12 @@ pub enum Token {
 
     // Not exactly a keyword, but a special identifier
     Wildcard,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]

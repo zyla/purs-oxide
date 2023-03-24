@@ -166,6 +166,96 @@ mod tests {
     }
 
     #[test]
+    fn test_typed_value_decl() {
+        assert_debug_snapshot!(parse_module(indoc!("
+        module Foo where
+        x :: Int
+        x = 1
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 32,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Foo",
+                        ),
+                    ),
+                    exports: None,
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 17,
+                                end: 25,
+                            },
+                            Commented(
+                                [],
+                                TypeSignature(
+                                    TypeDeclarationData {
+                                        ident: Symbol(
+                                            "x",
+                                        ),
+                                        type: Located(
+                                            SourceSpan {
+                                                start: 22,
+                                                end: 25,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 26,
+                                end: 31,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "x",
+                                        ),
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 30,
+                                                        end: 31,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_atomic_type() {
         assert_debug_snapshot!(parse_type("var"), @r###"
         Located(

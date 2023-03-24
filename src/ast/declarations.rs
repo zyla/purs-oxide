@@ -79,6 +79,12 @@ pub struct TypeDeclarationData {
     pub r#type: Type,
 }
 
+impl TypeDeclarationData {
+    pub fn new(ident: Symbol, r#type: Type) -> Self {
+        Self { ident, r#type }
+    }
+}
+
 pub type Declaration = Located<Commented<DeclarationKind>>;
 
 #[derive(Debug)]
