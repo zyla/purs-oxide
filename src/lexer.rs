@@ -263,7 +263,7 @@ impl<'a> Iterator for Lexer<'a> {
         if let Some(prev_token) = &prev_token {
             match &prev_token.token {
                 // Where doesn't need additional indentation
-                Token::Where if next_token.column >= prev_token.indent_level => {
+                Token::Where => {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
@@ -1172,6 +1172,20 @@ mod tests {
         module Foo where{
         test = a `case _ of {x | unit # \_ -> true, true -> const}` b;
         foo}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_indented_module_where() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo
+              where
+            x = 1
+        ")), @r###"
+        module Foo
+          where{
+        x = 1}
         <eof>
         "###);
     }
