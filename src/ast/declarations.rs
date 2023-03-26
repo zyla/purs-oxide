@@ -1,4 +1,4 @@
-use super::{Commented, Expr, Located, Type};
+use super::{Commented, Expr, Located, Pat, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -164,9 +164,7 @@ pub struct ValueDeclaration {
 
     // TODO: what is this?
     // pub name: NameKind
-
-    // TODO
-    // pub binders: Vec<Binder>
+    pub params: Vec<Pat>,
     pub expr: Vec<GuardedExpr>,
 }
 

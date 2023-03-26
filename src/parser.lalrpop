@@ -93,14 +93,16 @@ DeclarationKind: DeclarationKind = {
 }
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> "=" <expr:Expr> => ValueDeclaration{ident, expr: vec![GuardedExpr{guards: vec![], expr}]}
+  <ident:LowerIdent> <params:Pat*> "=" <expr:Expr> => ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
 TypeDeclaration: TypeDeclarationData = {
   <ident:LowerIdent> "::" <type_:Type> => TypeDeclarationData::new(ident,type_)
 }
 
-pub Expr: Expr = Located<InfixExpr<AccessorExpr<PrimaryExpr>>>;
+pub Expr: Expr = Located<ExprKind>;
+
+ExprKind: ExprKind = InfixExpr<AccessorExpr<PrimaryExpr>>;
 
 InfixExpr<Next>: ExprKind = {
   Next,
@@ -117,30 +119,64 @@ AccessorExpr<Next>: ExprKind = {
 };
 
 PrimaryExpr: ExprKind = {
-  int => ExprKind::Literal(Literal::Integer(<>)),
-  // float => ExprKind::Literal(Literal::Float(<>)),
-  string => ExprKind::Literal(Literal::String(<>)),
-  char => ExprKind::Literal(Literal::Char(<>)),
-  "true" => ExprKind::Literal(Literal::Boolean(true)),
-  "false" => ExprKind::Literal(Literal::Boolean(false)),
-  "[" <SepBy<Expr, ",">> "]" => ExprKind::Literal(Literal::Array(<>)),
-  "{" <SepBy<RecordField, ",">> "}" => ExprKind::Literal(Literal::Object(<>)),
+  Literal<Expr, RecordShortcutExpr> => ExprKind::Literal(<>),
   LowerQualifiedIdent => ExprKind::Var(<>),
+  "(" <ExprKind> ")" => <>,
 }
 
-RecordField: (Symbol, Expr) = {
-  <label:Label> ":" <expr:Expr> => (label, expr),
+pub Pat: Pat = Located<PatKind>;
 
+PatKind: PatKind = InfixPat<PrimaryPat>;
+
+InfixPat<Next>: PatKind = {
+  Next,
+  <first:Located<Next>> <rest:( <Operator> <Located<Next>> )+> => PatKind::Infix(Box::new(first), rest),
+};
+
+PrimaryPat: PatKind = {
+  Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
+  LowerIdent => PatKind::Var(<>),
+  "(" <PatKind> ")" => <>,
+}
+
+Literal<T, RecordShortcut>: Literal<T> = {
+  int => Literal::Integer(<>),
+  // float => Literal::Float(<>),
+  string => Literal::String(<>),
+  char => Literal::Char(<>),
+  "true" => Literal::Boolean(true),
+  "false" => Literal::Boolean(false),
+  "[" <SepBy<T, ",">> "]" => Literal::Array(<>),
+  "{" <SepBy<RecordField<T, RecordShortcut>, ",">> "}" => Literal::Object(<>),
+}
+
+RecordField<T, RecordShortcut>: (Symbol, T) = {
+  <label:Label> ":" <expr:T> => (label, expr),
+  RecordShortcut
+};
+
+RecordShortcutExpr: (Symbol, Expr) = {
   // Note: string literal labels not allowed here, because they may not be a valid variable name
   <start:@L> <label:lower_ident> <end:@R> => {
     let label = Symbol::new(label);
     (
       label.clone(),
-      Located(SourceSpan{start, end},
-        ExprKind::Var(QualifiedName(label)))
+      Located(SourceSpan{start, end}, ExprKind::Var(QualifiedName(label)))
     )
-  },
+  }
 };
+
+RecordShortcutPat: (Symbol, Pat) = {
+  // Note: string literal labels not allowed here, because they may not be a valid variable name
+  <start:@L> <label:lower_ident> <end:@R> => {
+    let label = Symbol::new(label);
+    (
+      label.clone(),
+      Located(SourceSpan{start, end}, PatKind::Var(label))
+    )
+  }
+};
+
 
 // TODO: extract the comments
 Commented<T>: Commented<T> = {

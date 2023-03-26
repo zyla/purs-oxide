@@ -141,6 +141,7 @@ mod tests {
                                         ident: Symbol(
                                             "x",
                                         ),
+                                        params: [],
                                         expr: [
                                             GuardedExpr {
                                                 guards: [],
@@ -232,6 +233,7 @@ mod tests {
                                         ident: Symbol(
                                             "x",
                                         ),
+                                        params: [],
                                         expr: [
                                             GuardedExpr {
                                                 guards: [],
@@ -588,6 +590,7 @@ mod tests {
                                         ident: Symbol(
                                             "x",
                                         ),
+                                        params: [],
                                         expr: [
                                             GuardedExpr {
                                                 guards: [],
@@ -654,6 +657,423 @@ mod tests {
                         ),
                     ],
                     declarations: [],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_function_with_params() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            f x = 1
+            g x y = 1
+            h [x, y] = 1
+            j {x, y: 1} = 1
+            k "foo" = 1
+            l 42 = 1
+            m (x) = 1
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 96,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 25,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "f",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 20,
+                                                    end: 21,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "x",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 24,
+                                                        end: 25,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 26,
+                                end: 35,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "g",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 28,
+                                                    end: 29,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "x",
+                                                    ),
+                                                ),
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 30,
+                                                    end: 31,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "y",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 34,
+                                                        end: 35,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 36,
+                                end: 48,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "h",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 38,
+                                                    end: 44,
+                                                },
+                                                Literal(
+                                                    Array(
+                                                        [
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 39,
+                                                                    end: 40,
+                                                                },
+                                                                Var(
+                                                                    Symbol(
+                                                                        "x",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 42,
+                                                                    end: 43,
+                                                                },
+                                                                Var(
+                                                                    Symbol(
+                                                                        "y",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 47,
+                                                        end: 48,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 49,
+                                end: 64,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "j",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 51,
+                                                    end: 60,
+                                                },
+                                                Literal(
+                                                    Object(
+                                                        [
+                                                            (
+                                                                Symbol(
+                                                                    "x",
+                                                                ),
+                                                                Located(
+                                                                    SourceSpan {
+                                                                        start: 52,
+                                                                        end: 53,
+                                                                    },
+                                                                    Var(
+                                                                        Symbol(
+                                                                            "x",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                Symbol(
+                                                                    "y",
+                                                                ),
+                                                                Located(
+                                                                    SourceSpan {
+                                                                        start: 58,
+                                                                        end: 59,
+                                                                    },
+                                                                    Literal(
+                                                                        Integer(
+                                                                            1,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 63,
+                                                        end: 64,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 65,
+                                end: 76,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "k",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 67,
+                                                    end: 72,
+                                                },
+                                                Literal(
+                                                    String(
+                                                        "foo",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 75,
+                                                        end: 76,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 77,
+                                end: 85,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "l",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 79,
+                                                    end: 81,
+                                                },
+                                                Literal(
+                                                    Integer(
+                                                        42,
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 84,
+                                                        end: 85,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 86,
+                                end: 95,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "m",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 88,
+                                                    end: 91,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "x",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 94,
+                                                        end: 95,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
                 },
             ),
         )
@@ -1826,6 +2246,25 @@ mod tests {
                 QualifiedName(
                     Symbol(
                         "Data.Maybe.fromJust",
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_parens() {
+        assert_debug_snapshot!(parse_expr(r#"(foo)"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 5,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "foo",
                     ),
                 ),
             ),

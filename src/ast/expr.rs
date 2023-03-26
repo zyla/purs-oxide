@@ -8,7 +8,7 @@ pub type Expr = Located<ExprKind>;
 pub enum ExprKind {
     Literal(Literal<Expr>),
 
-    /// Infix operator sequencec with unknown precedence
+    /// Infix operator sequence with unknown precedence
     Infix(Box<Expr>, Vec<(Symbol, Expr)>),
 
     /// Record field accessor
@@ -16,6 +16,18 @@ pub enum ExprKind {
 
     // TODO
     Var(QualifiedName),
+}
+
+pub type Pat = Located<PatKind>;
+
+#[derive(Debug)]
+pub enum PatKind {
+    Literal(Literal<Pat>),
+
+    /// Infix operator sequence with unknown precedence
+    Infix(Box<Pat>, Vec<(Symbol, Pat)>),
+
+    Var(Symbol),
 }
 
 #[derive(Debug)]
