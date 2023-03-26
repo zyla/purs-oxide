@@ -58,6 +58,8 @@ pub enum Token {
     False,
     Class,
     Type,
+    As,
+    Hiding,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

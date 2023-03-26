@@ -11,8 +11,30 @@ pub Module: Module = Located<Commented<ModuleInner>>;
 pub ModuleInner: ModuleInner = {
   "module" <name:UpperQualifiedIdent>
   <exports:("(" <SepBy<DeclarationRef, ",">> ")")?>
-  "where" <declarations: MaybeLayoutBlock<Declaration>>
-      => ModuleInner { name, exports, declarations }
+  "where" <guts:ModuleGuts>
+      => ModuleInner { name, exports, imports: guts.0, declarations: guts.1 }
+};
+
+ModuleGuts: (Vec<Import>, Vec<Declaration>) = {
+  () => (vec![], vec![]),
+  LayoutStart <imports:SepBy<Import, LayoutSep>>
+    <declarations:SepBy<Declaration, LayoutSep>> LayoutEnd =>
+    (imports, declarations),
+};
+
+pub Import: Import = Located<ImportInner>;
+
+pub ImportInner: ImportInner = {
+  "import" <module:UpperQualifiedIdent>
+    <kind:ImportDeclarationKind>
+    <alias:("as" <UpperQualifiedIdent>)?> =>
+    ImportInner{module,kind,alias}
+};
+
+pub ImportDeclarationKind: ImportDeclarationKind = {
+  () => ImportDeclarationKind::Implicit,
+  "(" <SepBy<DeclarationRef, ",">> ")" => ImportDeclarationKind::Explicit(<>),
+  "hiding" "(" <SepBy<DeclarationRef, ",">> ")" => ImportDeclarationKind::Hiding(<>),
 };
 
 LowerIdent: Symbol = {
@@ -271,6 +293,8 @@ extern {
     "false" => Token::False,
     "class" => Token::Class,
     "type" => Token::Type,
+    "as" => Token::As,
+    "hiding" => Token::Hiding,
     "_" => Token::Wildcard,
   }
 }

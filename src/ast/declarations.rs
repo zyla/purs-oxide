@@ -8,7 +8,17 @@ pub type Module = Located<Commented<ModuleInner>>;
 pub struct ModuleInner {
     pub name: ModuleName,
     pub exports: Option<Vec<DeclarationRef>>,
+    pub imports: Vec<Import>,
     pub declarations: Vec<Declaration>,
+}
+
+pub type Import = Located<ImportInner>;
+
+#[derive(Debug)]
+pub struct ImportInner {
+    pub module: ModuleName,
+    pub kind: ImportDeclarationKind,
+    pub alias: Option<ModuleName>,
 }
 
 pub type DeclarationRef = Located<DeclarationRefKind>;

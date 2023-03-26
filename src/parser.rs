@@ -72,6 +72,7 @@ mod tests {
                         ),
                     ),
                     exports: None,
+                    imports: [],
                     declarations: [],
                 },
             ),
@@ -98,6 +99,7 @@ mod tests {
                         ),
                     ),
                     exports: None,
+                    imports: [],
                     declarations: [],
                 },
             ),
@@ -125,6 +127,7 @@ mod tests {
                         ),
                     ),
                     exports: None,
+                    imports: [],
                     declarations: [
                         Located(
                             SourceSpan {
@@ -186,6 +189,7 @@ mod tests {
                         ),
                     ),
                     exports: None,
+                    imports: [],
                     declarations: [
                         Located(
                             SourceSpan {
@@ -393,7 +397,218 @@ mod tests {
                             ),
                         ],
                     ),
+                    imports: [],
                     declarations: [],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_imports() {
+        assert_debug_snapshot!(parse_module(indoc!("
+          module Test where
+
+          import Foo.Asd
+          import Bar.Asd as Baz
+          import Qux.Asd (x)
+          import Zzz.Asd (y, z) as Yyy
+          import Aaa.Asd hiding (q)
+
+          x = 1
+
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 138,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [
+                        Located(
+                            SourceSpan {
+                                start: 19,
+                                end: 34,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Foo.Asd",
+                                    ),
+                                ),
+                                kind: Implicit,
+                                alias: None,
+                            },
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 34,
+                                end: 55,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Bar.Asd",
+                                    ),
+                                ),
+                                kind: Implicit,
+                                alias: Some(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Baz",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 56,
+                                end: 74,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Qux.Asd",
+                                    ),
+                                ),
+                                kind: Explicit(
+                                    [
+                                        Located(
+                                            SourceSpan {
+                                                start: 72,
+                                                end: 73,
+                                            },
+                                            Value {
+                                                name: Symbol(
+                                                    "x",
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                ),
+                                alias: None,
+                            },
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 75,
+                                end: 103,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Zzz.Asd",
+                                    ),
+                                ),
+                                kind: Explicit(
+                                    [
+                                        Located(
+                                            SourceSpan {
+                                                start: 91,
+                                                end: 92,
+                                            },
+                                            Value {
+                                                name: Symbol(
+                                                    "y",
+                                                ),
+                                            },
+                                        ),
+                                        Located(
+                                            SourceSpan {
+                                                start: 94,
+                                                end: 95,
+                                            },
+                                            Value {
+                                                name: Symbol(
+                                                    "z",
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                ),
+                                alias: Some(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Yyy",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 104,
+                                end: 129,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Aaa.Asd",
+                                    ),
+                                ),
+                                kind: Hiding(
+                                    [
+                                        Located(
+                                            SourceSpan {
+                                                start: 127,
+                                                end: 128,
+                                            },
+                                            Value {
+                                                name: Symbol(
+                                                    "q",
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                ),
+                                alias: None,
+                            },
+                        ),
+                    ],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 131,
+                                end: 136,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "x",
+                                        ),
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 135,
+                                                        end: 136,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
                 },
             ),
         )
