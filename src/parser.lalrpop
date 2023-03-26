@@ -9,8 +9,10 @@ grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 pub Module: Module = Located<Commented<ModuleInner>>;
 
 pub ModuleInner: ModuleInner = {
-  "module" <name:UpperQualifiedIdent> "where" <declarations: MaybeLayoutBlock<Declaration>>
-      => ModuleInner { name, exports: None, declarations }
+  "module" <name:UpperQualifiedIdent>
+  <exports:("(" <SepBy<DeclarationRef, ",">> ")")?>
+  "where" <declarations: MaybeLayoutBlock<Declaration>>
+      => ModuleInner { name, exports, declarations }
 };
 
 LowerIdent: Symbol = {
@@ -43,6 +45,23 @@ MaybeLayoutBlock<T>: Vec<T> = {
 LayoutBlock<T>: Vec<T> = {
   LayoutStart <v:SepBy<T, LayoutSep>> LayoutEnd => v
 }
+
+DeclarationRef: DeclarationRef = Located<DeclarationRefKind>;
+
+DeclarationRefKind: DeclarationRefKind = {
+  "class" <name:UpperIdent> => DeclarationRefKind::TypeClass{name},
+  "type" <name:Operator> => DeclarationRefKind::TypeOp{name},
+  <name:UpperIdent> <constructors:DeclarationRefConstructors?> =>
+    DeclarationRefKind::Type{name,constructors},
+  <name:LowerIdent> => DeclarationRefKind::Value{name},
+  <name:Operator> => DeclarationRefKind::ValueOp{name},
+  "module" <name:UpperQualifiedIdent> => DeclarationRefKind::Module{name},
+};
+
+DeclarationRefConstructors: DeclarationRefConstructors = {
+  "(" ".." ")" => DeclarationRefConstructors::All,
+  "(" <SepBy<UpperIdent, ",">> ")" => DeclarationRefConstructors::Some(<>),
+};
 
 Declaration: Declaration = Located<Commented<DeclarationKind>>;
 
@@ -115,6 +134,10 @@ SepBy<T, Sep>: Vec<T> = {
             v
         }
     }
+};
+
+OptionalList<T, X>: Vec<T> = {
+  X? => <>.unwrap_or_else(|| vec![]),
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -225,6 +248,7 @@ extern {
     "=>" => Token::FatArrow,
     "::" => Token::TypeOf,
     "<-" => Token::Bind,
+    ".." => Token::DotDot,
 
     operator => Token::Operator(<String>),
 
@@ -245,6 +269,8 @@ extern {
     "forall" => Token::Forall,
     "true" => Token::True,
     "false" => Token::False,
+    "class" => Token::Class,
+    "type" => Token::Type,
     "_" => Token::Wildcard,
   }
 }

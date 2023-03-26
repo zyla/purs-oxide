@@ -35,6 +35,7 @@ pub enum Token {
     FatArrow, // =>
     TypeOf,   // ::
     Bind,     // <-
+    DotDot,   // ..
 
     Operator(String),
 
@@ -55,6 +56,8 @@ pub enum Token {
     Forall,
     True,
     False,
+    Class,
+    Type,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

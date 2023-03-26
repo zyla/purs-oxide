@@ -256,6 +256,151 @@ mod tests {
     }
 
     #[test]
+    fn test_export_list() {
+        assert_debug_snapshot!(parse_module(indoc!("
+          module Control.Applicative
+            ( class Applicative
+            , pure
+            , module Data.Functor
+            , Either
+            , Foo(..)
+            , Maybe(Just, Nothing)
+            , +~
+            , type <>
+            ) where
+
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 158,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Control.Applicative",
+                        ),
+                    ),
+                    exports: Some(
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 31,
+                                    end: 48,
+                                },
+                                TypeClass {
+                                    name: Symbol(
+                                        "Applicative",
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 53,
+                                    end: 57,
+                                },
+                                Value {
+                                    name: Symbol(
+                                        "pure",
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 62,
+                                    end: 81,
+                                },
+                                Module {
+                                    name: QualifiedName(
+                                        Symbol(
+                                            "Data.Functor",
+                                        ),
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 86,
+                                    end: 92,
+                                },
+                                Type {
+                                    name: Symbol(
+                                        "Either",
+                                    ),
+                                    constructors: None,
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 97,
+                                    end: 104,
+                                },
+                                Type {
+                                    name: Symbol(
+                                        "Foo",
+                                    ),
+                                    constructors: Some(
+                                        All,
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 109,
+                                    end: 129,
+                                },
+                                Type {
+                                    name: Symbol(
+                                        "Maybe",
+                                    ),
+                                    constructors: Some(
+                                        Some(
+                                            [
+                                                Symbol(
+                                                    "Just",
+                                                ),
+                                                Symbol(
+                                                    "Nothing",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 134,
+                                    end: 136,
+                                },
+                                ValueOp {
+                                    name: Symbol(
+                                        "+~",
+                                    ),
+                                },
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 141,
+                                    end: 148,
+                                },
+                                TypeOp {
+                                    name: Symbol(
+                                        "<>",
+                                    ),
+                                },
+                            ),
+                        ],
+                    ),
+                    declarations: [],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_atomic_type() {
         assert_debug_snapshot!(parse_type("var"), @r###"
         Located(

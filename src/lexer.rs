@@ -525,6 +525,8 @@ fn ident_to_token(ident: &[u8], is_upper: bool) -> Token {
         b"forall" => Token::Forall,
         b"true" => Token::True,
         b"false" => Token::False,
+        b"class" => Token::Class,
+        b"type" => Token::Type,
         b"_" => Token::Wildcard,
         _ => {
             let str = String::from_utf8(ident.to_vec()).unwrap();
@@ -555,6 +557,7 @@ fn operator_to_token(s: &[u8]) -> Token {
         b"=>" => Token::FatArrow,
         b"::" => Token::TypeOf,
         b"<-" => Token::Bind,
+        b".." => Token::DotDot,
         _ => Token::Operator(String::from_utf8(s.into()).unwrap()),
     }
 }

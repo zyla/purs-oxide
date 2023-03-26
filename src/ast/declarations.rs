@@ -6,7 +6,7 @@ pub type Module = Located<Commented<ModuleInner>>;
 
 #[derive(Debug)]
 pub struct ModuleInner {
-    pub name: QualifiedName,
+    pub name: ModuleName,
     pub exports: Option<Vec<DeclarationRef>>,
     pub declarations: Vec<Declaration>,
 }
@@ -19,7 +19,7 @@ pub enum NameSource {
     CompilerNamed,
 }
 
-pub type ModuleName = Symbol;
+pub type ModuleName = QualifiedName;
 
 #[derive(Debug)]
 pub enum DeclarationRefKind {
@@ -31,7 +31,7 @@ pub enum DeclarationRefKind {
     },
     Type {
         name: Symbol,
-        constructors: Option<Vec<Symbol>>,
+        constructors: Option<DeclarationRefConstructors>,
     },
     Value {
         name: Symbol,
@@ -51,6 +51,12 @@ pub enum DeclarationRefKind {
         defined_in: ModuleName,
         declaration_ref: Box<DeclarationRef>,
     },
+}
+
+#[derive(Debug)]
+pub enum DeclarationRefConstructors {
+    All,
+    Some(Vec<Symbol>),
 }
 
 #[derive(Debug)]
