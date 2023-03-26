@@ -92,7 +92,24 @@ DeclarationKind: DeclarationKind = {
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
   "type" <name:UpperIdent> <params:TypeParameter*> "=" <body:Type> => DeclarationKind::TypeSynonym{name, params, body},
   "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
+  ClassDeclaration => DeclarationKind::Class(<>),
 }
+
+ClassDeclaration: TypeClassDeclaration = {
+  "class" <constraints:(<TypeClassConstraints> "=>")?> <name:UpperIdent> <params:TypeParameter*>
+    <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>
+    TypeClassDeclaration {
+      constraints: constraints.unwrap_or_else(|| vec![]),
+      name,
+      params,
+      methods: methods.unwrap_or_else(|| vec![]),
+    }
+};
+
+TypeClassConstraints: Vec<Type> = {
+// TODO:  <Located<Constraint>> => vec![<>],
+  "(" <SepBy<Located<Constraint>, ",">> ")"
+};
 
 TypeParameter: (Symbol, Type) = {
   <start:@L> <name:LowerIdent> <end:@R> =>
@@ -212,6 +229,14 @@ SepBy<T, Sep>: Vec<T> = {
     }
 };
 
+SepBy1<T, Sep>: Vec<T> = {
+    <v:(<T> Sep)*> <e:T> => {
+        let mut v = v;
+        v.push(e);
+        v
+    }
+};
+
 OptionalList<T, X>: Vec<T> = {
   X? => <>.unwrap_or_else(|| vec![]),
 };
@@ -234,9 +259,18 @@ Type1: TypeKind = {
   TypeApp
 }
 
+Constraint: TypeKind = {
+  <l:Located<Constraint>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
+  TypeConstructor
+};
+
 TypeApp: TypeKind = {
   <l:Located<TypeApp>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
   AtomicType
+};
+
+TypeConstructor: TypeKind = {
+  UpperQualifiedIdent => TypeKind::TypeConstructor(<>),
 };
 
 AtomicType: TypeKind = {
@@ -246,7 +280,7 @@ AtomicType: TypeKind = {
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
   // TODO: hole
 
-  UpperQualifiedIdent => TypeKind::TypeConstructor(<>),
+  TypeConstructor,
   "(" <fields:SepBy<RowField, ",">> <rest:RowRest?> ")" => TypeKind::Row{fields,rest},
   <record_start:@L> "{" <record_end:@R>
   <row_start:@L> <fields:SepBy<RowField, ",">> <rest:RowRest?> <row_end:@R> "}" =>

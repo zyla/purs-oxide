@@ -117,7 +117,7 @@ pub enum DeclarationKind {
 
     TypeSynonym {
         name: Symbol,
-        params: Vec<(Symbol, Type)>,
+        params: Vec<TypeParameter>,
         body: Type,
     },
 
@@ -137,6 +137,18 @@ pub enum DeclarationKind {
         name: Symbol,
         type_: Type,
     },
+
+    Class(TypeClassDeclaration),
+}
+
+pub type TypeParameter = (Symbol, Type);
+
+#[derive(Debug)]
+pub struct TypeClassDeclaration {
+    pub constraints: Vec<Type>,
+    pub name: Symbol,
+    pub params: Vec<TypeParameter>,
+    pub methods: Vec<TypeDeclarationData>,
 }
 
 #[derive(Debug)]
