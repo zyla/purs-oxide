@@ -16,6 +16,8 @@ pub enum ExprKind {
 
     // TODO
     Var(QualifiedName),
+
+    App(Box<Expr>, Vec<Expr>),
 }
 
 pub type Pat = Located<PatKind>;

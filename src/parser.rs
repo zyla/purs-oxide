@@ -2272,5 +2272,149 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_app_1() {
+        assert_debug_snapshot!(parse_expr(r#"f x y"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 5,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 2,
+                            end: 3,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "x",
+                                ),
+                            ),
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 4,
+                            end: 5,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "y",
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_app_2() {
+        assert_debug_snapshot!(parse_expr(r#"f a.b (g x)"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 11,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 2,
+                            end: 5,
+                        },
+                        Accessor(
+                            Located(
+                                SourceSpan {
+                                    start: 2,
+                                    end: 3,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "a",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            Symbol(
+                                "b",
+                            ),
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 6,
+                            end: 11,
+                        },
+                        App(
+                            Located(
+                                SourceSpan {
+                                    start: 7,
+                                    end: 8,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "g",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 9,
+                                        end: 10,
+                                    },
+                                    Var(
+                                        QualifiedName(
+                                            Symbol(
+                                                "x",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
     //
 }

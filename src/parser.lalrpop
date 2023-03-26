@@ -102,7 +102,7 @@ TypeDeclaration: TypeDeclarationData = {
 
 pub Expr: Expr = Located<ExprKind>;
 
-ExprKind: ExprKind = InfixExpr<AccessorExpr<PrimaryExpr>>;
+ExprKind: ExprKind = InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>;
 
 InfixExpr<Next>: ExprKind = {
   Next,
@@ -111,6 +111,11 @@ InfixExpr<Next>: ExprKind = {
 
 Operator: Symbol = {
   operator => Symbol::new(<>)
+};
+
+ApplyExpr<Next>: ExprKind = {
+  Next,
+  <f:Located<Next>> <args:Located<Next>+> => ExprKind::App(Box::new(f), args),
 };
 
 AccessorExpr<Next>: ExprKind = {
