@@ -18,6 +18,8 @@ pub enum ExprKind {
     Var(QualifiedName),
 
     App(Box<Expr>, Vec<Expr>),
+
+    Lam(Vec<Pat>, Box<Expr>),
 }
 
 pub type Pat = Located<PatKind>;
@@ -30,6 +32,8 @@ pub enum PatKind {
     Infix(Box<Pat>, Vec<(Symbol, Pat)>),
 
     Var(Symbol),
+
+    Wildcard,
 }
 
 #[derive(Debug)]

@@ -2416,5 +2416,92 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_parse_lam_1() {
+        assert_debug_snapshot!(parse_expr(r#"\x -> y"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 7,
+            },
+            Lam(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 1,
+                            end: 2,
+                        },
+                        Var(
+                            Symbol(
+                                "x",
+                            ),
+                        ),
+                    ),
+                ],
+                Located(
+                    SourceSpan {
+                        start: 6,
+                        end: 7,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "y",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_parse_lam_2() {
+        assert_debug_snapshot!(parse_expr(r#"\_ y -> y"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 9,
+            },
+            Lam(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 1,
+                            end: 2,
+                        },
+                        Wildcard,
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 3,
+                            end: 4,
+                        },
+                        Var(
+                            Symbol(
+                                "y",
+                            ),
+                        ),
+                    ),
+                ],
+                Located(
+                    SourceSpan {
+                        start: 8,
+                        end: 9,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "y",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }

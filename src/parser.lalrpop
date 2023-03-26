@@ -102,7 +102,12 @@ TypeDeclaration: TypeDeclarationData = {
 
 pub Expr: Expr = Located<ExprKind>;
 
-ExprKind: ExprKind = InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>;
+ExprKind: ExprKind = LambdaExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>;
+
+LambdaExpr<Next>: ExprKind = {
+  Next,
+  "\\" <params:Located<PrimaryPat>+> "->" <body:Located<Next>> => ExprKind::Lam(params, Box::new(body)),
+};
 
 InfixExpr<Next>: ExprKind = {
   Next,
@@ -142,6 +147,7 @@ PrimaryPat: PatKind = {
   Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
   LowerIdent => PatKind::Var(<>),
   "(" <PatKind> ")" => <>,
+  "_" => PatKind::Wildcard,
 }
 
 Literal<T, RecordShortcut>: Literal<T> = {
