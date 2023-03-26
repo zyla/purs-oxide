@@ -132,6 +132,11 @@ pub enum DeclarationKind {
     TypeSignature(TypeDeclarationData),
 
     ValueDeclaration(ValueDeclaration),
+
+    ForeignValue {
+        name: Symbol,
+        type_: Type,
+    },
 }
 
 #[derive(Debug)]

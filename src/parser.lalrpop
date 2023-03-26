@@ -91,6 +91,7 @@ DeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
   "type" <name:UpperIdent> <params:TypeParameter*> "=" <body:Type> => DeclarationKind::TypeSynonym{name, params, body},
+  "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
 }
 
 TypeParameter: (Symbol, Type) = {
@@ -350,6 +351,7 @@ extern {
     "type" => Token::Type,
     "as" => Token::As,
     "hiding" => Token::Hiding,
+    "foreign" => Token::Foreign,
     "_" => Token::Wildcard,
   }
 }

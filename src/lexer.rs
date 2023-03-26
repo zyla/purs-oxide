@@ -529,6 +529,7 @@ fn ident_to_token(ident: &[u8], is_upper: bool) -> Token {
         b"type" => Token::Type,
         b"as" => Token::As,
         b"hiding" => Token::Hiding,
+        b"foreign" => Token::Foreign,
         b"_" => Token::Wildcard,
         _ => {
             let str = String::from_utf8(ident.to_vec()).unwrap();

@@ -1248,6 +1248,83 @@ mod tests {
     }
 
     #[test]
+    fn test_foreign_import() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            foreign import foo :: Int -> Int
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 51,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 50,
+                            },
+                            Commented(
+                                [],
+                                ForeignValue {
+                                    name: Symbol(
+                                        "foo",
+                                    ),
+                                    type_: Located(
+                                        SourceSpan {
+                                            start: 40,
+                                            end: 50,
+                                        },
+                                        FunctionType(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 40,
+                                                    end: 43,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 47,
+                                                    end: 50,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_atomic_type() {
         assert_debug_snapshot!(parse_type("var"), @r###"
         Located(
