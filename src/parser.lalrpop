@@ -175,6 +175,8 @@ Type1: TypeKind = {
     TypeKind::ForAll{vars,body:Box::new(body),skolem_scope:None},
   <constraint:Located<TypeApp>> "=>" <body:Type> =>
     TypeKind::Constrained{constraint:Box::new(constraint),body:Box::new(body)},
+  <arg:Located<TypeApp>> "->" <result:Type> =>
+    TypeKind::FunctionType(Box::new(arg), Box::new(result)),
   TypeApp
 }
 

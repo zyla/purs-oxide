@@ -11,6 +11,7 @@ pub enum TypeKind {
     Wildcard(WildcardKind),
     TypeConstructor(QualifiedName),
     TypeApp(Box<Type>, Box<Type>),
+    FunctionType(Box<Type>, Box<Type>),
 
     /// Kind parameter application. Doesn't seem to appear in source, because kind params are
     /// implicit?

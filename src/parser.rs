@@ -1333,6 +1333,67 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_function_type() {
+        assert_debug_snapshot!(parse_type("A -> B -> C"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 11,
+            },
+            FunctionType(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    TypeConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "A",
+                            ),
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 5,
+                        end: 11,
+                    },
+                    FunctionType(
+                        Located(
+                            SourceSpan {
+                                start: 5,
+                                end: 6,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "B",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 10,
+                                end: 11,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "C",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_literals() {
         assert_debug_snapshot!(parse_expr("123"), @r###"
         Located(
