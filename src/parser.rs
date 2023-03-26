@@ -269,15 +269,15 @@ mod tests {
             , Either
             , Foo(..)
             , Maybe(Just, Nothing)
-            , +~
-            , type <>
+            , (+~)
+            , type (<>)
             ) where
 
         ")), @r###"
         Located(
             SourceSpan {
                 start: 0,
-                end: 158,
+                end: 162,
             },
             Commented(
                 [],
@@ -376,7 +376,7 @@ mod tests {
                             Located(
                                 SourceSpan {
                                     start: 134,
-                                    end: 136,
+                                    end: 138,
                                 },
                                 ValueOp {
                                     name: Symbol(
@@ -386,8 +386,8 @@ mod tests {
                             ),
                             Located(
                                 SourceSpan {
-                                    start: 141,
-                                    end: 148,
+                                    start: 143,
+                                    end: 152,
                                 },
                                 TypeOp {
                                     name: Symbol(
@@ -609,6 +609,51 @@ mod tests {
                             ),
                         ),
                     ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_indented_where() {
+        assert_debug_snapshot!(parse_module(indoc!("
+            module Control.Applicative
+              where
+            import Control.Apply
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 56,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Control.Applicative",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [
+                        Located(
+                            SourceSpan {
+                                start: 35,
+                                end: 56,
+                            },
+                            ImportInner {
+                                module: QualifiedName(
+                                    Symbol(
+                                        "Control.Apply",
+                                    ),
+                                ),
+                                kind: Implicit,
+                                alias: None,
+                            },
+                        ),
+                    ],
+                    declarations: [],
                 },
             ),
         )

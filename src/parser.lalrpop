@@ -72,11 +72,11 @@ DeclarationRef: DeclarationRef = Located<DeclarationRefKind>;
 
 DeclarationRefKind: DeclarationRefKind = {
   "class" <name:UpperIdent> => DeclarationRefKind::TypeClass{name},
-  "type" <name:Operator> => DeclarationRefKind::TypeOp{name},
+  "type" "(" <name:Operator> ")" => DeclarationRefKind::TypeOp{name},
   <name:UpperIdent> <constructors:DeclarationRefConstructors?> =>
     DeclarationRefKind::Type{name,constructors},
   <name:LowerIdent> => DeclarationRefKind::Value{name},
-  <name:Operator> => DeclarationRefKind::ValueOp{name},
+  "(" <name:Operator> ")" => DeclarationRefKind::ValueOp{name},
   "module" <name:UpperQualifiedIdent> => DeclarationRefKind::Module{name},
 };
 
