@@ -1081,6 +1081,173 @@ mod tests {
     }
 
     #[test]
+    fn test_type_synonym() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            type Foo = Int
+            type Bar a = a
+            type Baz a b = a
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 65,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 32,
+                            },
+                            Commented(
+                                [],
+                                TypeSynonym {
+                                    name: Symbol(
+                                        "Foo",
+                                    ),
+                                    params: [],
+                                    body: Located(
+                                        SourceSpan {
+                                            start: 29,
+                                            end: 32,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Int",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 33,
+                                end: 47,
+                            },
+                            Commented(
+                                [],
+                                TypeSynonym {
+                                    name: Symbol(
+                                        "Bar",
+                                    ),
+                                    params: [
+                                        (
+                                            Symbol(
+                                                "a",
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 42,
+                                                    end: 43,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Prim.Type",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: Located(
+                                        SourceSpan {
+                                            start: 46,
+                                            end: 47,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 48,
+                                end: 64,
+                            },
+                            Commented(
+                                [],
+                                TypeSynonym {
+                                    name: Symbol(
+                                        "Baz",
+                                    ),
+                                    params: [
+                                        (
+                                            Symbol(
+                                                "a",
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 57,
+                                                    end: 58,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Prim.Type",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        (
+                                            Symbol(
+                                                "b",
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 59,
+                                                    end: 60,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Prim.Type",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: Located(
+                                        SourceSpan {
+                                            start: 63,
+                                            end: 64,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_atomic_type() {
         assert_debug_snapshot!(parse_type("var"), @r###"
         Located(
