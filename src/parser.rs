@@ -1867,7 +1867,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Can't get the grammar to work"]
     fn test_instance_2() {
         assert_debug_snapshot!(parse_module(indoc!(r#"
             module Test where

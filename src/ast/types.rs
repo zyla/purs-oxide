@@ -42,6 +42,8 @@ pub enum TypeKind {
     },
     BinaryNoParensType(Box<Type>, Box<Type>, Box<Type>),
     Parens(Box<Type>),
+
+    Error,
 }
 
 #[derive(Debug)]
@@ -54,14 +56,10 @@ pub enum WildcardKind {
 #[derive(Debug)]
 pub struct SkolemScope(pub u64);
 
-pub type Constraint = Box<Type>;
-/*
- * for now just Type
 #[derive(Debug)]
 pub struct Constraint {
     pub class: QualifiedName,
-    pub kind_args: Vec<Type>,
+    //    pub kind_args: Vec<Type>,
     pub type_args: Vec<Type>,
     // TODO: PartialConstraintData - do we need it?
 }
-*/

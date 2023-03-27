@@ -97,10 +97,12 @@ DeclarationKind: DeclarationKind = {
 }
 
 ClassDeclaration: TypeClassDeclaration = {
-  "class" <constraints:(<TypeClassConstraints> "=>")?> <name:UpperIdent> <params:TypeParameter*>
+  "class"
+    <constraints:(<TypeClassConstraints> "=>")?>
+    <name:UpperIdent> <params:TypeParameter*>
     <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>
     TypeClassDeclaration {
-      constraints: constraints.unwrap_or_else(|| vec![]),
+      constraints: vec![],
       name,
       params,
       methods: methods.unwrap_or_else(|| vec![]),
@@ -114,15 +116,14 @@ InstanceDeclaration: InstanceDeclaration = {
     <class:UpperQualifiedIdent>
     <args:Located<AtomicType>*>
     <body:("where" <MaybeLayoutBlock<ValueDeclaration>>)?> =>
-    InstanceDeclaration {
-      constraints: constraints.unwrap_or_else(|| vec![]),
-      instance_name,
-      class,
-      args,
-      body: body.unwrap_or_else(|| vec![]),
-    }
+      InstanceDeclaration {
+        constraints: constraints.unwrap_or_else(|| vec![]),
+        instance_name,
+        class,
+        args,
+        body: body.unwrap_or_else(|| vec![]),
+      }
 };
-
 
 TypeClassConstraints: Vec<Type> = {
 // TODO:  <Located<Constraint>> => vec![<>],
@@ -270,16 +271,16 @@ Type1: TypeKind = {
   // Here it seems to work. I have no idea why.
   "forall" <vars:OneOrMore<ForallVar>> "." <body:Type> =>
     TypeKind::ForAll{vars,body:Box::new(body),skolem_scope:None},
-  <constraint:Located<TypeApp>> "=>" <body:Type> =>
+  <constraint:Constraint> "=>" <body:Type> =>
     TypeKind::Constrained{constraint:Box::new(constraint),body:Box::new(body)},
   <arg:Located<TypeApp>> "->" <result:Type> =>
     TypeKind::FunctionType(Box::new(arg), Box::new(result)),
   TypeApp
 }
 
-Constraint: TypeKind = {
-  <l:Located<Constraint>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
-  TypeConstructor
+Constraint: Constraint = {
+  <class:UpperQualifiedIdent> <type_args:Located<AtomicType>*> =>
+    Constraint { class, type_args }
 };
 
 TypeApp: TypeKind = {

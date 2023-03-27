@@ -1,4 +1,4 @@
-use super::{Commented, Expr, Located, Pat, Type};
+use super::{Commented, Constraint, Expr, Located, Pat, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -147,7 +147,7 @@ pub type TypeParameter = (Symbol, Type);
 
 #[derive(Debug)]
 pub struct TypeClassDeclaration {
-    pub constraints: Vec<Type>,
+    pub constraints: Vec<Constraint>,
     pub name: Symbol,
     pub params: Vec<TypeParameter>,
     pub methods: Vec<TypeDeclarationData>,
@@ -155,7 +155,7 @@ pub struct TypeClassDeclaration {
 
 #[derive(Debug)]
 pub struct InstanceDeclaration {
-    pub constraints: Vec<Type>,
+    pub constraints: Vec<Constraint>,
     pub instance_name: Option<Symbol>,
     pub class: QualifiedName,
     pub args: Vec<Type>,
