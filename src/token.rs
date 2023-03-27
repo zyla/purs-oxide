@@ -31,11 +31,12 @@ pub enum Token {
     Dot,
     Backslash,
 
-    Arrow,    // ->
-    FatArrow, // =>
-    TypeOf,   // ::
-    Bind,     // <-
-    DotDot,   // ..
+    Arrow,        // ->
+    FatArrow,     // =>
+    LeftFatArrow, // <=
+    TypeOf,       // ::
+    Bind,         // <-
+    DotDot,       // ..
 
     Operator(String),
 

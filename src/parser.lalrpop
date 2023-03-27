@@ -99,7 +99,7 @@ DeclarationKind: DeclarationKind = {
 
 ClassDeclaration: TypeClassDeclaration = {
   "class"
-    <constraints:(<TypeClassConstraints> "=>")?>
+    <constraints:(<TypeClassConstraints> "<=")?>
     <head:Located<Constraint>>
     <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
       let (name, params) = super::constraint_to_class_head(head)
@@ -390,6 +390,7 @@ extern {
 
     "->" => Token::Arrow,
     "=>" => Token::FatArrow,
+    "<=" => Token::LeftFatArrow,
     "::" => Token::TypeOf,
     "<-" => Token::Bind,
     ".." => Token::DotDot,

@@ -558,6 +558,7 @@ fn operator_to_token(s: &[u8]) -> Token {
         b"\\" => Token::Backslash,
         b"->" => Token::Arrow,
         b"=>" => Token::FatArrow,
+        b"<=" => Token::LeftFatArrow,
         b"::" => Token::TypeOf,
         b"<-" => Token::Bind,
         b".." => Token::DotDot,

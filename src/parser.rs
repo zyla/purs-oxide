@@ -1504,7 +1504,7 @@ mod tests {
     fn test_typeclass_2() {
         assert_debug_snapshot!(parse_module(indoc!(r#"
             module Test where
-            class Bar a => Foo a where
+            class Bar a <= Foo a where
               bar :: a
         "#)), @r###"
         Located(
@@ -1622,7 +1622,7 @@ mod tests {
     fn test_typeclass_3() {
         assert_debug_snapshot!(parse_module(indoc!(r#"
             module Test where
-            class (Bar a, Baz b) => Foo a where
+            class (Bar a, Baz b) <= Foo a where
               bar :: a
         "#)), @r###"
         Located(
