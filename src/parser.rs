@@ -3233,6 +3233,23 @@ mod tests {
     }
 
     #[test]
+    fn test_function_as_type_operator() {
+        assert_debug_snapshot!(parse_type("(->)"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 4,
+            },
+            Var(
+                Symbol(
+                    "->",
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_literals() {
         assert_debug_snapshot!(parse_expr("123"), @r###"
         Located(
@@ -3977,6 +3994,196 @@ mod tests {
                     ),
                 ],
             ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_case() {
+        assert_debug_snapshot!(parse_expr(indoc!("
+          case x of
+            C a b ->
+              1
+            D (A c) _ -> 1
+            _ -> 1
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 53,
+            },
+            Case {
+                expr: Located(
+                    SourceSpan {
+                        start: 5,
+                        end: 6,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "x",
+                            ),
+                        ),
+                    ),
+                ),
+                branches: [
+                    CaseBranch {
+                        pat: Located(
+                            SourceSpan {
+                                start: 12,
+                                end: 17,
+                            },
+                            App(
+                                Located(
+                                    SourceSpan {
+                                        start: 12,
+                                        end: 13,
+                                    },
+                                    DataConstructor(
+                                        QualifiedName(
+                                            Symbol(
+                                                "C",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 14,
+                                            end: 15,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 16,
+                                            end: 17,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "b",
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                        expr: Located(
+                            SourceSpan {
+                                start: 25,
+                                end: 26,
+                            },
+                            Literal(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                        ),
+                    },
+                    CaseBranch {
+                        pat: Located(
+                            SourceSpan {
+                                start: 29,
+                                end: 38,
+                            },
+                            App(
+                                Located(
+                                    SourceSpan {
+                                        start: 29,
+                                        end: 30,
+                                    },
+                                    DataConstructor(
+                                        QualifiedName(
+                                            Symbol(
+                                                "D",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 31,
+                                            end: 36,
+                                        },
+                                        App(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 32,
+                                                    end: 33,
+                                                },
+                                                DataConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "A",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 34,
+                                                        end: 35,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "c",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 37,
+                                            end: 38,
+                                        },
+                                        Wildcard,
+                                    ),
+                                ],
+                            ),
+                        ),
+                        expr: Located(
+                            SourceSpan {
+                                start: 42,
+                                end: 43,
+                            },
+                            Literal(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                        ),
+                    },
+                    CaseBranch {
+                        pat: Located(
+                            SourceSpan {
+                                start: 46,
+                                end: 47,
+                            },
+                            Wildcard,
+                        ),
+                        expr: Located(
+                            SourceSpan {
+                                start: 51,
+                                end: 52,
+                            },
+                            Literal(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
         )
         "###);
     }

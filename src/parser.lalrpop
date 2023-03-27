@@ -73,12 +73,17 @@ DeclarationRef: DeclarationRef = Located<DeclarationRefKind>;
 
 DeclarationRefKind: DeclarationRefKind = {
   "class" <name:UpperIdent> => DeclarationRefKind::TypeClass{name},
-  "type" "(" <name:Operator> ")" => DeclarationRefKind::TypeOp{name},
+  "type" "(" <name:TypeOperator> ")" => DeclarationRefKind::TypeOp{name},
   <name:UpperIdent> <constructors:DeclarationRefConstructors?> =>
     DeclarationRefKind::Type{name,constructors},
   <name:LowerIdent> => DeclarationRefKind::Value{name},
   "(" <name:Operator> ")" => DeclarationRefKind::ValueOp{name},
   "module" <name:UpperQualifiedIdent> => DeclarationRefKind::Module{name},
+};
+
+TypeOperator: Symbol = {
+  Operator,
+  "->" => Symbol::new("->".into()),
 };
 
 DeclarationRefConstructors: DeclarationRefConstructors = {
@@ -149,7 +154,7 @@ TypeParameter: (Symbol, Type) = {
 };
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> <params:Pat*> "=" <expr:Expr> => ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]}
+  <ident:LowerIdent> <params:Located<PrimaryPat>*> "=" <expr:Expr> => ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]}
 }
 
 TypeDeclaration: TypeDeclarationData = {
@@ -189,21 +194,38 @@ AccessorExpr<Next>: ExprKind = {
 PrimaryExpr: ExprKind = {
   Literal<Expr, RecordShortcutExpr> => ExprKind::Literal(<>),
   LowerQualifiedIdent => ExprKind::Var(<>),
+  UpperQualifiedIdent => ExprKind::DataConstructor(<>),
   "(" <ExprKind> ")" => <>,
+  CaseExpr,
 }
+
+CaseExpr: ExprKind = {
+  "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>> =>
+    ExprKind::Case{ expr, branches }
+};
+
+CaseBranch: CaseBranch = {
+  <pat:Pat> "->" <expr:Expr> => CaseBranch{ pat, expr }
+};
 
 pub Pat: Pat = Located<PatKind>;
 
-PatKind: PatKind = InfixPat<PrimaryPat>;
+PatKind: PatKind = InfixPat<ApplyPat<PrimaryPat>>;
 
 InfixPat<Next>: PatKind = {
   Next,
   <first:Located<Next>> <rest:( <Operator> <Located<Next>> )+> => PatKind::Infix(Box::new(first), rest),
 };
 
+ApplyPat<Next>: PatKind = {
+  Next,
+  <f:Box<Located<Next>>> <args:Located<Next>+> => PatKind::App(f, args),
+};
+
 PrimaryPat: PatKind = {
   Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
   LowerIdent => PatKind::Var(<>),
+  UpperQualifiedIdent => PatKind::DataConstructor(<>),
   "(" <PatKind> ")" => <>,
   "_" => PatKind::Wildcard,
 }
@@ -309,6 +331,7 @@ TypeConstructor: TypeKind = {
 
 AtomicType: TypeKind = {
   LowerIdent => TypeKind::Var(<>),
+  "(" <TypeOperator> ")" => TypeKind::Var(<>),
   string=>TypeKind::TypeLevelString(<>),
   int=>TypeKind::TypeLevelInt(<>.into()),
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
@@ -354,6 +377,10 @@ OneOrMore<T>: Vec<T> = {
     xs.push(x);
     xs
   }
+}
+
+Box<T>: Box<T> = {
+  <T> => Box::new(<>)
 }
 
 extern {

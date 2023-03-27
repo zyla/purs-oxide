@@ -17,9 +17,22 @@ pub enum ExprKind {
     // TODO
     Var(QualifiedName),
 
+    DataConstructor(QualifiedName),
+
     App(Box<Expr>, Vec<Expr>),
 
     Lam(Vec<Pat>, Box<Expr>),
+
+    Case {
+        expr: Box<Expr>,
+        branches: Vec<CaseBranch>,
+    },
+}
+
+#[derive(Debug)]
+pub struct CaseBranch {
+    pub pat: Pat,
+    pub expr: Expr,
 }
 
 pub type Pat = Located<PatKind>;
@@ -32,6 +45,10 @@ pub enum PatKind {
     Infix(Box<Pat>, Vec<(Symbol, Pat)>),
 
     Var(Symbol),
+
+    App(Box<Pat>, Vec<Pat>),
+
+    DataConstructor(QualifiedName),
 
     Wildcard,
 }
