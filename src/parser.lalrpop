@@ -3,6 +3,7 @@ use crate::lexer;
 use crate::ast::*;
 use crate::symbol::*;
 use lalrpop_util::ErrorRecovery;
+use lalrpop_util::ParseError;
 
 grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 
@@ -97,13 +98,21 @@ DeclarationKind: DeclarationKind = {
 }
 
 ClassDeclaration: TypeClassDeclaration = {
-  "class" <constraints:(<TypeClassConstraints> "=>")?> <name:UpperIdent> <params:TypeParameter*>
-    <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>
-    TypeClassDeclaration {
-      constraints: constraints.unwrap_or_else(|| vec![]),
-      name,
-      params,
-      methods: methods.unwrap_or_else(|| vec![]),
+  "class"
+    <constraints:(<TypeClassConstraints> "=>")?>
+    <head:Located<Constraint>>
+    <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
+      let (name, params) = super::constraint_to_class_head(head)
+        .ok_or_else(|| ParseError::User {
+          // TODO: make it not a lexer error
+          error: lexer::Error("Invalid instance head".into())
+        })?;
+      Ok(TypeClassDeclaration {
+        constraints: constraints.unwrap_or_else(|| vec![]),
+        name,
+        params,
+        methods: methods.unwrap_or_else(|| vec![]),
+      })
     }
 };
 
@@ -111,15 +120,20 @@ InstanceDeclaration: InstanceDeclaration = {
   "instance"
     <instance_name:(<LowerIdent> "::")?>
     <constraints:(<TypeClassConstraints> "=>")?>
-    <class:UpperQualifiedIdent>
-    <args:Located<AtomicType>*>
-    <body:("where" <MaybeLayoutBlock<ValueDeclaration>>)?> =>
-    InstanceDeclaration {
-      constraints: constraints.unwrap_or_else(|| vec![]),
-      instance_name,
-      class,
-      args,
-      body: body.unwrap_or_else(|| vec![]),
+    <head:Located<Constraint>>
+    <body:("where" <MaybeLayoutBlock<ValueDeclaration>>)?> =>? {
+      let (class, args) = super::constraint_to_instance_head(head)
+        .ok_or_else(|| ParseError::User {
+          // TODO: make it not a lexer error
+          error: lexer::Error("Invalid instance head".into())
+        })?;
+      Ok(InstanceDeclaration {
+        constraints: constraints.unwrap_or_else(|| vec![]),
+        instance_name,
+        class,
+        args,
+        body: body.unwrap_or_else(|| vec![]),
+      })
     }
 };
 

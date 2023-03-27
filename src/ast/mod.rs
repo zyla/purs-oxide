@@ -11,3 +11,9 @@ pub use types::*;
 
 #[derive(Debug)]
 pub struct QualifiedName(pub Symbol);
+
+impl QualifiedName {
+    pub fn is_actually_qualified(&self) -> bool {
+        self.0 .0.contains('.')
+    }
+}

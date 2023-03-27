@@ -1,10 +1,63 @@
+use crate::ast::Located;
 use crate::ast::{Expr, Module, Type};
+use crate::ast::{QualifiedName, TypeKind};
 use crate::lexer;
+use crate::symbol::Symbol;
 use crate::token::Token;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 
 lalrpop_mod!(pub parser);
+
+pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<Type>)> {
+    let mut t = c;
+    let mut args = vec![];
+    loop {
+        match t.into_inner() {
+            TypeKind::TypeConstructor(con) => {
+                args.reverse();
+                return Some((con, args));
+            }
+            TypeKind::TypeApp(f, x) => {
+                args.push(*x);
+                t = *f;
+            }
+            _ => return None,
+        }
+    }
+}
+
+pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<(Symbol, Type)>)> {
+    let mut t = c;
+    let mut params = vec![];
+    loop {
+        match t.into_inner() {
+            TypeKind::TypeConstructor(con) => {
+                if con.is_actually_qualified() {
+                    return None;
+                }
+                params.reverse();
+                return Some((con.0, params));
+            }
+            TypeKind::TypeApp(f, x) => match *x {
+                Located(loc, TypeKind::Var(v)) => {
+                    params.push((
+                        v,
+                        Located(
+                            loc,
+                            TypeKind::TypeConstructor(QualifiedName(Symbol::new(
+                                "Prim.Type".into(),
+                            ))),
+                        ),
+                    ));
+                    t = *f;
+                }
+                _ => return None,
+            },
+            _ => return None,
+        }
+    }
+}
 
 type ParseResult<'a, T> = (
     Vec<ErrorRecovery<usize, Token, &'a str>>,

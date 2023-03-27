@@ -7,6 +7,12 @@ pub struct SourceSpan {
 #[derive(Debug)]
 pub struct Located<T>(pub SourceSpan, pub T);
 
+impl<T> Located<T> {
+    pub fn into_inner(self) -> T {
+        self.1
+    }
+}
+
 #[derive(Debug)]
 pub struct Comment(pub String);
 
