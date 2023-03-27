@@ -171,7 +171,9 @@ InfixExpr<Next>: ExprKind = {
 };
 
 Operator: Symbol = {
-  operator => Symbol::new(<>)
+  operator => Symbol::new(<>),
+  "<=" => Symbol::new("<=".into()),
+  "=>" => Symbol::new("=>".into()),
 };
 
 ApplyExpr<Next>: ExprKind = {

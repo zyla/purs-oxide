@@ -3922,5 +3922,64 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_fat_arrows_as_operators() {
+        assert_debug_snapshot!(parse_expr(r#"1 <= 2 >= 3"#), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 11,
+            },
+            Infix(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+                [
+                    (
+                        Symbol(
+                            "<=",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 5,
+                                end: 6,
+                            },
+                            Literal(
+                                Integer(
+                                    2,
+                                ),
+                            ),
+                        ),
+                    ),
+                    (
+                        Symbol(
+                            ">=",
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 10,
+                                end: 11,
+                            },
+                            Literal(
+                                Integer(
+                                    3,
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
     //
 }
