@@ -1743,6 +1743,494 @@ mod tests {
     }
 
     #[test]
+    fn test_instance_1() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance Foo Int where
+              foo x = 1
+              bar = 2
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 63,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 63,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 31,
+                                                    end: 34,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [
+                                            ValueDeclaration {
+                                                ident: Symbol(
+                                                    "foo",
+                                                ),
+                                                params: [
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 47,
+                                                            end: 48,
+                                                        },
+                                                        Var(
+                                                            Symbol(
+                                                                "x",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                expr: [
+                                                    GuardedExpr {
+                                                        guards: [],
+                                                        expr: Located(
+                                                            SourceSpan {
+                                                                start: 51,
+                                                                end: 52,
+                                                            },
+                                                            Literal(
+                                                                Integer(
+                                                                    1,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                            ValueDeclaration {
+                                                ident: Symbol(
+                                                    "bar",
+                                                ),
+                                                params: [],
+                                                expr: [
+                                                    GuardedExpr {
+                                                        guards: [],
+                                                        expr: Located(
+                                                            SourceSpan {
+                                                                start: 61,
+                                                                end: 62,
+                                                            },
+                                                            Literal(
+                                                                Integer(
+                                                                    2,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    #[ignore = "Can't get the grammar to work"]
+    fn test_instance_2() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance Bar a => Foo a where
+              bar = 1
+        "#)), @r###"
+        "###);
+    }
+
+    #[test]
+    fn test_instance_3() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance (Bar a, Baz b) => Foo Int where
+              bar = 1
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 69,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 69,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 28,
+                                                    end: 33,
+                                                },
+                                                TypeApp(
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 28,
+                                                            end: 31,
+                                                        },
+                                                        TypeConstructor(
+                                                            QualifiedName(
+                                                                Symbol(
+                                                                    "Bar",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 32,
+                                                            end: 33,
+                                                        },
+                                                        Var(
+                                                            Symbol(
+                                                                "a",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 35,
+                                                    end: 40,
+                                                },
+                                                TypeApp(
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 35,
+                                                            end: 38,
+                                                        },
+                                                        TypeConstructor(
+                                                            QualifiedName(
+                                                                Symbol(
+                                                                    "Baz",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 39,
+                                                            end: 40,
+                                                        },
+                                                        Var(
+                                                            Symbol(
+                                                                "b",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 49,
+                                                    end: 52,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [
+                                            ValueDeclaration {
+                                                ident: Symbol(
+                                                    "bar",
+                                                ),
+                                                params: [],
+                                                expr: [
+                                                    GuardedExpr {
+                                                        guards: [],
+                                                        expr: Located(
+                                                            SourceSpan {
+                                                                start: 67,
+                                                                end: 68,
+                                                            },
+                                                            Literal(
+                                                                Integer(
+                                                                    1,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_instance_4() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance Foo Int where
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 41,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 41,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 31,
+                                                    end: 34,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_instance_5() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance Foo Int
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 35,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 34,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 31,
+                                                    end: 34,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_instance_6() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance namedInstance :: Foo Int where
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 58,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 58,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_name: Some(
+                                            Symbol(
+                                                "namedInstance",
+                                            ),
+                                        ),
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 48,
+                                                    end: 51,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
     fn test_parse_atomic_type() {
         assert_debug_snapshot!(parse_type("var"), @r###"
         Located(

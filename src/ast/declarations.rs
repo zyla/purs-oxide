@@ -139,6 +139,8 @@ pub enum DeclarationKind {
     },
 
     Class(TypeClassDeclaration),
+
+    Instance(InstanceDeclaration),
 }
 
 pub type TypeParameter = (Symbol, Type);
@@ -149,6 +151,15 @@ pub struct TypeClassDeclaration {
     pub name: Symbol,
     pub params: Vec<TypeParameter>,
     pub methods: Vec<TypeDeclarationData>,
+}
+
+#[derive(Debug)]
+pub struct InstanceDeclaration {
+    pub constraints: Vec<Type>,
+    pub instance_name: Option<Symbol>,
+    pub class: QualifiedName,
+    pub args: Vec<Type>,
+    pub body: Vec<ValueDeclaration>,
 }
 
 #[derive(Debug)]
