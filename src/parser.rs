@@ -1501,13 +1501,120 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Can't get the grammar to work"]
     fn test_typeclass_2() {
         assert_debug_snapshot!(parse_module(indoc!(r#"
             module Test where
             class Bar a => Foo a where
               bar :: a
         "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 56,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 56,
+                            },
+                            Commented(
+                                [],
+                                Class(
+                                    TypeClassDeclaration {
+                                        constraints: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 24,
+                                                    end: 29,
+                                                },
+                                                TypeApp(
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 24,
+                                                            end: 27,
+                                                        },
+                                                        TypeConstructor(
+                                                            QualifiedName(
+                                                                Symbol(
+                                                                    "Bar",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 28,
+                                                            end: 29,
+                                                        },
+                                                        Var(
+                                                            Symbol(
+                                                                "a",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        name: Symbol(
+                                            "Foo",
+                                        ),
+                                        params: [
+                                            (
+                                                Symbol(
+                                                    "a",
+                                                ),
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 37,
+                                                        end: 38,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Prim.Type",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        methods: [
+                                            TypeDeclarationData {
+                                                ident: Symbol(
+                                                    "bar",
+                                                ),
+                                                type: Located(
+                                                    SourceSpan {
+                                                        start: 54,
+                                                        end: 55,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "a",
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
         "###);
     }
 
@@ -1920,13 +2027,122 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Can't get the grammar to work"]
     fn test_instance_2() {
         assert_debug_snapshot!(parse_module(indoc!(r#"
             module Test where
             instance Bar a => Foo a where
               bar = 1
         "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 58,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 58,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 27,
+                                                    end: 32,
+                                                },
+                                                TypeApp(
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 27,
+                                                            end: 30,
+                                                        },
+                                                        TypeConstructor(
+                                                            QualifiedName(
+                                                                Symbol(
+                                                                    "Bar",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 31,
+                                                            end: 32,
+                                                        },
+                                                        Var(
+                                                            Symbol(
+                                                                "a",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 40,
+                                                    end: 41,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "a",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [
+                                            ValueDeclaration {
+                                                ident: Symbol(
+                                                    "bar",
+                                                ),
+                                                params: [],
+                                                expr: [
+                                                    GuardedExpr {
+                                                        guards: [],
+                                                        expr: Located(
+                                                            SourceSpan {
+                                                                start: 56,
+                                                                end: 57,
+                                                            },
+                                                            Literal(
+                                                                Integer(
+                                                                    1,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
         "###);
     }
 

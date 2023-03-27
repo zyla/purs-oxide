@@ -139,7 +139,7 @@ InstanceDeclaration: InstanceDeclaration = {
 
 
 TypeClassConstraints: Vec<Type> = {
-// TODO:  <Located<Constraint>> => vec![<>],
+  <Located<Constraint>> => vec![<>],
   "(" <SepBy<Located<Constraint>, ",">> ")"
 };
 
