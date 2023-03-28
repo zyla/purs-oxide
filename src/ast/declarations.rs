@@ -141,7 +141,7 @@ pub enum DeclarationKind {
 
     Class(TypeClassDeclaration),
 
-    Instance(InstanceDeclaration),
+    InstanceChain(Vec<InstanceDeclaration>),
 }
 
 pub type Kind = Type;

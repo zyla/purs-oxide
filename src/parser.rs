@@ -1831,90 +1831,92 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: Plain,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
-                                            ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 31,
-                                                    end: 34,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
-                                                        ),
-                                                    ),
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
                                                 ),
                                             ),
-                                        ],
-                                        body: [
-                                            ValueDeclaration {
-                                                ident: Symbol(
-                                                    "foo",
-                                                ),
-                                                params: [
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 47,
-                                                            end: 48,
-                                                        },
-                                                        Var(
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 31,
+                                                        end: 34,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
                                                             Symbol(
-                                                                "x",
+                                                                "Int",
                                                             ),
                                                         ),
                                                     ),
-                                                ],
-                                                expr: [
-                                                    GuardedExpr {
-                                                        guards: [],
-                                                        expr: Located(
-                                                            SourceSpan {
-                                                                start: 51,
-                                                                end: 52,
-                                                            },
-                                                            Literal(
-                                                                Integer(
-                                                                    1,
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    },
-                                                ],
-                                            },
-                                            ValueDeclaration {
-                                                ident: Symbol(
-                                                    "bar",
                                                 ),
-                                                params: [],
-                                                expr: [
-                                                    GuardedExpr {
-                                                        guards: [],
-                                                        expr: Located(
+                                            ],
+                                            body: [
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "foo",
+                                                    ),
+                                                    params: [
+                                                        Located(
                                                             SourceSpan {
-                                                                start: 61,
-                                                                end: 62,
+                                                                start: 47,
+                                                                end: 48,
                                                             },
-                                                            Literal(
-                                                                Integer(
-                                                                    2,
+                                                            Var(
+                                                                Symbol(
+                                                                    "x",
                                                                 ),
                                                             ),
                                                         ),
-                                                    },
-                                                ],
-                                            },
-                                        ],
-                                    },
+                                                    ],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 51,
+                                                                    end: 52,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "bar",
+                                                    ),
+                                                    params: [],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 61,
+                                                                    end: 62,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        2,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -1955,87 +1957,89 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 27,
-                                                    end: 32,
-                                                },
-                                                TypeApp(
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 27,
-                                                            end: 30,
-                                                        },
-                                                        TypeConstructor(
-                                                            QualifiedName(
-                                                                Symbol(
-                                                                    "Bar",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 31,
-                                                            end: 32,
-                                                        },
-                                                        Var(
-                                                            Symbol(
-                                                                "a",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
-                                        ],
-                                        instance_type: Plain,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
-                                            ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 40,
-                                                    end: 41,
-                                                },
-                                                Var(
-                                                    Symbol(
-                                                        "a",
-                                                    ),
-                                                ),
-                                            ),
-                                        ],
-                                        body: [
-                                            ValueDeclaration {
-                                                ident: Symbol(
-                                                    "bar",
-                                                ),
-                                                params: [],
-                                                expr: [
-                                                    GuardedExpr {
-                                                        guards: [],
-                                                        expr: Located(
-                                                            SourceSpan {
-                                                                start: 56,
-                                                                end: 57,
-                                                            },
-                                                            Literal(
-                                                                Integer(
-                                                                    1,
-                                                                ),
-                                                            ),
-                                                        ),
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 27,
+                                                        end: 32,
                                                     },
-                                                ],
-                                            },
-                                        ],
-                                    },
+                                                    TypeApp(
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 27,
+                                                                end: 30,
+                                                            },
+                                                            TypeConstructor(
+                                                                QualifiedName(
+                                                                    Symbol(
+                                                                        "Bar",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 31,
+                                                                end: 32,
+                                                            },
+                                                            Var(
+                                                                Symbol(
+                                                                    "a",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
+                                            ),
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 40,
+                                                        end: 41,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "a",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            body: [
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "bar",
+                                                    ),
+                                                    params: [],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 56,
+                                                                    end: 57,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2076,121 +2080,123 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 28,
-                                                    end: 33,
-                                                },
-                                                TypeApp(
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 28,
-                                                            end: 31,
-                                                        },
-                                                        TypeConstructor(
-                                                            QualifiedName(
-                                                                Symbol(
-                                                                    "Bar",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 32,
-                                                            end: 33,
-                                                        },
-                                                        Var(
-                                                            Symbol(
-                                                                "a",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
-                                            Located(
-                                                SourceSpan {
-                                                    start: 35,
-                                                    end: 40,
-                                                },
-                                                TypeApp(
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 35,
-                                                            end: 38,
-                                                        },
-                                                        TypeConstructor(
-                                                            QualifiedName(
-                                                                Symbol(
-                                                                    "Baz",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                    Located(
-                                                        SourceSpan {
-                                                            start: 39,
-                                                            end: 40,
-                                                        },
-                                                        Var(
-                                                            Symbol(
-                                                                "b",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
-                                        ],
-                                        instance_type: Plain,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
-                                            ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 49,
-                                                    end: 52,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
-                                        ],
-                                        body: [
-                                            ValueDeclaration {
-                                                ident: Symbol(
-                                                    "bar",
-                                                ),
-                                                params: [],
-                                                expr: [
-                                                    GuardedExpr {
-                                                        guards: [],
-                                                        expr: Located(
-                                                            SourceSpan {
-                                                                start: 67,
-                                                                end: 68,
-                                                            },
-                                                            Literal(
-                                                                Integer(
-                                                                    1,
-                                                                ),
-                                                            ),
-                                                        ),
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 28,
+                                                        end: 33,
                                                     },
-                                                ],
-                                            },
-                                        ],
-                                    },
+                                                    TypeApp(
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 28,
+                                                                end: 31,
+                                                            },
+                                                            TypeConstructor(
+                                                                QualifiedName(
+                                                                    Symbol(
+                                                                        "Bar",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 32,
+                                                                end: 33,
+                                                            },
+                                                            Var(
+                                                                Symbol(
+                                                                    "a",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 35,
+                                                        end: 40,
+                                                    },
+                                                    TypeApp(
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 35,
+                                                                end: 38,
+                                                            },
+                                                            TypeConstructor(
+                                                                QualifiedName(
+                                                                    Symbol(
+                                                                        "Baz",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 39,
+                                                                end: 40,
+                                                            },
+                                                            Var(
+                                                                Symbol(
+                                                                    "b",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
+                                            ),
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 49,
+                                                        end: 52,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            body: [
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "bar",
+                                                    ),
+                                                    params: [],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 67,
+                                                                    end: 68,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2230,33 +2236,35 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: Plain,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 31,
-                                                    end: 34,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 31,
+                                                        end: 34,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
-                                            ),
-                                        ],
-                                        body: [],
-                                    },
+                                            ],
+                                            body: [],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2296,33 +2304,35 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: Plain,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 31,
-                                                    end: 34,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 31,
+                                                        end: 34,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
-                                            ),
-                                        ],
-                                        body: [],
-                                    },
+                                            ],
+                                            body: [],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2362,37 +2372,39 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: Plain,
-                                        instance_name: Some(
-                                            Symbol(
-                                                "namedInstance",
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: Some(
+                                                Symbol(
+                                                    "namedInstance",
+                                                ),
                                             ),
-                                        ),
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 48,
-                                                    end: 51,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 48,
+                                                        end: 51,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
-                                            ),
-                                        ],
-                                        body: [],
-                                    },
+                                            ],
+                                            body: [],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2433,33 +2445,35 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: Derive,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Derive,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 38,
-                                                    end: 41,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 38,
+                                                        end: 41,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
-                                            ),
-                                        ],
-                                        body: [],
-                                    },
+                                            ],
+                                            body: [],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),
@@ -2470,33 +2484,176 @@ mod tests {
                             },
                             Commented(
                                 [],
-                                Instance(
-                                    InstanceDeclaration {
-                                        constraints: [],
-                                        instance_type: DeriveNewtype,
-                                        instance_name: None,
-                                        class: QualifiedName(
-                                            Symbol(
-                                                "Foo",
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: DeriveNewtype,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ),
-                                        args: [
-                                            Located(
-                                                SourceSpan {
-                                                    start: 70,
-                                                    end: 73,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Int",
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 70,
+                                                        end: 73,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
                                                         ),
                                                     ),
                                                 ),
+                                            ],
+                                            body: [],
+                                        },
+                                    ],
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_instance_chain() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            instance Foo Int where
+              x = 1
+            else instance Foo a where
+              x = 2
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 83,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 83,
+                            },
+                            Commented(
+                                [],
+                                InstanceChain(
+                                    [
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
                                             ),
-                                        ],
-                                        body: [],
-                                    },
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 31,
+                                                        end: 34,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            body: [
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "x",
+                                                    ),
+                                                    params: [],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 47,
+                                                                    end: 48,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        InstanceDeclaration {
+                                            constraints: [],
+                                            instance_type: Plain,
+                                            instance_name: None,
+                                            class: QualifiedName(
+                                                Symbol(
+                                                    "Foo",
+                                                ),
+                                            ),
+                                            args: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 67,
+                                                        end: 68,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "a",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            body: [
+                                                ValueDeclaration {
+                                                    ident: Symbol(
+                                                        "x",
+                                                    ),
+                                                    params: [],
+                                                    expr: [
+                                                        GuardedExpr {
+                                                            guards: [],
+                                                            expr: Located(
+                                                                SourceSpan {
+                                                                    start: 81,
+                                                                    end: 82,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        2,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
                                 ),
                             ),
                         ),

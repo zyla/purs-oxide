@@ -99,7 +99,7 @@ DeclarationKind: DeclarationKind = {
   "type" <name:UpperIdent> <params:TypeParameter*> "=" <body:Type> => DeclarationKind::TypeSynonym{name, params, body},
   "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
   ClassDeclaration => DeclarationKind::Class(<>),
-  InstanceDeclaration => DeclarationKind::Instance(<>),
+  InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
 }
 
@@ -147,6 +147,8 @@ ClassDeclaration: TypeClassDeclaration = {
       })
     }
 };
+
+InstanceChain: Vec<InstanceDeclaration> = SepBy1<InstanceDeclaration, "else">;
 
 InstanceDeclaration: InstanceDeclaration = {
   <instance_type:InstanceType>
