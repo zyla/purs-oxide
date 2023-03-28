@@ -170,7 +170,13 @@ TypeDeclaration: TypeDeclarationData = {
 
 pub Expr: Expr = Located<ExprKind>;
 
-ExprKind: ExprKind = LambdaExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>;
+ExprKind: ExprKind = LambdaExpr<TypedExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>>;
+
+TypedExpr<Next>: ExprKind = {
+  Next,
+  <expr:Box<Located<Next>>> "::" <type_:Type> => ExprKind::Typed(expr, type_),
+};
+
 
 LambdaExpr<Next>: ExprKind = {
   Next,

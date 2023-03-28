@@ -4298,5 +4298,68 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_typed_expr() {
+        assert_debug_snapshot!(parse_expr("foo bar :: Int"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 14,
+            },
+            Typed(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 7,
+                    },
+                    App(
+                        Located(
+                            SourceSpan {
+                                start: 0,
+                                end: 3,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "foo",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 4,
+                                    end: 7,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "bar",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 11,
+                        end: 14,
+                    },
+                    TypeConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "Int",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }

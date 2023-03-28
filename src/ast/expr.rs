@@ -1,4 +1,4 @@
-use super::Located;
+use super::{Located, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -27,6 +27,8 @@ pub enum ExprKind {
         expr: Box<Expr>,
         branches: Vec<CaseBranch>,
     },
+
+    Typed(Box<Expr>, Type),
 }
 
 #[derive(Debug)]
