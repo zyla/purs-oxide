@@ -106,9 +106,9 @@ pub type Declaration = Located<Commented<DeclarationKind>>;
 #[derive(Debug)]
 pub enum DeclarationKind {
     Data {
-        r#type: DataDeclType,
+        type_: DataDeclType,
         name: Symbol,
-        params: Vec<(Symbol, Option<Type>)>,
+        params: Vec<TypeParameter>,
         constructors: Vec<DataConstructorDeclaration>,
     },
 
@@ -124,7 +124,7 @@ pub enum DeclarationKind {
     KindSignature {
         for_type: KindSignatureFor,
         name: Symbol,
-        kind: Type,
+        kind: Kind,
     },
 
     Role(RoleDeclarationData),
@@ -143,7 +143,9 @@ pub enum DeclarationKind {
     Instance(InstanceDeclaration),
 }
 
-pub type TypeParameter = (Symbol, Type);
+pub type Kind = Type;
+
+pub type TypeParameter = (Symbol, Option<Kind>);
 
 #[derive(Debug)]
 pub struct TypeClassDeclaration {
@@ -184,13 +186,14 @@ pub type DataConstructorDeclaration = Located<Commented<DataConstructorDeclarati
 pub struct DataConstructorDeclarationData {
     pub name: Symbol,
 
-    // TODO: why do they have names? I thought datacon fields are unnamed in PS
-    pub fields: Vec<(Symbol, Type)>,
+    // TODO: in original AST they have names. Why? I thought datacon fields are unnamed in PS
+    pub fields: Vec<Type>,
 }
 
 #[derive(Debug)]
 pub enum DataDeclType {
     Data,
+    ForeignData,
     Newtype,
 }
 

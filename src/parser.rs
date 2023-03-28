@@ -1,4 +1,5 @@
 use crate::ast::Located;
+use crate::ast::TypeParameter;
 use crate::ast::{Expr, Module, Type};
 use crate::ast::{QualifiedName, TypeKind};
 use crate::lexer;
@@ -27,7 +28,7 @@ pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<
     }
 }
 
-pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<(Symbol, Type)>)> {
+pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParameter>)> {
     let mut t = c;
     let mut params = vec![];
     loop {
@@ -40,18 +41,11 @@ pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<(Symbol, T
                 return Some((con.0, params));
             }
             TypeKind::TypeApp(f, x) => match *x {
-                Located(loc, TypeKind::Var(v)) => {
-                    params.push((
-                        v,
-                        Located(
-                            loc,
-                            TypeKind::TypeConstructor(QualifiedName(Symbol::new(
-                                "Prim.Type".into(),
-                            ))),
-                        ),
-                    ));
+                Located(_, TypeKind::Var(v)) => {
+                    params.push((v, None));
                     t = *f;
                 }
+                // TODO: handle kinded types
                 _ => return None,
             },
             _ => return None,
@@ -1201,19 +1195,7 @@ mod tests {
                                             Symbol(
                                                 "a",
                                             ),
-                                            Located(
-                                                SourceSpan {
-                                                    start: 42,
-                                                    end: 43,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Prim.Type",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
+                                            None,
                                         ),
                                     ],
                                     body: Located(
@@ -1246,37 +1228,13 @@ mod tests {
                                             Symbol(
                                                 "a",
                                             ),
-                                            Located(
-                                                SourceSpan {
-                                                    start: 57,
-                                                    end: 58,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Prim.Type",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
+                                            None,
                                         ),
                                         (
                                             Symbol(
                                                 "b",
                                             ),
-                                            Located(
-                                                SourceSpan {
-                                                    start: 59,
-                                                    end: 60,
-                                                },
-                                                TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Prim.Type",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ),
+                                            None,
                                         ),
                                     ],
                                     body: Located(
@@ -1419,19 +1377,7 @@ mod tests {
                                                 Symbol(
                                                     "a",
                                                 ),
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 28,
-                                                        end: 29,
-                                                    },
-                                                    TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Prim.Type",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
+                                                None,
                                             ),
                                         ],
                                         methods: [
@@ -1574,19 +1520,7 @@ mod tests {
                                                 Symbol(
                                                     "a",
                                                 ),
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 37,
-                                                        end: 38,
-                                                    },
-                                                    TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Prim.Type",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
+                                                None,
                                             ),
                                         ],
                                         methods: [
@@ -1724,19 +1658,7 @@ mod tests {
                                                 Symbol(
                                                     "a",
                                                 ),
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 46,
-                                                        end: 47,
-                                                    },
-                                                    TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Prim.Type",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
+                                                None,
                                             ),
                                         ],
                                         methods: [
@@ -1808,19 +1730,7 @@ mod tests {
                                                 Symbol(
                                                     "a",
                                                 ),
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 28,
-                                                        end: 29,
-                                                    },
-                                                    TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Prim.Type",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
+                                                None,
                                             ),
                                         ],
                                         methods: [],
@@ -1875,19 +1785,7 @@ mod tests {
                                                 Symbol(
                                                     "a",
                                                 ),
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 28,
-                                                        end: 29,
-                                                    },
-                                                    TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Prim.Type",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
+                                                None,
                                             ),
                                         ],
                                         methods: [],
@@ -2600,6 +2498,168 @@ mod tests {
                                         body: [],
                                     },
                                 ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_data_decl() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            data Maybe a = Nothing | Just a
+            newtype Foo = Foo Int
+            foreign import data X
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 94,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 49,
+                            },
+                            Commented(
+                                [],
+                                Data {
+                                    type_: Data,
+                                    name: Symbol(
+                                        "Maybe",
+                                    ),
+                                    params: [
+                                        (
+                                            Symbol(
+                                                "a",
+                                            ),
+                                            None,
+                                        ),
+                                    ],
+                                    constructors: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 33,
+                                                end: 40,
+                                            },
+                                            Commented(
+                                                [],
+                                                DataConstructorDeclarationData {
+                                                    name: Symbol(
+                                                        "Nothing",
+                                                    ),
+                                                    fields: [],
+                                                },
+                                            ),
+                                        ),
+                                        Located(
+                                            SourceSpan {
+                                                start: 43,
+                                                end: 49,
+                                            },
+                                            Commented(
+                                                [],
+                                                DataConstructorDeclarationData {
+                                                    name: Symbol(
+                                                        "Just",
+                                                    ),
+                                                    fields: [
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 48,
+                                                                end: 49,
+                                                            },
+                                                            Var(
+                                                                Symbol(
+                                                                    "a",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                },
+                                            ),
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 50,
+                                end: 71,
+                            },
+                            Commented(
+                                [],
+                                Data {
+                                    type_: Newtype,
+                                    name: Symbol(
+                                        "Foo",
+                                    ),
+                                    params: [],
+                                    constructors: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 64,
+                                                end: 71,
+                                            },
+                                            Commented(
+                                                [],
+                                                DataConstructorDeclarationData {
+                                                    name: Symbol(
+                                                        "Foo",
+                                                    ),
+                                                    fields: [
+                                                        Located(
+                                                            SourceSpan {
+                                                                start: 68,
+                                                                end: 71,
+                                                            },
+                                                            TypeConstructor(
+                                                                QualifiedName(
+                                                                    Symbol(
+                                                                        "Int",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                },
+                                            ),
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 72,
+                                end: 93,
+                            },
+                            Commented(
+                                [],
+                                Data {
+                                    type_: ForeignData,
+                                    name: Symbol(
+                                        "X",
+                                    ),
+                                    params: [],
+                                    constructors: [],
+                                },
                             ),
                         ),
                     ],

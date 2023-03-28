@@ -100,7 +100,31 @@ DeclarationKind: DeclarationKind = {
   "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
   ClassDeclaration => DeclarationKind::Class(<>),
   InstanceDeclaration => DeclarationKind::Instance(<>),
+  DataDeclaration,
 }
+
+DataDeclaration: DeclarationKind = {
+  <type_:DataDeclType> <name:UpperIdent> <params:TypeParameter*>
+    <constructors:("=" <SepBy1<DataConstructorDeclaration, "|">>)?> =>
+    DeclarationKind::Data {
+      type_,
+      name,
+      params,
+      constructors: constructors.unwrap_or_else(|| vec![]),
+    }
+};
+
+DataConstructorDeclaration = Located<Commented<DataConstructorDeclarationData>>;
+
+DataConstructorDeclarationData: DataConstructorDeclarationData = {
+  <name:UpperIdent> <fields:Located<AtomicType>*> => DataConstructorDeclarationData{ name, fields }
+};
+
+DataDeclType: DataDeclType = {
+  "data" => DataDeclType::Data,
+  "foreign" "import" "data" => DataDeclType::ForeignData,
+  "newtype" => DataDeclType::Newtype,
+};
 
 ClassDeclaration: TypeClassDeclaration = {
   "class"
@@ -155,9 +179,9 @@ TypeClassConstraints: Vec<Type> = {
   "(" <SepBy<Located<Constraint>, ",">> ")"
 };
 
-TypeParameter: (Symbol, Type) = {
-  <start:@L> <name:LowerIdent> <end:@R> =>
-    (name, Located(SourceSpan{start, end}, TypeKind::TypeConstructor(QualifiedName(Symbol::new("Prim.Type".into())))))
+TypeParameter: TypeParameter = {
+  <name:LowerIdent> => (name, None),
+  "(" <name:LowerIdent> "::" <type_:Type> ")" => (name, Some(type_))
 };
 
 ValueDeclaration: ValueDeclaration = {
