@@ -170,7 +170,7 @@ TypeDeclaration: TypeDeclarationData = {
 
 pub Expr: Expr = Located<ExprKind>;
 
-ExprKind: ExprKind = LambdaExpr<TypedExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>>;
+ExprKind: ExprKind = LambdaIfExpr<TypedExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>>;
 
 TypedExpr<Next>: ExprKind = {
   Next,
@@ -178,9 +178,10 @@ TypedExpr<Next>: ExprKind = {
 };
 
 
-LambdaExpr<Next>: ExprKind = {
+LambdaIfExpr<Next>: ExprKind = {
   Next,
   "\\" <params:Located<PrimaryPat>+> "->" <body:Located<Next>> => ExprKind::Lam(params, Box::new(body)),
+  "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Next>>> => ExprKind::If{ cond, then_, else_ },
 };
 
 InfixExpr<Next>: ExprKind = {
@@ -216,6 +217,7 @@ CaseExpr: ExprKind = {
   "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>> =>
     ExprKind::Case{ expr, branches }
 };
+
 
 CaseBranch: CaseBranch = {
   <pat:Pat> "->" <expr:Expr> => CaseBranch{ pat, expr }

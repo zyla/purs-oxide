@@ -4361,5 +4361,54 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_if() {
+        assert_debug_snapshot!(parse_expr("if b then 1 else 2"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 18,
+            },
+            If {
+                cond: Located(
+                    SourceSpan {
+                        start: 3,
+                        end: 4,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "b",
+                            ),
+                        ),
+                    ),
+                ),
+                then_: Located(
+                    SourceSpan {
+                        start: 10,
+                        end: 11,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+                else_: Located(
+                    SourceSpan {
+                        start: 17,
+                        end: 18,
+                    },
+                    Literal(
+                        Integer(
+                            2,
+                        ),
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
     //
 }

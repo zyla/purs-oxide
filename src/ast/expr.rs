@@ -28,6 +28,12 @@ pub enum ExprKind {
         branches: Vec<CaseBranch>,
     },
 
+    If {
+        cond: Box<Expr>,
+        then_: Box<Expr>,
+        else_: Box<Expr>,
+    },
+
     Typed(Box<Expr>, Type),
 }
 
