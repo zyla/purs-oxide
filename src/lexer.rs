@@ -135,17 +135,7 @@ impl<'a> Iterator for Lexer<'a> {
             }
 
             // End paren pairs
-            if matches!(
-                (&entry.token, &next_token.token),
-                (Token::LeftParen, Token::RightParen)
-                    | (Token::LeftBrace, Token::RightBrace)
-                    | (Token::LeftBracket, Token::RightBracket)
-                    | (Token::Case, Token::Of)
-                    | (Token::If, Token::Then)
-                    | (Token::Then, Token::Else)
-                    | (Token::Backslash, Token::Arrow)
-                    | (Token::Pipe, Token::Arrow | Token::Equal)
-            ) {
+            if is_matching_paren_pair(&entry.token, &next_token.token) {
                 self.layout_stack.pop();
 
                 if let Some(entry) = self.layout_stack.last() {
@@ -300,7 +290,9 @@ impl<'a> Iterator for Lexer<'a> {
                 | Token::Case
                 | Token::If
                 | Token::Then
-                | Token::Backslash => {
+                | Token::Backslash
+                    if !is_matching_paren_pair(&prev_token.token, &next_token.token) =>
+                {
                     self.layout_stack.push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
@@ -327,6 +319,20 @@ impl<'a> Iterator for Lexer<'a> {
         }
         Some(Ok(next_token))
     }
+}
+
+fn is_matching_paren_pair(t1: &Token, t2: &Token) -> bool {
+    matches!(
+        (t1, t2),
+        (Token::LeftParen, Token::RightParen)
+            | (Token::LeftBrace, Token::RightBrace)
+            | (Token::LeftBracket, Token::RightBracket)
+            | (Token::Case, Token::Of)
+            | (Token::If, Token::Then)
+            | (Token::Then, Token::Else)
+            | (Token::Backslash, Token::Arrow)
+            | (Token::Pipe, Token::Arrow | Token::Equal)
+    )
 }
 
 fn find_parent_backtick(layout_stack: &[LayoutEntry]) -> Option<usize> {
@@ -1191,6 +1197,24 @@ mod tests {
         module Foo
           where{
         x = 1}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_empty_paren_pairs() {
+        assert_snapshot!(print_layout(indoc!("
+            module Foo where
+            x = {}
+            x = []
+            x = ()
+            y = 1
+        ")), @r###"
+        module Foo where{
+        x = {};
+        x = [];
+        x = ();
+        y = 1}
         <eof>
         "###);
     }
