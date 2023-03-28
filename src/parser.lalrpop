@@ -104,12 +104,15 @@ DeclarationKind: DeclarationKind = {
 }
 
 DataDeclaration: DeclarationKind = {
-  <type_:DataDeclType> <name:UpperIdent> <params:TypeParameter*>
+  <type_:DataDeclType> <name:UpperIdent>
+    <params:TypeParameter*>
+    <kind:("::" <Type>)?>
     <constructors:("=" <SepBy1<DataConstructorDeclaration, "|">>)?> =>
     DeclarationKind::Data {
       type_,
       name,
       params,
+      kind,
       constructors: constructors.unwrap_or_else(|| vec![]),
     }
 };

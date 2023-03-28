@@ -2514,11 +2514,12 @@ mod tests {
             data Maybe a = Nothing | Just a
             newtype Foo = Foo Int
             foreign import data X
+            foreign import data X :: Type
         "#)), @r###"
         Located(
             SourceSpan {
                 start: 0,
-                end: 94,
+                end: 124,
             },
             Commented(
                 [],
@@ -2551,6 +2552,7 @@ mod tests {
                                             None,
                                         ),
                                     ],
+                                    kind: None,
                                     constructors: [
                                         Located(
                                             SourceSpan {
@@ -2611,6 +2613,7 @@ mod tests {
                                         "Foo",
                                     ),
                                     params: [],
+                                    kind: None,
                                     constructors: [
                                         Located(
                                             SourceSpan {
@@ -2658,6 +2661,39 @@ mod tests {
                                         "X",
                                     ),
                                     params: [],
+                                    kind: None,
+                                    constructors: [],
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 94,
+                                end: 123,
+                            },
+                            Commented(
+                                [],
+                                Data {
+                                    type_: ForeignData,
+                                    name: Symbol(
+                                        "X",
+                                    ),
+                                    params: [],
+                                    kind: Some(
+                                        Located(
+                                            SourceSpan {
+                                                start: 119,
+                                                end: 123,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Type",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                     constructors: [],
                                 },
                             ),

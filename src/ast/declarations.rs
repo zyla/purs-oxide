@@ -109,6 +109,7 @@ pub enum DeclarationKind {
         type_: DataDeclType,
         name: Symbol,
         params: Vec<TypeParameter>,
+        kind: Option<Type>,
         constructors: Vec<DataConstructorDeclaration>,
     },
 
