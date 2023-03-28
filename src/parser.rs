@@ -1936,6 +1936,7 @@ mod tests {
                                 Instance(
                                     InstanceDeclaration {
                                         constraints: [],
+                                        instance_type: Plain,
                                         instance_name: None,
                                         class: QualifiedName(
                                             Symbol(
@@ -2092,6 +2093,7 @@ mod tests {
                                                 ),
                                             ),
                                         ],
+                                        instance_type: Plain,
                                         instance_name: None,
                                         class: QualifiedName(
                                             Symbol(
@@ -2244,6 +2246,7 @@ mod tests {
                                                 ),
                                             ),
                                         ],
+                                        instance_type: Plain,
                                         instance_name: None,
                                         class: QualifiedName(
                                             Symbol(
@@ -2332,6 +2335,7 @@ mod tests {
                                 Instance(
                                     InstanceDeclaration {
                                         constraints: [],
+                                        instance_type: Plain,
                                         instance_name: None,
                                         class: QualifiedName(
                                             Symbol(
@@ -2397,6 +2401,7 @@ mod tests {
                                 Instance(
                                     InstanceDeclaration {
                                         constraints: [],
+                                        instance_type: Plain,
                                         instance_name: None,
                                         class: QualifiedName(
                                             Symbol(
@@ -2462,6 +2467,7 @@ mod tests {
                                 Instance(
                                     InstanceDeclaration {
                                         constraints: [],
+                                        instance_type: Plain,
                                         instance_name: Some(
                                             Symbol(
                                                 "namedInstance",
@@ -2477,6 +2483,110 @@ mod tests {
                                                 SourceSpan {
                                                     start: 48,
                                                     end: 51,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_instance_deriving() {
+        assert_debug_snapshot!(parse_module(indoc!(r#"
+            module Test where
+            derive instance Foo Int
+            derive newtype instance Foo Int
+        "#)), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 74,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Test",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 18,
+                                end: 41,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_type: Derive,
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 38,
+                                                    end: 41,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Int",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        body: [],
+                                    },
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 42,
+                                end: 73,
+                            },
+                            Commented(
+                                [],
+                                Instance(
+                                    InstanceDeclaration {
+                                        constraints: [],
+                                        instance_type: DeriveNewtype,
+                                        instance_name: None,
+                                        class: QualifiedName(
+                                            Symbol(
+                                                "Foo",
+                                            ),
+                                        ),
+                                        args: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 70,
+                                                    end: 73,
                                                 },
                                                 TypeConstructor(
                                                     QualifiedName(

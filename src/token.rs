@@ -62,6 +62,9 @@ pub enum Token {
     As,
     Hiding,
     Foreign,
+    Derive,
+    Newtype,
+    Data,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

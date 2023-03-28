@@ -122,6 +122,7 @@ ClassDeclaration: TypeClassDeclaration = {
 };
 
 InstanceDeclaration: InstanceDeclaration = {
+  <instance_type:InstanceType>
   "instance"
     <instance_name:(<LowerIdent> "::")?>
     <constraints:(<TypeClassConstraints> "=>")?>
@@ -134,6 +135,7 @@ InstanceDeclaration: InstanceDeclaration = {
         })?;
       Ok(InstanceDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
+        instance_type,
         instance_name,
         class,
         args,
@@ -142,6 +144,11 @@ InstanceDeclaration: InstanceDeclaration = {
     }
 };
 
+InstanceType: InstanceType = {
+  () => InstanceType::Plain,
+  "derive" => InstanceType::Derive,
+  "derive" "newtype" => InstanceType::DeriveNewtype,
+};
 
 TypeClassConstraints: Vec<Type> = {
   <Located<Constraint>> => vec![<>],
@@ -448,6 +455,9 @@ extern {
     "as" => Token::As,
     "hiding" => Token::Hiding,
     "foreign" => Token::Foreign,
+    "derive" => Token::Derive,
+    "newtype" => Token::Newtype,
+    "data" => Token::Data,
     "_" => Token::Wildcard,
   }
 }

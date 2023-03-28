@@ -156,10 +156,18 @@ pub struct TypeClassDeclaration {
 #[derive(Debug)]
 pub struct InstanceDeclaration {
     pub constraints: Vec<Type>,
+    pub instance_type: InstanceType,
     pub instance_name: Option<Symbol>,
     pub class: QualifiedName,
     pub args: Vec<Type>,
     pub body: Vec<ValueDeclaration>,
+}
+
+#[derive(Debug)]
+pub enum InstanceType {
+    Plain,
+    Derive,
+    DeriveNewtype,
 }
 
 #[derive(Debug)]
