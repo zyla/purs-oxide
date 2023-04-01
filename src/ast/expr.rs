@@ -18,6 +18,9 @@ pub enum ExprKind {
 
     Var(QualifiedName),
 
+    /// Standalone operator
+    Operator(Symbol),
+
     DataConstructor(QualifiedName),
 
     App(Box<Expr>, Vec<Expr>),

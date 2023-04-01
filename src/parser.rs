@@ -121,6 +121,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             }
             ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
             ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
+            ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
         },
     ))
 }
@@ -799,6 +800,11 @@ mod tests {
               where y = 5
         "
         )));
+    }
+
+    #[test]
+    fn test_standalone_operator() {
+        assert_debug_snapshot!(parse_expr("(+)"));
     }
 
     //

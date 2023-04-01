@@ -6,6 +6,8 @@ pub type Type = Located<TypeKind>;
 pub enum TypeKind {
     Unknown(u64),
     Var(Symbol),
+    /// Standalone operator
+    Operator(Symbol),
     TypeLevelString(String),
     TypeLevelInt(num::BigInt),
     Wildcard(WildcardKind),

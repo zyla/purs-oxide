@@ -293,6 +293,7 @@ PrimaryExpr<Variant>: ExprKind = {
   "(" <ExprKind<"full">> ")" => <>,
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
+  "(" <Operator> ")" => ExprKind::Operator(<>),
 }
 
 RecordUpdate: (Symbol, Expr) = {
@@ -408,7 +409,7 @@ TypeConstructor: TypeKind = {
 
 AtomicType: TypeKind = {
   LowerIdent => TypeKind::Var(<>),
-  "(" <TypeOperator> ")" => TypeKind::Var(<>),
+  "(" <TypeOperator> ")" => TypeKind::Operator(<>),
   string=>TypeKind::TypeLevelString(<>),
   int=>TypeKind::TypeLevelInt(<>.into()),
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
