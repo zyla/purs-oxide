@@ -4368,12 +4368,13 @@ mod tests {
             C a b ->
               1
             D (A c) _ -> 1
+            E -> 1
             _ -> 1
         ")), @r###"
         Located(
             SourceSpan {
                 start: 0,
-                end: 53,
+                end: 62,
             },
             Case {
                 expr: Located(
@@ -4507,12 +4508,39 @@ mod tests {
                                 start: 46,
                                 end: 47,
                             },
-                            Wildcard,
+                            DataConstructorApp(
+                                QualifiedName(
+                                    Symbol(
+                                        "E",
+                                    ),
+                                ),
+                                [],
+                            ),
                         ),
                         expr: Located(
                             SourceSpan {
                                 start: 51,
                                 end: 52,
+                            },
+                            Literal(
+                                Integer(
+                                    1,
+                                ),
+                            ),
+                        ),
+                    },
+                    CaseBranch {
+                        pat: Located(
+                            SourceSpan {
+                                start: 55,
+                                end: 56,
+                            },
+                            Wildcard,
+                        ),
+                        expr: Located(
+                            SourceSpan {
+                                start: 60,
+                                end: 61,
                             },
                             Literal(
                                 Integer(

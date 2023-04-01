@@ -275,7 +275,7 @@ InfixPat<Next>: PatKind = {
 
 ApplyPat<Next>: PatKind = {
   Next,
-  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>+> => PatKind::DataConstructorApp(con, args),
+  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>*> => PatKind::DataConstructorApp(con, args),
 };
 
 PrimaryPat: PatKind = {
