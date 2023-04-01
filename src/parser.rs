@@ -5035,5 +5035,199 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_block_argument() {
+        assert_debug_snapshot!(parse_expr("f \\x -> y"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 9,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 2,
+                            end: 9,
+                        },
+                        Lam(
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 3,
+                                        end: 4,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "x",
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            Located(
+                                SourceSpan {
+                                    start: 8,
+                                    end: 9,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "y",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_named_pattern() {
+        assert_debug_snapshot!(parse_expr("\\x@Nothing -> y"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 15,
+            },
+            Lam(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 1,
+                            end: 10,
+                        },
+                        Named(
+                            Symbol(
+                                "x",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 3,
+                                    end: 10,
+                                },
+                                DataConstructorApp(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Nothing",
+                                        ),
+                                    ),
+                                    [],
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+                Located(
+                    SourceSpan {
+                        start: 14,
+                        end: 15,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "y",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_fn_arg_con_arity0() {
+        assert_debug_snapshot!(parse_module(indoc!("
+        module Some.Module where
+        f Nothing = 1
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 39,
+            },
+            Commented(
+                [],
+                ModuleInner {
+                    name: QualifiedName(
+                        Symbol(
+                            "Some.Module",
+                        ),
+                    ),
+                    exports: None,
+                    imports: [],
+                    declarations: [
+                        Located(
+                            SourceSpan {
+                                start: 25,
+                                end: 38,
+                            },
+                            Commented(
+                                [],
+                                ValueDeclaration(
+                                    ValueDeclaration {
+                                        ident: Symbol(
+                                            "f",
+                                        ),
+                                        params: [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 27,
+                                                    end: 34,
+                                                },
+                                                DataConstructorApp(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Nothing",
+                                                        ),
+                                                    ),
+                                                    [],
+                                                ),
+                                            ),
+                                        ],
+                                        expr: [
+                                            GuardedExpr {
+                                                guards: [],
+                                                expr: Located(
+                                                    SourceSpan {
+                                                        start: 37,
+                                                        end: 38,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        )
+        "###);
+    }
+
     //
 }

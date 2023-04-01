@@ -64,6 +64,8 @@ pub enum PatKind {
     DataConstructorApp(QualifiedName, Vec<Pat>),
 
     Wildcard,
+
+    Named(Symbol, Box<Pat>),
 }
 
 #[derive(Debug)]

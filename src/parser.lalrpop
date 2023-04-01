@@ -236,7 +236,10 @@ Operator: Symbol = {
 
 ApplyExpr<Next>: ExprKind = {
   Next,
-  <f:Located<Next>> <args:Located<Next>+> => ExprKind::App(Box::new(f), args),
+  <f:Located<Next>> <mut args:Located<Next>*> <last:Located<LambdaIfExpr<Next>>> => {
+    args.push(last);
+    ExprKind::App(Box::new(f), args)
+  },
 };
 
 AccessorExpr<Next>: ExprKind = {
@@ -275,7 +278,7 @@ InfixPat<Next>: PatKind = {
 
 ApplyPat<Next>: PatKind = {
   Next,
-  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>*> => PatKind::DataConstructorApp(con, args),
+  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>+> => PatKind::DataConstructorApp(con, args),
 };
 
 PrimaryPat: PatKind = {
@@ -287,6 +290,8 @@ LetPrimaryPat: PatKind = {
   Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
   "(" <PatKind> ")" => <>,
   "_" => PatKind::Wildcard,
+  <name:LowerIdent> "@" <pat:Box<Located<PrimaryPat>>> => PatKind::Named(name, pat),
+  <UpperQualifiedIdent> => PatKind::DataConstructorApp(<>, vec![]),
 }
 
 Literal<T, RecordShortcut>: Literal<T> = {
@@ -475,6 +480,7 @@ extern {
     ";" => Token::Semicolon,
     "." => Token::Dot,
     "\\" => Token::Backslash,
+    "@" => Token::At,
 
     "->" => Token::Arrow,
     "=>" => Token::FatArrow,

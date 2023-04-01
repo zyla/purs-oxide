@@ -565,6 +565,7 @@ fn operator_to_token(s: &[u8]) -> Token {
         b":" => Token::Colon,
         b"." => Token::Dot,
         b"\\" => Token::Backslash,
+        b"@" => Token::At,
         b"->" => Token::Arrow,
         b"=>" => Token::FatArrow,
         b"<=" => Token::LeftFatArrow,
