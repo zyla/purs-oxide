@@ -4733,12 +4733,12 @@ mod tests {
                 x = 1
 
                 y = 2
-            in x + y
+            in \\z -> x + z
         ")), @r###"
         Located(
             SourceSpan {
                 start: 0,
-                end: 46,
+                end: 52,
             },
             Let {
                 decls: [
@@ -4841,42 +4841,63 @@ mod tests {
                 body: Located(
                     SourceSpan {
                         start: 41,
-                        end: 46,
+                        end: 52,
                     },
-                    Infix(
-                        Located(
-                            SourceSpan {
-                                start: 41,
-                                end: 42,
-                            },
-                            Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "x",
-                                    ),
-                                ),
-                            ),
-                        ),
+                    Lam(
                         [
-                            (
-                                Symbol(
-                                    "+",
-                                ),
-                                Located(
-                                    SourceSpan {
-                                        start: 45,
-                                        end: 46,
-                                    },
-                                    Var(
-                                        QualifiedName(
-                                            Symbol(
-                                                "y",
-                                            ),
-                                        ),
+                            Located(
+                                SourceSpan {
+                                    start: 42,
+                                    end: 43,
+                                },
+                                Var(
+                                    Symbol(
+                                        "z",
                                     ),
                                 ),
                             ),
                         ],
+                        Located(
+                            SourceSpan {
+                                start: 47,
+                                end: 52,
+                            },
+                            Infix(
+                                Located(
+                                    SourceSpan {
+                                        start: 47,
+                                        end: 48,
+                                    },
+                                    Var(
+                                        QualifiedName(
+                                            Symbol(
+                                                "x",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                [
+                                    (
+                                        Symbol(
+                                            "+",
+                                        ),
+                                        Located(
+                                            SourceSpan {
+                                                start: 51,
+                                                end: 52,
+                                            },
+                                            Var(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "z",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
                     ),
                 ),
             },

@@ -216,9 +216,9 @@ TypedExpr<Next>: ExprKind = {
 
 LambdaIfExpr<Next>: ExprKind = {
   Next,
-  "\\" <params:Located<PrimaryPat>+> "->" <body:Located<Next>> => ExprKind::Lam(params, Box::new(body)),
+  "\\" <params:Located<PrimaryPat>+> "->" <body:Located<LambdaIfExpr<Next>>> => ExprKind::Lam(params, Box::new(body)),
   "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Next>>> => ExprKind::If{ cond, then_, else_ },
-  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<Next>>> => ExprKind::Let{ decls, body },
+  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<LambdaIfExpr<Next>>>> => ExprKind::Let{ decls, body },
 };
 
 InfixExpr<Next>: ExprKind = {
