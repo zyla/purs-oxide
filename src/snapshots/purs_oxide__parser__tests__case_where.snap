@@ -1,0 +1,92 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n        case x of\n            _ -> y\n              where y = 5\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 39,
+    },
+    Case {
+        expr: Located(
+            SourceSpan {
+                start: 5,
+                end: 6,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+        branches: [
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 14,
+                        end: 15,
+                    },
+                    Wildcard,
+                ),
+                expr: Located(
+                    SourceSpan {
+                        start: 19,
+                        end: 39,
+                    },
+                    Let {
+                        decls: [
+                            Located(
+                                SourceSpan {
+                                    start: 33,
+                                    end: 38,
+                                },
+                                Commented(
+                                    [],
+                                    ValueDeclaration(
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "y",
+                                            ),
+                                            params: [],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 37,
+                                                            end: 38,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                5,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    ),
+                                ),
+                            ),
+                        ],
+                        body: Located(
+                            SourceSpan {
+                                start: 19,
+                                end: 20,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "y",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ),
+            },
+        ],
+    },
+)

@@ -108,7 +108,7 @@ LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
 LetDeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
-  <pat:AsPat<ExprV<"let_pat">>> "=" <expr:Expr> => DeclarationKind::Destructuring { pat, expr },
+  <pat:AsPat<ExprV<"let_pat">>> "=" <expr:Located<ExprWhere>> => DeclarationKind::Destructuring { pat, expr },
 }
 
 DataDeclaration: DeclarationKind = {
@@ -198,7 +198,7 @@ TypeParameter: TypeParameter = {
 };
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> <params:AsPat<Located<PrimaryExpr<"full">>>*> "=" <expr:Expr> =>
+  <ident:LowerIdent> <params:AsPat<Located<PrimaryExpr<"full">>>*> "=" <expr:Located<ExprWhere>> =>
     ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]},
 }
 
@@ -210,12 +210,13 @@ pub Expr = ExprV<"full">;
 
 ExprV<Variant> = Located<ExprKind<Variant>>;
 
-ExprKind<Variant>: ExprKind = ExprN1<Variant>;
-
-// if, let, etc.
-ExprN1<Variant>: ExprKind = {
-  Expr0<Variant>,
+ExprWhere: ExprKind = {
+  ExprKind<"full">,
+  <body:Box<Expr>> "where" <decls:LayoutBlock<LetDeclaration>>
+    => ExprKind::Let{ decls, body },
 };
+
+ExprKind<Variant>: ExprKind = Expr0<Variant>;
 
 ApplyLambda<E>: ExprKind = {
   LambdaLike,
@@ -299,7 +300,7 @@ RecordUpdate: (Symbol, Expr) = {
 };
 
 CaseBranch: CaseBranch = {
-  <pat:AsPat<ExprV<"case_pat">>> "->" <expr:Expr> => CaseBranch{ pat, expr }
+  <pat:AsPat<ExprV<"case_pat">>> "->" <expr:Located<ExprWhere>> => CaseBranch{ pat, expr }
 };
 
 DoItem: DoItem = {

@@ -1,0 +1,105 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n        let x = y\n              where y = 5\n        in x\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 32,
+    },
+    Let {
+        decls: [
+            Located(
+                SourceSpan {
+                    start: 4,
+                    end: 31,
+                },
+                Commented(
+                    [],
+                    ValueDeclaration(
+                        ValueDeclaration {
+                            ident: Symbol(
+                                "x",
+                            ),
+                            params: [],
+                            expr: [
+                                GuardedExpr {
+                                    guards: [],
+                                    expr: Located(
+                                        SourceSpan {
+                                            start: 8,
+                                            end: 31,
+                                        },
+                                        Let {
+                                            decls: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 22,
+                                                        end: 27,
+                                                    },
+                                                    Commented(
+                                                        [],
+                                                        ValueDeclaration(
+                                                            ValueDeclaration {
+                                                                ident: Symbol(
+                                                                    "y",
+                                                                ),
+                                                                params: [],
+                                                                expr: [
+                                                                    GuardedExpr {
+                                                                        guards: [],
+                                                                        expr: Located(
+                                                                            SourceSpan {
+                                                                                start: 26,
+                                                                                end: 27,
+                                                                            },
+                                                                            Literal(
+                                                                                Integer(
+                                                                                    5,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            body: Located(
+                                                SourceSpan {
+                                                    start: 8,
+                                                    end: 9,
+                                                },
+                                                Var(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "y",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                    ),
+                                },
+                            ],
+                        },
+                    ),
+                ),
+            ),
+        ],
+        body: Located(
+            SourceSpan {
+                start: 31,
+                end: 32,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+    },
+)

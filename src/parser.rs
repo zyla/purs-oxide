@@ -779,5 +779,27 @@ mod tests {
         )));
     }
 
+    #[test]
+    fn test_let_where() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+        let x = y
+              where y = 5
+        in x
+        "
+        )));
+    }
+
+    #[test]
+    fn test_case_where() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+        case x of
+            _ -> y
+              where y = 5
+        "
+        )));
+    }
+
     //
 }
