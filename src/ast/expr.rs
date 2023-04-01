@@ -16,7 +16,6 @@ pub enum ExprKind {
 
     RecordUpdate(Box<Expr>, RecordUpdate),
 
-    // TODO
     Var(QualifiedName),
 
     DataConstructor(QualifiedName),
@@ -47,6 +46,15 @@ pub enum ExprKind {
 
     // Pseudo-expression, used only as an intermediate value during parsing.
     RecordUpdateSuffix(RecordUpdate),
+
+    Do(Vec<DoItem>),
+}
+
+#[derive(Debug)]
+pub enum DoItem {
+    Let(Vec<Declaration>),
+    Expr(Expr),
+    Bind(Pat, Expr),
 }
 
 type RecordUpdate = Vec<(Symbol, Expr)>;
@@ -79,6 +87,8 @@ pub enum PatKind {
     Wildcard,
 
     Named(Symbol, Box<Pat>),
+
+    Typed(Box<Pat>, Type),
 }
 
 #[derive(Debug)]

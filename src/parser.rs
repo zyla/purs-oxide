@@ -1,4 +1,7 @@
+use crate::ast::Literal;
 use crate::ast::Located;
+use crate::ast::Pat;
+use crate::ast::PatKind;
 use crate::ast::TypeParameter;
 use crate::ast::{Expr, ExprKind, Module, Type};
 use crate::ast::{QualifiedName, TypeKind};
@@ -70,6 +73,76 @@ pub(self) fn apply_record_updates(mut f_args: Vec<Expr>) -> ExprKind {
     }
     let f = result.remove(0);
     ExprKind::App(Box::new(f), result)
+}
+
+pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
+    let Located(span, kind) = expr;
+    Ok(Located(
+        span,
+        match kind {
+            ExprKind::Literal(lit) => PatKind::Literal(lit_expr_to_pat(lit)?),
+            ExprKind::Infix(x, xs) => PatKind::Infix(
+                Box::new(expr_to_pat(*x)?),
+                xs.into_iter()
+                    .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
+                    .collect::<Result<_, _>>()?,
+            ),
+            ExprKind::Accessor(_, _) => return Err("Illegal record accessor in pattern".into()),
+            ExprKind::RecordUpdate(x, xs) => PatKind::Infix(
+                Box::new(expr_to_pat(*x)?),
+                xs.into_iter()
+                    .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
+                    .collect::<Result<_, _>>()?,
+            ),
+            ExprKind::Var(name) => {
+                if name.is_actually_qualified() {
+                    return Err("Illegal qualified name in pattern".into());
+                } else {
+                    PatKind::Var(name.0)
+                }
+            }
+            ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(name, vec![]),
+            ExprKind::App(f, args) => match f.into_inner() {
+                ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(
+                    name,
+                    args.into_iter()
+                        .map(|x| expr_to_pat(x))
+                        .collect::<Result<_, _>>()?,
+                ),
+                _ => return Err("illegal pattern in data constructor position".into()),
+            },
+            ExprKind::Lam(_, _) => return Err("Illegal lambda in pattern".into()),
+            ExprKind::Case { .. } => return Err("Illegal case in pattern".into()),
+            ExprKind::If { .. } => return Err("Illegal if in pattern".into()),
+            ExprKind::Typed(x, ty) => PatKind::Typed(Box::new(expr_to_pat(*x)?), ty),
+            ExprKind::Let { .. } => return Err("Illegal let in pattern".into()),
+            ExprKind::Wildcard => PatKind::Wildcard,
+            ExprKind::RecordUpdateSuffix(_) => {
+                return Err("Illegal record update in pattern".into())
+            }
+            ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
+        },
+    ))
+}
+
+pub(self) fn lit_expr_to_pat(lit: Literal<Expr>) -> Result<Literal<Pat>, String> {
+    Ok(match lit {
+        Literal::Integer(x) => Literal::Integer(x),
+        Literal::Float(x) => Literal::Float(x),
+        Literal::String(x) => Literal::String(x),
+        Literal::Char(x) => Literal::Char(x),
+        Literal::Boolean(x) => Literal::Boolean(x),
+        Literal::Array(xs) => Literal::Array(
+            xs.into_iter()
+                .map(|x| expr_to_pat(x))
+                .collect::<Result<_, _>>()?,
+        ),
+        Literal::Object(xs) => Literal::Object(
+            xs.into_iter()
+                .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
+                .collect::<Result<_, _>>()?,
+        ),
+    })
 }
 
 type ParseResult<'a, T> = (
@@ -630,6 +703,28 @@ mod tests {
     #[test]
     fn test_record_update_3() {
         assert_debug_snapshot!(parse_expr("f r { x = 1 } { y: 2 } q"));
+    }
+
+    #[test]
+    fn test_do_simple() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          do
+            x <- f
+            pure 1
+        "
+        )));
+    }
+
+    #[test]
+    fn test_do_let() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          do
+            let x = 1
+            pure 2
+        "
+        )));
     }
 
     //

@@ -255,6 +255,7 @@ PrimaryExpr: ExprKind = {
   "(" <ExprKind> ")" => <>,
   CaseExpr,
   "_" => ExprKind::Wildcard,
+  "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
 }
 
 RecordUpdate: (Symbol, Expr) = {
@@ -268,6 +269,22 @@ CaseExpr: ExprKind = {
 
 CaseBranch: CaseBranch = {
   <pat:Pat> "->" <expr:Expr> => CaseBranch{ pat, expr }
+};
+
+DoItem: DoItem = {
+  "let" <LayoutBlock<LetDeclaration>> => DoItem::Let(<>),
+  <Expr> => DoItem::Expr(<>),
+  <pat:ExprPat> "<-" <expr:Expr> => DoItem::Bind(pat, expr),
+};
+
+ExprPat: Pat = {
+  <Expr> =>? {
+    super::expr_to_pat(<>)
+      .map_err(|err| ParseError::User {
+        // TODO: make it not a lexer error
+        error: lexer::Error(err)
+      })
+  }
 };
 
 pub Pat: Pat = Located<PatKind>;
