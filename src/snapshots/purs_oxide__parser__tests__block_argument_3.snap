@@ -1,0 +1,89 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"f $ g \\\\x -> y\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 13,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "f",
+                    ),
+                ),
+            ),
+        ),
+        [
+            (
+                Symbol(
+                    "$",
+                ),
+                Located(
+                    SourceSpan {
+                        start: 4,
+                        end: 13,
+                    },
+                    App(
+                        Located(
+                            SourceSpan {
+                                start: 4,
+                                end: 5,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "g",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 6,
+                                    end: 13,
+                                },
+                                Lam(
+                                    [
+                                        Located(
+                                            SourceSpan {
+                                                start: 7,
+                                                end: 8,
+                                            },
+                                            Var(
+                                                Symbol(
+                                                    "x",
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    Located(
+                                        SourceSpan {
+                                            start: 12,
+                                            end: 13,
+                                        },
+                                        Var(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "y",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

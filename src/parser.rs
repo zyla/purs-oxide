@@ -691,6 +691,11 @@ mod tests {
     }
 
     #[test]
+    fn test_block_argument_3() {
+        assert_debug_snapshot!(parse_expr("f $ g \\x -> y"));
+    }
+
+    #[test]
     fn test_lambda_infix() {
         assert_debug_snapshot!(parse_expr("1 + \\x -> y + 2"));
     }
