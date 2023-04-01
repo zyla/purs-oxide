@@ -9,7 +9,7 @@ grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 
 pub Module: Module = Located<Commented<ModuleInner>>;
 
-pub ModuleInner: ModuleInner = {
+ModuleInner: ModuleInner = {
   "module" <name:UpperQualifiedIdent>
   <exports:("(" <SepBy<DeclarationRef, ",">> ")")?>
   "where" <guts:ModuleGuts>
@@ -23,16 +23,16 @@ ModuleGuts: (Vec<Import>, Vec<Declaration>) = {
     (imports, declarations),
 };
 
-pub Import: Import = Located<ImportInner>;
+Import: Import = Located<ImportInner>;
 
-pub ImportInner: ImportInner = {
+ImportInner: ImportInner = {
   "import" <module:UpperQualifiedIdent>
     <kind:ImportDeclarationKind>
     <alias:("as" <UpperQualifiedIdent>)?> =>
     ImportInner{module,kind,alias}
 };
 
-pub ImportDeclarationKind: ImportDeclarationKind = {
+ImportDeclarationKind: ImportDeclarationKind = {
   () => ImportDeclarationKind::Implicit,
   "(" <SepBy<DeclarationRef, ",">> ")" => ImportDeclarationKind::Explicit(<>),
   "hiding" "(" <SepBy<DeclarationRef, ",">> ")" => ImportDeclarationKind::Hiding(<>),
@@ -108,7 +108,7 @@ LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
 LetDeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
-  <pat:LetPat> "=" <expr:Expr> => DeclarationKind::Destructuring { pat, expr },
+  <pat:AsPat<ExprV<"let_pat">>> "=" <expr:Expr> => DeclarationKind::Destructuring { pat, expr },
 }
 
 DataDeclaration: DeclarationKind = {
@@ -198,7 +198,7 @@ TypeParameter: TypeParameter = {
 };
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> <params:Located<PrimaryPat>*> "=" <expr:Expr> =>
+  <ident:LowerIdent> <params:AsPat<Located<PrimaryExpr<"full">>>*> "=" <expr:Expr> =>
     ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]},
 }
 
@@ -206,19 +206,21 @@ TypeDeclaration: TypeDeclarationData = {
   <ident:LowerIdent> "::" <type_:Type> => TypeDeclarationData::new(ident,type_)
 }
 
-pub Expr: Expr = Located<ExprKind>;
+pub Expr = ExprV<"full">;
 
-ExprKind: ExprKind = LambdaIfExpr<TypedExpr<InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr>>>>>;
+ExprV<Variant> = Located<ExprKind<Variant>>;
 
-TypedExpr<Next>: ExprKind = {
+ExprKind<Variant>: ExprKind = LambdaIfExpr<TypedExpr<Variant, InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr<Variant>>>>>>;
+
+TypedExpr<Variant, Next>: ExprKind = {
   Next,
-  <expr:Box<Located<Next>>> "::" <type_:Type> => ExprKind::Typed(expr, type_),
+  <expr:Box<Located<Next>>> "::" <type_:Type> if Variant != "pat" => ExprKind::Typed(expr, type_),
 };
 
 
 LambdaIfExpr<Next>: ExprKind = {
   Next,
-  "\\" <params:Located<PrimaryPat>+> "->" <body:Located<LambdaIfExpr<Next>>> => ExprKind::Lam(params, Box::new(body)),
+  "\\" <params:AsPat<Located<PrimaryExpr<"full">>>+> "->" <body:Located<LambdaIfExpr<Next>>> => ExprKind::Lam(params, Box::new(body)),
   "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Next>>> => ExprKind::If{ cond, then_, else_ },
   "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<LambdaIfExpr<Next>>>> => ExprKind::Let{ decls, body },
 };
@@ -247,13 +249,13 @@ AccessorExpr<Next>: ExprKind = {
   <obj:Located<AccessorExpr<Next>>> "." <label:Label> => ExprKind::Accessor(Box::new(obj), label),
 };
 
-PrimaryExpr: ExprKind = {
+PrimaryExpr<Variant>: ExprKind = {
   Literal<Expr, RecordShortcutExpr> => ExprKind::Literal(<>),
   "{" <SepBy1<RecordUpdate, ",">> "}" => ExprKind::RecordUpdateSuffix(<>),
-  LowerQualifiedIdent => ExprKind::Var(<>),
+  LowerQualifiedIdent if Variant != "let_pat" => ExprKind::Var(<>),
   UpperQualifiedIdent => ExprKind::DataConstructor(<>),
-  "(" <ExprKind> ")" => <>,
-  CaseExpr,
+  "(" <ExprKind<"full">> ")" => <>,
+  CaseExpr if Variant != "case",
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
 }
@@ -268,17 +270,17 @@ CaseExpr: ExprKind = {
 };
 
 CaseBranch: CaseBranch = {
-  <pat:Pat> "->" <expr:Expr> => CaseBranch{ pat, expr }
+  <pat:AsPat<ExprV<"pat">>> "->" <expr:Expr> => CaseBranch{ pat, expr }
 };
 
 DoItem: DoItem = {
   "let" <LayoutBlock<LetDeclaration>> => DoItem::Let(<>),
   <Expr> => DoItem::Expr(<>),
-  <pat:ExprPat> "<-" <expr:Expr> => DoItem::Bind(pat, expr),
+  <pat:AsPat<ExprV<"full">>> "<-" <expr:Expr> => DoItem::Bind(pat, expr),
 };
 
-ExprPat: Pat = {
-  <Expr> =>? {
+AsPat<E>: Pat = {
+  <E> =>? {
     super::expr_to_pat(<>)
       .map_err(|err| ParseError::User {
         // TODO: make it not a lexer error
@@ -286,34 +288,6 @@ ExprPat: Pat = {
       })
   }
 };
-
-pub Pat: Pat = Located<PatKind>;
-PatKind = InfixPat<ApplyPat<PrimaryPat>>;
-
-LetPat: Pat = Located<InfixPat<ApplyPat<LetPrimaryPat>>>;
-
-InfixPat<Next>: PatKind = {
-  Next,
-  <first:Located<Next>> <rest:( <Operator> <Located<Next>> )+> => PatKind::Infix(Box::new(first), rest),
-};
-
-ApplyPat<Next>: PatKind = {
-  Next,
-  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>+> => PatKind::DataConstructorApp(con, args),
-};
-
-PrimaryPat: PatKind = {
-  LetPrimaryPat,
-  LowerIdent => PatKind::Var(<>),
-};
-
-LetPrimaryPat: PatKind = {
-  Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
-  "(" <PatKind> ")" => <>,
-  "_" => PatKind::Wildcard,
-  <name:LowerIdent> "@" <pat:Box<Located<PrimaryPat>>> => PatKind::Named(name, pat),
-  <UpperQualifiedIdent> => PatKind::DataConstructorApp(<>, vec![]),
-}
 
 Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<>),
@@ -341,18 +315,6 @@ RecordShortcutExpr: (Symbol, Expr) = {
     )
   }
 };
-
-RecordShortcutPat: (Symbol, Pat) = {
-  // Note: string literal labels not allowed here, because they may not be a valid variable name
-  <start:@L> <label:lower_ident> <end:@R> => {
-    let label = Symbol::new(label);
-    (
-      label.clone(),
-      Located(SourceSpan{start, end}, PatKind::Var(label))
-    )
-  }
-};
-
 
 // TODO: extract the comments
 Commented<T>: Commented<T> = {
