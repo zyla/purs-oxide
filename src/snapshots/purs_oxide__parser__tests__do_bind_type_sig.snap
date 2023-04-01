@@ -1,0 +1,97 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          do\n            x :: Int <- foo\n            pure 2\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 30,
+    },
+    Do(
+        [
+            Bind(
+                Located(
+                    SourceSpan {
+                        start: 5,
+                        end: 13,
+                    },
+                    Typed(
+                        Located(
+                            SourceSpan {
+                                start: 5,
+                                end: 6,
+                            },
+                            Var(
+                                Symbol(
+                                    "x",
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 10,
+                                end: 13,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Int",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 17,
+                        end: 20,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "foo",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            Expr(
+                Located(
+                    SourceSpan {
+                        start: 23,
+                        end: 29,
+                    },
+                    App(
+                        Located(
+                            SourceSpan {
+                                start: 23,
+                                end: 27,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "pure",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 28,
+                                    end: 29,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

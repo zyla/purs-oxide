@@ -752,5 +752,27 @@ mod tests {
         )));
     }
 
+    #[test]
+    fn test_do_destructuring_pattern() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          do
+            Tuple x y <- foo
+            pure 2
+        "
+        )));
+    }
+
+    #[test]
+    fn test_do_bind_type_sig() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          do
+            x :: Int <- foo
+            pure 2
+        "
+        )));
+    }
+
     //
 }
