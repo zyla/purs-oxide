@@ -215,7 +215,7 @@ ExprKind<Variant>: ExprKind = Expr0<Variant>;
 // Typed
 Expr0<Variant>: ExprKind = {
   Expr1<Variant>,
-  <expr:Box<Located<Expr1<Variant>>>> "::" <type_:Type> if Variant != "pat" => ExprKind::Typed(expr, type_),
+  <expr:Box<Located<Expr1<Variant>>>> "::" <type_:Type> if Variant != "case_pat" => ExprKind::Typed(expr, type_),
 };
 
 // Infix
@@ -239,7 +239,13 @@ Expr3<Variant> = Expr4<Variant>;
 // Apply
 Expr4<Variant>: ExprKind = {
   Expr5<Variant>,
-  <f:Located<Expr5<Variant>>> <args:Located<Expr5<"full">>+> => super::apply_record_updates(f, args)
+  <f:Located<Expr6<Variant>>> <mut args:Located<Expr6<"full">>*> <last:Located<Expr5<"full">>>
+    if Variant == "full" => {
+      args.push(last);
+      super::apply_record_updates(f, args)
+    },
+  <f:Located<PrimaryExpr<Variant>>> <args:Located<PrimaryExpr<"full">>+>
+    if Variant != "full" => super::apply_record_updates(f, args),
 };
 
 // if, let, etc.
