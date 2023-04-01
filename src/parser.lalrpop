@@ -236,9 +236,9 @@ Operator: Symbol = {
 
 ApplyExpr<Next>: ExprKind = {
   Next,
-  <f:Located<Next>> <mut args:Located<Next>*> <last:Located<LambdaIfExpr<Next>>> => {
-    args.push(last);
-    ExprKind::App(Box::new(f), args)
+  <mut f_args:Located<Next>+> <last:Located<LambdaIfExpr<Next>>> => {
+    f_args.push(last);
+    super::apply_record_updates(f_args)
   },
 };
 
@@ -249,6 +249,7 @@ AccessorExpr<Next>: ExprKind = {
 
 PrimaryExpr: ExprKind = {
   Literal<Expr, RecordShortcutExpr> => ExprKind::Literal(<>),
+  "{" <SepBy1<RecordUpdate, ",">> "}" => ExprKind::RecordUpdateSuffix(<>),
   LowerQualifiedIdent => ExprKind::Var(<>),
   UpperQualifiedIdent => ExprKind::DataConstructor(<>),
   "(" <ExprKind> ")" => <>,
@@ -256,11 +257,14 @@ PrimaryExpr: ExprKind = {
   "_" => ExprKind::Wildcard,
 }
 
+RecordUpdate: (Symbol, Expr) = {
+  <label:Label> "=" <expr:Expr> => (label, expr)
+};
+
 CaseExpr: ExprKind = {
   "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>> =>
     ExprKind::Case{ expr, branches }
 };
-
 
 CaseBranch: CaseBranch = {
   <pat:Pat> "->" <expr:Expr> => CaseBranch{ pat, expr }

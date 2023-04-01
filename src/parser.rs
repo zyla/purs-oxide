@@ -1,6 +1,6 @@
 use crate::ast::Located;
 use crate::ast::TypeParameter;
-use crate::ast::{Expr, Module, Type};
+use crate::ast::{Expr, ExprKind, Module, Type};
 use crate::ast::{QualifiedName, TypeKind};
 use crate::lexer;
 use crate::symbol::Symbol;
@@ -51,6 +51,25 @@ pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParame
             _ => return None,
         }
     }
+}
+
+pub(self) fn apply_record_updates(mut f_args: Vec<Expr>) -> ExprKind {
+    assert!(!f_args.is_empty());
+    let mut result = vec![f_args.remove(0)];
+    for expr in f_args {
+        match expr {
+            Located(suffix_span, ExprKind::RecordUpdateSuffix(update)) => {
+                let last = result.pop().expect("should be non-empty");
+                result.push(Located(
+                    suffix_span,
+                    ExprKind::RecordUpdate(Box::new(last), update),
+                ));
+            }
+            _ => result.push(expr),
+        }
+    }
+    let f = result.remove(0);
+    ExprKind::App(Box::new(f), result)
 }
 
 type ParseResult<'a, T> = (
@@ -5224,6 +5243,269 @@ mod tests {
                         ),
                     ],
                 },
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_record_update_1() {
+        assert_debug_snapshot!(parse_expr("r { x = 1 }"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 11,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 2,
+                        end: 11,
+                    },
+                    RecordUpdate(
+                        Located(
+                            SourceSpan {
+                                start: 0,
+                                end: 1,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "r",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            (
+                                Symbol(
+                                    "x",
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 8,
+                                        end: 9,
+                                    },
+                                    Literal(
+                                        Integer(
+                                            1,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+                [],
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_record_update_2() {
+        assert_debug_snapshot!(parse_expr("f r { x = 1, y = 2, \"random label\" = 3 }"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 40,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 4,
+                            end: 40,
+                        },
+                        RecordUpdate(
+                            Located(
+                                SourceSpan {
+                                    start: 2,
+                                    end: 3,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "r",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            [
+                                (
+                                    Symbol(
+                                        "x",
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 10,
+                                            end: 11,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                (
+                                    Symbol(
+                                        "y",
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 17,
+                                            end: 18,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                2,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                (
+                                    Symbol(
+                                        "random label",
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 37,
+                                            end: 38,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                3,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_record_update_3() {
+        assert_debug_snapshot!(parse_expr("f r { x = 1 } { y: 2 } q"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 24,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 4,
+                            end: 13,
+                        },
+                        RecordUpdate(
+                            Located(
+                                SourceSpan {
+                                    start: 2,
+                                    end: 3,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "r",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            [
+                                (
+                                    Symbol(
+                                        "x",
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 10,
+                                            end: 11,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 14,
+                            end: 22,
+                        },
+                        Literal(
+                            Object(
+                                [
+                                    (
+                                        Symbol(
+                                            "y",
+                                        ),
+                                        Located(
+                                            SourceSpan {
+                                                start: 19,
+                                                end: 20,
+                                            },
+                                            Literal(
+                                                Integer(
+                                                    2,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 23,
+                            end: 24,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "q",
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
             ),
         )
         "###);

@@ -14,6 +14,8 @@ pub enum ExprKind {
     /// Record field accessor
     Accessor(Box<Expr>, Symbol),
 
+    RecordUpdate(Box<Expr>, RecordUpdate),
+
     // TODO
     Var(QualifiedName),
 
@@ -42,6 +44,17 @@ pub enum ExprKind {
     },
 
     Wildcard,
+
+    // Pseudo-expression, used only as an intermediate value during parsing.
+    RecordUpdateSuffix(RecordUpdate),
+}
+
+type RecordUpdate = Vec<(Symbol, Expr)>;
+
+#[derive(Debug)]
+pub enum RecordLiteralOrUpdate {
+    Literal(Vec<(Symbol, Expr)>),
+    Update(Vec<(Symbol, Expr)>),
 }
 
 #[derive(Debug)]
