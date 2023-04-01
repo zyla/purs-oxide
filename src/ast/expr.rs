@@ -47,6 +47,9 @@ pub enum ExprKind {
     // Pseudo-expression, used only as an intermediate value during parsing.
     RecordUpdateSuffix(RecordUpdate),
 
+    // Pseudo-expression, used only as an intermediate value during parsing.
+    NamedPat(Symbol, Box<Expr>),
+
     Do(Vec<DoItem>),
 }
 

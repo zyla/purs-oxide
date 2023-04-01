@@ -210,24 +210,18 @@ pub Expr = ExprV<"full">;
 
 ExprV<Variant> = Located<ExprKind<Variant>>;
 
-ExprKind<Variant>: ExprKind = LambdaIfExpr<TypedExpr<Variant, InfixExpr<ApplyExpr<AccessorExpr<PrimaryExpr<Variant>>>>>>;
+ExprKind<Variant>: ExprKind = Expr0<Variant>;
 
-TypedExpr<Variant, Next>: ExprKind = {
-  Next,
-  <expr:Box<Located<Next>>> "::" <type_:Type> if Variant != "pat" => ExprKind::Typed(expr, type_),
+// Typed
+Expr0<Variant>: ExprKind = {
+  Expr1<Variant>,
+  <expr:Box<Located<Expr1<Variant>>>> "::" <type_:Type> if Variant != "pat" => ExprKind::Typed(expr, type_),
 };
 
-
-LambdaIfExpr<Next>: ExprKind = {
-  Next,
-  "\\" <params:AsPat<Located<PrimaryExpr<"full">>>+> "->" <body:Located<LambdaIfExpr<Next>>> => ExprKind::Lam(params, Box::new(body)),
-  "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Next>>> => ExprKind::If{ cond, then_, else_ },
-  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<LambdaIfExpr<Next>>>> => ExprKind::Let{ decls, body },
-};
-
-InfixExpr<Next>: ExprKind = {
-  Next,
-  <first:Located<Next>> <rest:( <Operator> <Located<Next>> )+> => ExprKind::Infix(Box::new(first), rest),
+// Infix
+Expr1<Variant>: ExprKind = {
+  Expr2<Variant>,
+  <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+> => ExprKind::Infix(first, rest),
 };
 
 Operator: Symbol = {
@@ -236,26 +230,44 @@ Operator: Symbol = {
   "=>" => Symbol::new("=>".into()),
 };
 
-ApplyExpr<Next>: ExprKind = {
-  Next,
-  <mut f_args:Located<Next>+> <last:Located<LambdaIfExpr<Next>>> => {
-    f_args.push(last);
-    super::apply_record_updates(f_args)
-  },
+// Backtick
+Expr2<Variant> = Expr3<Variant>;
+
+// Negate
+Expr3<Variant> = Expr4<Variant>;
+
+// Apply
+Expr4<Variant>: ExprKind = {
+  Expr5<Variant>,
+  <f:Located<Expr5<Variant>>> <args:Located<Expr5<"full">>+> => super::apply_record_updates(f, args)
 };
 
-AccessorExpr<Next>: ExprKind = {
-  Next,
-  <obj:Located<AccessorExpr<Next>>> "." <label:Label> => ExprKind::Accessor(Box::new(obj), label),
+// if, let, etc.
+Expr5<Variant>: ExprKind = {
+  Expr6<Variant>,
+  "\\" <params:AsPat<Located<PrimaryExpr<"full">>>+> "->" <body:Box<Located<Expr4<"full">>>>
+    if Variant == "full" => ExprKind::Lam(params, body),
+  "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Expr5<"full">>>> => ExprKind::If{ cond, then_, else_ },
+  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<Expr5<"full">>>> => ExprKind::Let{ decls, body },
+};
+
+// Record update - handled elsewhere
+Expr6<Variant> = Expr7<Variant>;
+
+// Accessor
+Expr7<Variant>: ExprKind = {
+  PrimaryExpr<Variant>,
+  <obj:Box<Located<Expr7<Variant>>>> "." <label:Label> => ExprKind::Accessor(obj, label),
 };
 
 PrimaryExpr<Variant>: ExprKind = {
   Literal<Expr, RecordShortcutExpr> => ExprKind::Literal(<>),
   "{" <SepBy1<RecordUpdate, ",">> "}" => ExprKind::RecordUpdateSuffix(<>),
   LowerQualifiedIdent if Variant != "let_pat" => ExprKind::Var(<>),
+  <name:LowerIdent> "@" <expr:Box<Located<PrimaryExpr<"full">>>> => ExprKind::NamedPat(name, expr),
   UpperQualifiedIdent => ExprKind::DataConstructor(<>),
   "(" <ExprKind<"full">> ")" => <>,
-  CaseExpr if Variant != "case",
+  CaseExpr,
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
 }
@@ -270,13 +282,13 @@ CaseExpr: ExprKind = {
 };
 
 CaseBranch: CaseBranch = {
-  <pat:AsPat<ExprV<"pat">>> "->" <expr:Expr> => CaseBranch{ pat, expr }
+  <pat:AsPat<ExprV<"case_pat">>> "->" <expr:Expr> => CaseBranch{ pat, expr }
 };
 
 DoItem: DoItem = {
   "let" <LayoutBlock<LetDeclaration>> => DoItem::Let(<>),
   <Expr> => DoItem::Expr(<>),
-  <pat:AsPat<ExprV<"full">>> "<-" <expr:Expr> => DoItem::Bind(pat, expr),
+  <pat:AsPat<Expr>> "<-" <expr:Expr> => DoItem::Bind(pat, expr),
 };
 
 AsPat<E>: Pat = {

@@ -56,10 +56,9 @@ pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParame
     }
 }
 
-pub(self) fn apply_record_updates(mut f_args: Vec<Expr>) -> ExprKind {
-    assert!(!f_args.is_empty());
-    let mut result = vec![f_args.remove(0)];
-    for expr in f_args {
+pub(self) fn apply_record_updates(f: Expr, args: Vec<Expr>) -> ExprKind {
+    let mut result = vec![f];
+    for expr in args {
         match expr {
             Located(suffix_span, ExprKind::RecordUpdateSuffix(update)) => {
                 let last = result.pop().expect("should be non-empty");
@@ -121,6 +120,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                 return Err("Illegal record update in pattern".into())
             }
             ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
+            ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
         },
     ))
 }
