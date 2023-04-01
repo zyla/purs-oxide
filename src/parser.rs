@@ -4663,5 +4663,226 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_let_1() {
+        assert_debug_snapshot!(parse_expr("let x = 1 in x"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 14,
+            },
+            Let {
+                decls: [
+                    Located(
+                        SourceSpan {
+                            start: 4,
+                            end: 9,
+                        },
+                        Commented(
+                            [],
+                            ValueDeclaration(
+                                ValueDeclaration {
+                                    ident: Symbol(
+                                        "x",
+                                    ),
+                                    params: [],
+                                    expr: [
+                                        GuardedExpr {
+                                            guards: [],
+                                            expr: Located(
+                                                SourceSpan {
+                                                    start: 8,
+                                                    end: 9,
+                                                },
+                                                Literal(
+                                                    Integer(
+                                                        1,
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                    ],
+                                },
+                            ),
+                        ),
+                    ),
+                ],
+                body: Located(
+                    SourceSpan {
+                        start: 13,
+                        end: 14,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "x",
+                            ),
+                        ),
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_let_2() {
+        assert_debug_snapshot!(parse_expr(indoc!("
+            let
+                x :: Int
+                x = 1
+
+                y = 2
+            in x + y
+        ")), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 46,
+            },
+            Let {
+                decls: [
+                    Located(
+                        SourceSpan {
+                            start: 8,
+                            end: 16,
+                        },
+                        Commented(
+                            [],
+                            TypeSignature(
+                                TypeDeclarationData {
+                                    ident: Symbol(
+                                        "x",
+                                    ),
+                                    type: Located(
+                                        SourceSpan {
+                                            start: 13,
+                                            end: 16,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Int",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 21,
+                            end: 26,
+                        },
+                        Commented(
+                            [],
+                            ValueDeclaration(
+                                ValueDeclaration {
+                                    ident: Symbol(
+                                        "x",
+                                    ),
+                                    params: [],
+                                    expr: [
+                                        GuardedExpr {
+                                            guards: [],
+                                            expr: Located(
+                                                SourceSpan {
+                                                    start: 25,
+                                                    end: 26,
+                                                },
+                                                Literal(
+                                                    Integer(
+                                                        1,
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                    ],
+                                },
+                            ),
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 32,
+                            end: 37,
+                        },
+                        Commented(
+                            [],
+                            ValueDeclaration(
+                                ValueDeclaration {
+                                    ident: Symbol(
+                                        "y",
+                                    ),
+                                    params: [],
+                                    expr: [
+                                        GuardedExpr {
+                                            guards: [],
+                                            expr: Located(
+                                                SourceSpan {
+                                                    start: 36,
+                                                    end: 37,
+                                                },
+                                                Literal(
+                                                    Integer(
+                                                        2,
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                    ],
+                                },
+                            ),
+                        ),
+                    ),
+                ],
+                body: Located(
+                    SourceSpan {
+                        start: 41,
+                        end: 46,
+                    },
+                    Infix(
+                        Located(
+                            SourceSpan {
+                                start: 41,
+                                end: 42,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "x",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            (
+                                Symbol(
+                                    "+",
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 45,
+                                        end: 46,
+                                    },
+                                    Var(
+                                        QualifiedName(
+                                            Symbol(
+                                                "y",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            },
+        )
+        "###);
+    }
+
     //
 }

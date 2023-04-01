@@ -103,6 +103,13 @@ DeclarationKind: DeclarationKind = {
   DataDeclaration,
 }
 
+LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
+
+LetDeclarationKind: DeclarationKind = {
+  ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
+  TypeDeclaration => DeclarationKind::TypeSignature(<>),
+}
+
 DataDeclaration: DeclarationKind = {
   <type_:DataDeclType> <name:UpperIdent>
     <params:TypeParameter*>
@@ -211,6 +218,7 @@ LambdaIfExpr<Next>: ExprKind = {
   Next,
   "\\" <params:Located<PrimaryPat>+> "->" <body:Located<Next>> => ExprKind::Lam(params, Box::new(body)),
   "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Next>>> => ExprKind::If{ cond, then_, else_ },
+  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<Next>>> => ExprKind::Let{ decls, body },
 };
 
 InfixExpr<Next>: ExprKind = {

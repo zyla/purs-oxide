@@ -1,4 +1,4 @@
-use super::{Located, Type};
+use super::{Declaration, Located, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -35,6 +35,11 @@ pub enum ExprKind {
     },
 
     Typed(Box<Expr>, Type),
+
+    Let {
+        decls: Vec<Declaration>,
+        body: Box<Expr>,
+    },
 }
 
 #[derive(Debug)]
