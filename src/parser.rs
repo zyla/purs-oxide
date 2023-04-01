@@ -4929,5 +4929,45 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_data_con_expr() {
+        assert_debug_snapshot!(parse_expr("Just 1"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 6,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 4,
+                    },
+                    DataConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "Just",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 5,
+                            end: 6,
+                        },
+                        Literal(
+                            Integer(
+                                1,
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        )
+        "###);
+    }
+
     //
 }
