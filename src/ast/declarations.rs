@@ -134,6 +134,12 @@ pub enum DeclarationKind {
 
     ValueDeclaration(ValueDeclaration),
 
+    // C x y = z, used in `let`
+    Destructuring {
+        pat: Pat,
+        expr: Expr,
+    },
+
     ForeignValue {
         name: Symbol,
         type_: Type,

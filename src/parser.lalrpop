@@ -108,6 +108,7 @@ LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
 LetDeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
+  <pat:LetPat> "=" <expr:Expr> => DeclarationKind::Destructuring { pat, expr },
 }
 
 DataDeclaration: DeclarationKind = {
@@ -197,7 +198,8 @@ TypeParameter: TypeParameter = {
 };
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> <params:Located<PrimaryPat>*> "=" <expr:Expr> => ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]}
+  <ident:LowerIdent> <params:Located<PrimaryPat>*> "=" <expr:Expr> =>
+    ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]},
 }
 
 TypeDeclaration: TypeDeclarationData = {
@@ -262,8 +264,9 @@ CaseBranch: CaseBranch = {
 };
 
 pub Pat: Pat = Located<PatKind>;
+PatKind = InfixPat<ApplyPat<PrimaryPat>>;
 
-PatKind: PatKind = InfixPat<ApplyPat<PrimaryPat>>;
+LetPat: Pat = Located<InfixPat<ApplyPat<LetPrimaryPat>>>;
 
 InfixPat<Next>: PatKind = {
   Next,
@@ -272,13 +275,16 @@ InfixPat<Next>: PatKind = {
 
 ApplyPat<Next>: PatKind = {
   Next,
-  <f:Box<Located<Next>>> <args:Located<Next>+> => PatKind::App(f, args),
+  <con:UpperQualifiedIdent> <args:Located<PrimaryPat>+> => PatKind::DataConstructorApp(con, args),
 };
 
 PrimaryPat: PatKind = {
-  Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
+  LetPrimaryPat,
   LowerIdent => PatKind::Var(<>),
-  UpperQualifiedIdent => PatKind::DataConstructor(<>),
+};
+
+LetPrimaryPat: PatKind = {
+  Literal<Pat, RecordShortcutPat> => PatKind::Literal(<>),
   "(" <PatKind> ")" => <>,
   "_" => PatKind::Wildcard,
 }

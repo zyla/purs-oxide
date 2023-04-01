@@ -4396,18 +4396,10 @@ mod tests {
                                 start: 12,
                                 end: 17,
                             },
-                            App(
-                                Located(
-                                    SourceSpan {
-                                        start: 12,
-                                        end: 13,
-                                    },
-                                    DataConstructor(
-                                        QualifiedName(
-                                            Symbol(
-                                                "C",
-                                            ),
-                                        ),
+                            DataConstructorApp(
+                                QualifiedName(
+                                    Symbol(
+                                        "C",
                                     ),
                                 ),
                                 [
@@ -4454,18 +4446,10 @@ mod tests {
                                 start: 29,
                                 end: 38,
                             },
-                            App(
-                                Located(
-                                    SourceSpan {
-                                        start: 29,
-                                        end: 30,
-                                    },
-                                    DataConstructor(
-                                        QualifiedName(
-                                            Symbol(
-                                                "D",
-                                            ),
-                                        ),
+                            DataConstructorApp(
+                                QualifiedName(
+                                    Symbol(
+                                        "D",
                                     ),
                                 ),
                                 [
@@ -4474,18 +4458,10 @@ mod tests {
                                             start: 31,
                                             end: 36,
                                         },
-                                        App(
-                                            Located(
-                                                SourceSpan {
-                                                    start: 32,
-                                                    end: 33,
-                                                },
-                                                DataConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "A",
-                                                        ),
-                                                    ),
+                                        DataConstructorApp(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "A",
                                                 ),
                                             ),
                                             [
@@ -4733,12 +4709,13 @@ mod tests {
                 x = 1
 
                 y = 2
+                Tuple a b = y
             in \\z -> x + z
         ")), @r###"
         Located(
             SourceSpan {
                 start: 0,
-                end: 52,
+                end: 70,
             },
             Let {
                 decls: [
@@ -4837,18 +4814,79 @@ mod tests {
                             ),
                         ),
                     ),
+                    Located(
+                        SourceSpan {
+                            start: 42,
+                            end: 55,
+                        },
+                        Commented(
+                            [],
+                            Destructuring {
+                                pat: Located(
+                                    SourceSpan {
+                                        start: 42,
+                                        end: 51,
+                                    },
+                                    DataConstructorApp(
+                                        QualifiedName(
+                                            Symbol(
+                                                "Tuple",
+                                            ),
+                                        ),
+                                        [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 48,
+                                                    end: 49,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "a",
+                                                    ),
+                                                ),
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 50,
+                                                    end: 51,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "b",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                expr: Located(
+                                    SourceSpan {
+                                        start: 54,
+                                        end: 55,
+                                    },
+                                    Var(
+                                        QualifiedName(
+                                            Symbol(
+                                                "y",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                    ),
                 ],
                 body: Located(
                     SourceSpan {
-                        start: 41,
-                        end: 52,
+                        start: 59,
+                        end: 70,
                     },
                     Lam(
                         [
                             Located(
                                 SourceSpan {
-                                    start: 42,
-                                    end: 43,
+                                    start: 60,
+                                    end: 61,
                                 },
                                 Var(
                                     Symbol(
@@ -4859,14 +4897,14 @@ mod tests {
                         ],
                         Located(
                             SourceSpan {
-                                start: 47,
-                                end: 52,
+                                start: 65,
+                                end: 70,
                             },
                             Infix(
                                 Located(
                                     SourceSpan {
-                                        start: 47,
-                                        end: 48,
+                                        start: 65,
+                                        end: 66,
                                     },
                                     Var(
                                         QualifiedName(
@@ -4883,8 +4921,8 @@ mod tests {
                                         ),
                                         Located(
                                             SourceSpan {
-                                                start: 51,
-                                                end: 52,
+                                                start: 69,
+                                                end: 70,
                                             },
                                             Var(
                                                 QualifiedName(

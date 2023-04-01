@@ -61,9 +61,7 @@ pub enum PatKind {
 
     Var(Symbol),
 
-    App(Box<Pat>, Vec<Pat>),
-
-    DataConstructor(QualifiedName),
+    DataConstructorApp(QualifiedName, Vec<Pat>),
 
     Wildcard,
 }
