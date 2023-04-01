@@ -1,4 +1,5 @@
-use std::{collections::VecDeque, fmt::Display};
+use std::iter::Peekable;
+use std::{collections::VecDeque, fmt::Display, str::CharIndices};
 
 use crate::token::{Token, TokenInfo};
 
@@ -18,9 +19,13 @@ pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Error>> + 
 }
 
 fn make_lexer(input: &str) -> impl Iterator<Item = LexResult> + '_ {
+    let mut chars = input.char_indices().peekable();
+    let first = chars.next();
     Lexer {
-        input: input.as_bytes(),
-        pos: 0,
+        input,
+        chars,
+        pos: first.map(|x| x.0).unwrap_or(0),
+        current: first.map(|x| x.1),
         token_start: 0,
         whitespace_start: 0,
         queue: Default::default(),
@@ -32,8 +37,10 @@ fn make_lexer(input: &str) -> impl Iterator<Item = LexResult> + '_ {
 }
 
 struct Lexer<'a> {
-    input: &'a [u8],
+    input: &'a str,
+    chars: Peekable<CharIndices<'a>>,
     pos: usize,
+    current: Option<char>,
     whitespace_start: usize,
     token_start: usize,
     queue: VecDeque<TokenInfo>,
@@ -438,20 +445,21 @@ impl<'a> Lexer<'a> {
         }
     }
     fn eof(&self) -> bool {
-        self.pos >= self.input.len()
+        self.current.is_none()
     }
     fn peek(&self) -> char {
-        // FIXME: we should handle utf8 (using char_indices iterator)
-        self.input[self.pos] as char
+        self.current.expect("eof")
     }
-    fn can_peek2(&self) -> bool {
-        self.pos + 2 < self.input.len()
+    fn can_peek2(&mut self) -> bool {
+        self.chars.peek().is_some()
     }
-    fn peek2(&self) -> char {
-        self.input[self.pos + 1] as char
+    fn peek2(&mut self) -> char {
+        self.chars.peek().expect("can't peek2").1
     }
     fn next_char(&mut self) {
-        self.pos += 1;
+        let item = self.chars.next();
+        self.pos = item.map(|x| x.0).unwrap_or(self.input.len());
+        self.current = item.map(|x| x.1);
     }
 
     fn make_token(&mut self, token: Token) -> LexResult {
@@ -513,35 +521,35 @@ impl<'a> Lexer<'a> {
     }
 }
 
-fn ident_to_token(ident: &[u8], is_upper: bool) -> Token {
+fn ident_to_token(ident: &str, is_upper: bool) -> Token {
     match ident {
-        b"if" => Token::If,
-        b"then" => Token::Then,
-        b"else" => Token::Else,
-        b"ado" => Token::Ado,
-        b"do" => Token::Do,
-        b"case" => Token::Case,
-        b"of" => Token::Of,
-        b"let" => Token::Let,
-        b"in" => Token::In,
-        b"where" => Token::Where,
-        b"instance" => Token::Instance,
-        b"module" => Token::Module,
-        b"import" => Token::Import,
-        b"forall" => Token::Forall,
-        b"true" => Token::True,
-        b"false" => Token::False,
-        b"class" => Token::Class,
-        b"type" => Token::Type,
-        b"as" => Token::As,
-        b"hiding" => Token::Hiding,
-        b"foreign" => Token::Foreign,
-        b"derive" => Token::Derive,
-        b"newtype" => Token::Newtype,
-        b"data" => Token::Data,
-        b"_" => Token::Wildcard,
+        "if" => Token::If,
+        "then" => Token::Then,
+        "else" => Token::Else,
+        "ado" => Token::Ado,
+        "do" => Token::Do,
+        "case" => Token::Case,
+        "of" => Token::Of,
+        "let" => Token::Let,
+        "in" => Token::In,
+        "where" => Token::Where,
+        "instance" => Token::Instance,
+        "module" => Token::Module,
+        "import" => Token::Import,
+        "forall" => Token::Forall,
+        "true" => Token::True,
+        "false" => Token::False,
+        "class" => Token::Class,
+        "type" => Token::Type,
+        "as" => Token::As,
+        "hiding" => Token::Hiding,
+        "foreign" => Token::Foreign,
+        "derive" => Token::Derive,
+        "newtype" => Token::Newtype,
+        "data" => Token::Data,
+        "_" => Token::Wildcard,
         _ => {
-            let str = String::from_utf8(ident.to_vec()).unwrap();
+            let str = ident.to_string();
             if is_upper {
                 if str.contains('.') {
                     Token::QualifiedUpperIdentifier(str)
@@ -557,22 +565,22 @@ fn ident_to_token(ident: &[u8], is_upper: bool) -> Token {
     }
 }
 
-fn operator_to_token(s: &[u8]) -> Token {
+fn operator_to_token(s: &str) -> Token {
     match s {
-        b"=" => Token::Equal,
-        b"|" => Token::Pipe,
-        b";" => Token::Semicolon,
-        b":" => Token::Colon,
-        b"." => Token::Dot,
-        b"\\" => Token::Backslash,
-        b"@" => Token::At,
-        b"->" => Token::Arrow,
-        b"=>" => Token::FatArrow,
-        b"<=" => Token::LeftFatArrow,
-        b"::" => Token::TypeOf,
-        b"<-" => Token::Bind,
-        b".." => Token::DotDot,
-        _ => Token::Operator(String::from_utf8(s.into()).unwrap()),
+        "=" => Token::Equal,
+        "|" => Token::Pipe,
+        ";" => Token::Semicolon,
+        ":" => Token::Colon,
+        "." => Token::Dot,
+        "\\" => Token::Backslash,
+        "@" => Token::At,
+        "->" => Token::Arrow,
+        "=>" => Token::FatArrow,
+        "<=" => Token::LeftFatArrow,
+        "::" => Token::TypeOf,
+        "<-" => Token::Bind,
+        ".." => Token::DotDot,
+        _ => Token::Operator(s.into()),
     }
 }
 
@@ -581,7 +589,7 @@ fn digit_value(c: char) -> usize {
 }
 
 fn is_ident_start(c: char) -> bool {
-    ('a'..='z').contains(&c) || ('A'..='Z').contains(&c) || c == '_'
+    c.is_alphabetic() || c == '_'
 }
 
 fn is_ident_char(c: char) -> bool {
@@ -1316,6 +1324,27 @@ mod tests {
             [
                 QualifiedLowerIdentifier(
                     "Data.Maybe.fromJust",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_utf8() {
+        assert_debug_snapshot!(
+        lex("Zażółć gęślą jaźń"),
+        @r###"
+        Ok(
+            [
+                UpperIdentifier(
+                    "Zażółć",
+                ),
+                LowerIdentifier(
+                    "gęślą",
+                ),
+                LowerIdentifier(
+                    "jaźń",
                 ),
             ],
         )
