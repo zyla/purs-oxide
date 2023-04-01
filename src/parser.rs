@@ -4905,5 +4905,29 @@ mod tests {
         "###);
     }
 
+    #[test]
+    fn test_wildcard() {
+        assert_debug_snapshot!(parse_expr("_.foo"), @r###"
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 5,
+            },
+            Accessor(
+                Located(
+                    SourceSpan {
+                        start: 0,
+                        end: 1,
+                    },
+                    Wildcard,
+                ),
+                Symbol(
+                    "foo",
+                ),
+            ),
+        )
+        "###);
+    }
+
     //
 }

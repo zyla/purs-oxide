@@ -40,6 +40,8 @@ pub enum ExprKind {
         decls: Vec<Declaration>,
         body: Box<Expr>,
     },
+
+    Wildcard,
 }
 
 #[derive(Debug)]

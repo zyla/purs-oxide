@@ -248,6 +248,7 @@ PrimaryExpr: ExprKind = {
   UpperQualifiedIdent => ExprKind::DataConstructor(<>),
   "(" <ExprKind> ")" => <>,
   CaseExpr,
+  "_" => ExprKind::Wildcard,
 }
 
 CaseExpr: ExprKind = {
