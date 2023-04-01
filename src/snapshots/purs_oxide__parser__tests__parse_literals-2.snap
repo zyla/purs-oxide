@@ -1,0 +1,15 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\" \"hello\" \"#)"
+---
+Located(
+    SourceSpan {
+        start: 1,
+        end: 8,
+    },
+    Literal(
+        String(
+            "hello",
+        ),
+    ),
+)

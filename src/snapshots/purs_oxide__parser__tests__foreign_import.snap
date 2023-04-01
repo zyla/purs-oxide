@@ -1,0 +1,72 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            foreign import foo :: Int -> Int\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 51,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 50,
+                    },
+                    Commented(
+                        [],
+                        ForeignValue {
+                            name: Symbol(
+                                "foo",
+                            ),
+                            type_: Located(
+                                SourceSpan {
+                                    start: 40,
+                                    end: 50,
+                                },
+                                FunctionType(
+                                    Located(
+                                        SourceSpan {
+                                            start: 40,
+                                            end: 43,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Int",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 47,
+                                            end: 50,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Int",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+)

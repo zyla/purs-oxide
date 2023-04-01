@@ -1,0 +1,117 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            instance Bar a => Foo a where\n              bar = 1\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 58,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 58,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 27,
+                                                end: 32,
+                                            },
+                                            TypeApp(
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 27,
+                                                        end: 30,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Bar",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 31,
+                                                        end: 32,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "a",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    instance_type: Plain,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 40,
+                                                end: 41,
+                                            },
+                                            Var(
+                                                Symbol(
+                                                    "a",
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "bar",
+                                            ),
+                                            params: [],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 56,
+                                                            end: 57,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                1,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

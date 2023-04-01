@@ -1,0 +1,45 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"( foo :: Int | e )\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 18,
+    },
+    Row {
+        fields: [
+            (
+                Symbol(
+                    "foo",
+                ),
+                Located(
+                    SourceSpan {
+                        start: 9,
+                        end: 12,
+                    },
+                    TypeConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "Int",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ],
+        rest: Some(
+            Located(
+                SourceSpan {
+                    start: 15,
+                    end: 16,
+                },
+                Var(
+                    Symbol(
+                        "e",
+                    ),
+                ),
+            ),
+        ),
+    },
+)

@@ -1,0 +1,60 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"let x = 1 in x\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 14,
+    },
+    Let {
+        decls: [
+            Located(
+                SourceSpan {
+                    start: 4,
+                    end: 9,
+                },
+                Commented(
+                    [],
+                    ValueDeclaration(
+                        ValueDeclaration {
+                            ident: Symbol(
+                                "x",
+                            ),
+                            params: [],
+                            expr: [
+                                GuardedExpr {
+                                    guards: [],
+                                    expr: Located(
+                                        SourceSpan {
+                                            start: 8,
+                                            end: 9,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ],
+                        },
+                    ),
+                ),
+            ),
+        ],
+        body: Located(
+            SourceSpan {
+                start: 13,
+                end: 14,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+    },
+)

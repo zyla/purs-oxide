@@ -1,0 +1,39 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\" foo.bar.baz \"#)"
+---
+Located(
+    SourceSpan {
+        start: 1,
+        end: 12,
+    },
+    Accessor(
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 8,
+            },
+            Accessor(
+                Located(
+                    SourceSpan {
+                        start: 1,
+                        end: 4,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "foo",
+                            ),
+                        ),
+                    ),
+                ),
+                Symbol(
+                    "bar",
+                ),
+            ),
+        ),
+        Symbol(
+            "baz",
+        ),
+    ),
+)

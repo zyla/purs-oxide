@@ -1,0 +1,132 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n          module Control.Applicative\n            ( class Applicative\n            , pure\n            , module Data.Functor\n            , Either\n            , Foo(..)\n            , Maybe(Just, Nothing)\n            , (+~)\n            , type (<>)\n            ) where\n\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 162,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Control.Applicative",
+                ),
+            ),
+            exports: Some(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 31,
+                            end: 48,
+                        },
+                        TypeClass {
+                            name: Symbol(
+                                "Applicative",
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 53,
+                            end: 57,
+                        },
+                        Value {
+                            name: Symbol(
+                                "pure",
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 62,
+                            end: 81,
+                        },
+                        Module {
+                            name: QualifiedName(
+                                Symbol(
+                                    "Data.Functor",
+                                ),
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 86,
+                            end: 92,
+                        },
+                        Type {
+                            name: Symbol(
+                                "Either",
+                            ),
+                            constructors: None,
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 97,
+                            end: 104,
+                        },
+                        Type {
+                            name: Symbol(
+                                "Foo",
+                            ),
+                            constructors: Some(
+                                All,
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 109,
+                            end: 129,
+                        },
+                        Type {
+                            name: Symbol(
+                                "Maybe",
+                            ),
+                            constructors: Some(
+                                Some(
+                                    [
+                                        Symbol(
+                                            "Just",
+                                        ),
+                                        Symbol(
+                                            "Nothing",
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 134,
+                            end: 138,
+                        },
+                        ValueOp {
+                            name: Symbol(
+                                "+~",
+                            ),
+                        },
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 143,
+                            end: 152,
+                        },
+                        TypeOp {
+                            name: Symbol(
+                                "<>",
+                            ),
+                        },
+                    ),
+                ],
+            ),
+            imports: [],
+            declarations: [],
+        },
+    ),
+)

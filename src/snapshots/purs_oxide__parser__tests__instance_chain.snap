@@ -1,0 +1,133 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            instance Foo Int where\n              x = 1\n            else instance Foo a where\n              x = 2\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 83,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 83,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: Plain,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 31,
+                                                end: 34,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "x",
+                                            ),
+                                            params: [],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 47,
+                                                            end: 48,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                1,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: Plain,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 67,
+                                                end: 68,
+                                            },
+                                            Var(
+                                                Symbol(
+                                                    "a",
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "x",
+                                            ),
+                                            params: [],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 81,
+                                                            end: 82,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                2,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

@@ -1,0 +1,27 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\" [1] \"#)"
+---
+Located(
+    SourceSpan {
+        start: 1,
+        end: 4,
+    },
+    Literal(
+        Array(
+            [
+                Located(
+                    SourceSpan {
+                        start: 2,
+                        end: 3,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+            ],
+        ),
+    ),
+)

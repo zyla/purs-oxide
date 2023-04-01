@@ -1,0 +1,39 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n            module Control.Applicative\n              where\n            import Control.Apply\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 56,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Control.Applicative",
+                ),
+            ),
+            exports: None,
+            imports: [
+                Located(
+                    SourceSpan {
+                        start: 35,
+                        end: 56,
+                    },
+                    ImportInner {
+                        module: QualifiedName(
+                            Symbol(
+                                "Control.Apply",
+                            ),
+                        ),
+                        kind: Implicit,
+                        alias: None,
+                    },
+                ),
+            ],
+            declarations: [],
+        },
+    ),
+)

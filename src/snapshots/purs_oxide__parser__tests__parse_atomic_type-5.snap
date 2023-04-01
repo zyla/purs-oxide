@@ -1,0 +1,17 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"Prelude.Int\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 11,
+    },
+    TypeConstructor(
+        QualifiedName(
+            Symbol(
+                "Prelude.Int",
+            ),
+        ),
+    ),
+)

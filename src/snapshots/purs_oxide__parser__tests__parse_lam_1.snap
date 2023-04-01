@@ -1,0 +1,38 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\"\\x -> y\"#)"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 7,
+    },
+    Lam(
+        [
+            Located(
+                SourceSpan {
+                    start: 1,
+                    end: 2,
+                },
+                Var(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ],
+        Located(
+            SourceSpan {
+                start: 6,
+                end: 7,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "y",
+                    ),
+                ),
+            ),
+        ),
+    ),
+)

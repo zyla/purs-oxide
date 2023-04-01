@@ -1,0 +1,38 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"Just 1\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 6,
+    },
+    App(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 4,
+            },
+            DataConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Just",
+                    ),
+                ),
+            ),
+        ),
+        [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Literal(
+                    Integer(
+                        1,
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

@@ -1,0 +1,100 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            class Bar a <= Foo a where\n              bar :: a\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 56,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 56,
+                    },
+                    Commented(
+                        [],
+                        Class(
+                            TypeClassDeclaration {
+                                constraints: [
+                                    Located(
+                                        SourceSpan {
+                                            start: 24,
+                                            end: 29,
+                                        },
+                                        TypeApp(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 24,
+                                                    end: 27,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Bar",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            Located(
+                                                SourceSpan {
+                                                    start: 28,
+                                                    end: 29,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "a",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                name: Symbol(
+                                    "Foo",
+                                ),
+                                params: [
+                                    (
+                                        Symbol(
+                                            "a",
+                                        ),
+                                        None,
+                                    ),
+                                ],
+                                methods: [
+                                    TypeDeclarationData {
+                                        ident: Symbol(
+                                            "bar",
+                                        ),
+                                        type: Located(
+                                            SourceSpan {
+                                                start: 54,
+                                                end: 55,
+                                            },
+                                            Var(
+                                                Symbol(
+                                                    "a",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

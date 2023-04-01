@@ -1,0 +1,26 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"( | e )\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 7,
+    },
+    Row {
+        fields: [],
+        rest: Some(
+            Located(
+                SourceSpan {
+                    start: 4,
+                    end: 5,
+                },
+                Var(
+                    Symbol(
+                        "e",
+                    ),
+                ),
+            ),
+        ),
+    },
+)

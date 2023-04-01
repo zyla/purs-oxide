@@ -1,0 +1,72 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n        module Some.Module where\n        f Nothing = 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 39,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Some.Module",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 25,
+                        end: 38,
+                    },
+                    Commented(
+                        [],
+                        ValueDeclaration(
+                            ValueDeclaration {
+                                ident: Symbol(
+                                    "f",
+                                ),
+                                params: [
+                                    Located(
+                                        SourceSpan {
+                                            start: 27,
+                                            end: 34,
+                                        },
+                                        DataConstructorApp(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Nothing",
+                                                ),
+                                            ),
+                                            [],
+                                        ),
+                                    ),
+                                ],
+                                expr: [
+                                    GuardedExpr {
+                                        guards: [],
+                                        expr: Located(
+                                            SourceSpan {
+                                                start: 37,
+                                                end: 38,
+                                            },
+                                            Literal(
+                                                Integer(
+                                                    1,
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

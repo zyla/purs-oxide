@@ -1,0 +1,22 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"_.foo\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 5,
+    },
+    Accessor(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Wildcard,
+        ),
+        Symbol(
+            "foo",
+        ),
+    ),
+)

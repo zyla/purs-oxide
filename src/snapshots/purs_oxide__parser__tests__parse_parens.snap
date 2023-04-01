@@ -1,0 +1,17 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\"(foo)\"#)"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 5,
+    },
+    Var(
+        QualifiedName(
+            Symbol(
+                "foo",
+            ),
+        ),
+    ),
+)

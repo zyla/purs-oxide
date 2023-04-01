@@ -1,0 +1,13 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"\\\"string\\\"\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 8,
+    },
+    TypeLevelString(
+        "string",
+    ),
+)

@@ -1,0 +1,190 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            data Maybe a = Nothing | Just a\n            newtype Foo = Foo Int\n            foreign import data X\n            foreign import data X :: Type\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 124,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 49,
+                    },
+                    Commented(
+                        [],
+                        Data {
+                            type_: Data,
+                            name: Symbol(
+                                "Maybe",
+                            ),
+                            params: [
+                                (
+                                    Symbol(
+                                        "a",
+                                    ),
+                                    None,
+                                ),
+                            ],
+                            kind: None,
+                            constructors: [
+                                Located(
+                                    SourceSpan {
+                                        start: 33,
+                                        end: 40,
+                                    },
+                                    Commented(
+                                        [],
+                                        DataConstructorDeclarationData {
+                                            name: Symbol(
+                                                "Nothing",
+                                            ),
+                                            fields: [],
+                                        },
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 43,
+                                        end: 49,
+                                    },
+                                    Commented(
+                                        [],
+                                        DataConstructorDeclarationData {
+                                            name: Symbol(
+                                                "Just",
+                                            ),
+                                            fields: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 48,
+                                                        end: 49,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "a",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        },
+                                    ),
+                                ),
+                            ],
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 50,
+                        end: 71,
+                    },
+                    Commented(
+                        [],
+                        Data {
+                            type_: Newtype,
+                            name: Symbol(
+                                "Foo",
+                            ),
+                            params: [],
+                            kind: None,
+                            constructors: [
+                                Located(
+                                    SourceSpan {
+                                        start: 64,
+                                        end: 71,
+                                    },
+                                    Commented(
+                                        [],
+                                        DataConstructorDeclarationData {
+                                            name: Symbol(
+                                                "Foo",
+                                            ),
+                                            fields: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 68,
+                                                        end: 71,
+                                                    },
+                                                    TypeConstructor(
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "Int",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        },
+                                    ),
+                                ),
+                            ],
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 72,
+                        end: 93,
+                    },
+                    Commented(
+                        [],
+                        Data {
+                            type_: ForeignData,
+                            name: Symbol(
+                                "X",
+                            ),
+                            params: [],
+                            kind: None,
+                            constructors: [],
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 94,
+                        end: 123,
+                    },
+                    Commented(
+                        [],
+                        Data {
+                            type_: ForeignData,
+                            name: Symbol(
+                                "X",
+                            ),
+                            params: [],
+                            kind: Some(
+                                Located(
+                                    SourceSpan {
+                                        start: 119,
+                                        end: 123,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName(
+                                            Symbol(
+                                                "Type",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            constructors: [],
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+)

@@ -1,0 +1,38 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"Maybe Int\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 9,
+    },
+    TypeApp(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 5,
+            },
+            TypeConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Maybe",
+                    ),
+                ),
+            ),
+        ),
+        Located(
+            SourceSpan {
+                start: 6,
+                end: 9,
+            },
+            TypeConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Int",
+                    ),
+                ),
+            ),
+        ),
+    ),
+)

@@ -1,0 +1,120 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            instance Foo Int where\n              foo x = 1\n              bar = 2\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 63,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 63,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: Plain,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 31,
+                                                end: 34,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "foo",
+                                            ),
+                                            params: [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 47,
+                                                        end: 48,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "x",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 51,
+                                                            end: 52,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                1,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                        ValueDeclaration {
+                                            ident: Symbol(
+                                                "bar",
+                                            ),
+                                            params: [],
+                                            expr: [
+                                                GuardedExpr {
+                                                    guards: [],
+                                                    expr: Located(
+                                                        SourceSpan {
+                                                            start: 61,
+                                                            end: 62,
+                                                        },
+                                                        Literal(
+                                                            Integer(
+                                                                2,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

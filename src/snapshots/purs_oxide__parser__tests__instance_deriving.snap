@@ -1,0 +1,102 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            derive instance Foo Int\n            derive newtype instance Foo Int\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 74,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 41,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: Derive,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 38,
+                                                end: 41,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 42,
+                        end: 73,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: DeriveNewtype,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 70,
+                                                end: 73,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

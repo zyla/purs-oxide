@@ -1,0 +1,67 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"Array (Maybe Int)\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 17,
+    },
+    TypeApp(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 5,
+            },
+            TypeConstructor(
+                QualifiedName(
+                    Symbol(
+                        "Array",
+                    ),
+                ),
+            ),
+        ),
+        Located(
+            SourceSpan {
+                start: 6,
+                end: 17,
+            },
+            Parens(
+                Located(
+                    SourceSpan {
+                        start: 7,
+                        end: 16,
+                    },
+                    TypeApp(
+                        Located(
+                            SourceSpan {
+                                start: 7,
+                                end: 12,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Maybe",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 13,
+                                end: 16,
+                            },
+                            TypeConstructor(
+                                QualifiedName(
+                                    Symbol(
+                                        "Int",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ),
+)

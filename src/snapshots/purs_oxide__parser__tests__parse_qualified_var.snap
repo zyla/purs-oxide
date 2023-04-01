@@ -1,0 +1,17 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\"Data.Maybe.fromJust\"#)"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 19,
+    },
+    Var(
+        QualifiedName(
+            Symbol(
+                "Data.Maybe.fromJust",
+            ),
+        ),
+    ),
+)

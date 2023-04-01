@@ -1,0 +1,23 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n        module Some.Module where\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 24,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Some.Module",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [],
+        },
+    ),
+)

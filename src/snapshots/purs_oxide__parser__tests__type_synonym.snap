@@ -1,0 +1,124 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            type Foo = Int\n            type Bar a = a\n            type Baz a b = a\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 65,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 32,
+                    },
+                    Commented(
+                        [],
+                        TypeSynonym {
+                            name: Symbol(
+                                "Foo",
+                            ),
+                            params: [],
+                            body: Located(
+                                SourceSpan {
+                                    start: 29,
+                                    end: 32,
+                                },
+                                TypeConstructor(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Int",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 33,
+                        end: 47,
+                    },
+                    Commented(
+                        [],
+                        TypeSynonym {
+                            name: Symbol(
+                                "Bar",
+                            ),
+                            params: [
+                                (
+                                    Symbol(
+                                        "a",
+                                    ),
+                                    None,
+                                ),
+                            ],
+                            body: Located(
+                                SourceSpan {
+                                    start: 46,
+                                    end: 47,
+                                },
+                                Var(
+                                    Symbol(
+                                        "a",
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 48,
+                        end: 64,
+                    },
+                    Commented(
+                        [],
+                        TypeSynonym {
+                            name: Symbol(
+                                "Baz",
+                            ),
+                            params: [
+                                (
+                                    Symbol(
+                                        "a",
+                                    ),
+                                    None,
+                                ),
+                                (
+                                    Symbol(
+                                        "b",
+                                    ),
+                                    None,
+                                ),
+                            ],
+                            body: Located(
+                                SourceSpan {
+                                    start: 63,
+                                    end: 64,
+                                },
+                                Var(
+                                    Symbol(
+                                        "a",
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+)

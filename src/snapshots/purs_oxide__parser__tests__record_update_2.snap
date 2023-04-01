@@ -1,0 +1,98 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"f r { x = 1, y = 2, \\\"random label\\\" = 3 }\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 40,
+    },
+    App(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "f",
+                    ),
+                ),
+            ),
+        ),
+        [
+            Located(
+                SourceSpan {
+                    start: 4,
+                    end: 40,
+                },
+                RecordUpdate(
+                    Located(
+                        SourceSpan {
+                            start: 2,
+                            end: 3,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "r",
+                                ),
+                            ),
+                        ),
+                    ),
+                    [
+                        (
+                            Symbol(
+                                "x",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 10,
+                                    end: 11,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        (
+                            Symbol(
+                                "y",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 17,
+                                    end: 18,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ),
+                        (
+                            Symbol(
+                                "random label",
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 37,
+                                    end: 38,
+                                },
+                                Literal(
+                                    Integer(
+                                        3,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        ],
+    ),
+)

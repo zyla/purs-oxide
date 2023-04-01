@@ -1,0 +1,57 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n        module Foo where\n        x = 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 23,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Foo",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 17,
+                        end: 22,
+                    },
+                    Commented(
+                        [],
+                        ValueDeclaration(
+                            ValueDeclaration {
+                                ident: Symbol(
+                                    "x",
+                                ),
+                                params: [],
+                                expr: [
+                                    GuardedExpr {
+                                        guards: [],
+                                        expr: Located(
+                                            SourceSpan {
+                                                start: 21,
+                                                end: 22,
+                                            },
+                                            Literal(
+                                                Integer(
+                                                    1,
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

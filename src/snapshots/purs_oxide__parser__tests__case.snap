@@ -1,0 +1,185 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          case x of\n            C a b ->\n              1\n            D (A c) _ -> 1\n            E -> 1\n            _ -> 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 62,
+    },
+    Case {
+        expr: Located(
+            SourceSpan {
+                start: 5,
+                end: 6,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+        branches: [
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 12,
+                        end: 17,
+                    },
+                    DataConstructorApp(
+                        QualifiedName(
+                            Symbol(
+                                "C",
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 14,
+                                    end: 15,
+                                },
+                                Var(
+                                    Symbol(
+                                        "a",
+                                    ),
+                                ),
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 16,
+                                    end: 17,
+                                },
+                                Var(
+                                    Symbol(
+                                        "b",
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+                expr: Located(
+                    SourceSpan {
+                        start: 25,
+                        end: 26,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+            },
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 29,
+                        end: 38,
+                    },
+                    DataConstructorApp(
+                        QualifiedName(
+                            Symbol(
+                                "D",
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 31,
+                                    end: 36,
+                                },
+                                DataConstructorApp(
+                                    QualifiedName(
+                                        Symbol(
+                                            "A",
+                                        ),
+                                    ),
+                                    [
+                                        Located(
+                                            SourceSpan {
+                                                start: 34,
+                                                end: 35,
+                                            },
+                                            Var(
+                                                Symbol(
+                                                    "c",
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 37,
+                                    end: 38,
+                                },
+                                Wildcard,
+                            ),
+                        ],
+                    ),
+                ),
+                expr: Located(
+                    SourceSpan {
+                        start: 42,
+                        end: 43,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+            },
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 46,
+                        end: 47,
+                    },
+                    DataConstructorApp(
+                        QualifiedName(
+                            Symbol(
+                                "E",
+                            ),
+                        ),
+                        [],
+                    ),
+                ),
+                expr: Located(
+                    SourceSpan {
+                        start: 51,
+                        end: 52,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+            },
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 55,
+                        end: 56,
+                    },
+                    Wildcard,
+                ),
+                expr: Located(
+                    SourceSpan {
+                        start: 60,
+                        end: 61,
+                    },
+                    Literal(
+                        Integer(
+                            1,
+                        ),
+                    ),
+                ),
+            },
+        ],
+    },
+)

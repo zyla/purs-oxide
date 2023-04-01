@@ -1,0 +1,15 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"var\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 3,
+    },
+    Var(
+        Symbol(
+            "var",
+        ),
+    ),
+)

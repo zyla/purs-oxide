@@ -1,0 +1,232 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n            let\n                x :: Int\n                x = 1\n\n                y = 2\n                Tuple a b = y\n            in \\\\z -> x + z\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 70,
+    },
+    Let {
+        decls: [
+            Located(
+                SourceSpan {
+                    start: 8,
+                    end: 16,
+                },
+                Commented(
+                    [],
+                    TypeSignature(
+                        TypeDeclarationData {
+                            ident: Symbol(
+                                "x",
+                            ),
+                            type: Located(
+                                SourceSpan {
+                                    start: 13,
+                                    end: 16,
+                                },
+                                TypeConstructor(
+                                    QualifiedName(
+                                        Symbol(
+                                            "Int",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+            ),
+            Located(
+                SourceSpan {
+                    start: 21,
+                    end: 26,
+                },
+                Commented(
+                    [],
+                    ValueDeclaration(
+                        ValueDeclaration {
+                            ident: Symbol(
+                                "x",
+                            ),
+                            params: [],
+                            expr: [
+                                GuardedExpr {
+                                    guards: [],
+                                    expr: Located(
+                                        SourceSpan {
+                                            start: 25,
+                                            end: 26,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ],
+                        },
+                    ),
+                ),
+            ),
+            Located(
+                SourceSpan {
+                    start: 32,
+                    end: 37,
+                },
+                Commented(
+                    [],
+                    ValueDeclaration(
+                        ValueDeclaration {
+                            ident: Symbol(
+                                "y",
+                            ),
+                            params: [],
+                            expr: [
+                                GuardedExpr {
+                                    guards: [],
+                                    expr: Located(
+                                        SourceSpan {
+                                            start: 36,
+                                            end: 37,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                2,
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ],
+                        },
+                    ),
+                ),
+            ),
+            Located(
+                SourceSpan {
+                    start: 42,
+                    end: 55,
+                },
+                Commented(
+                    [],
+                    Destructuring {
+                        pat: Located(
+                            SourceSpan {
+                                start: 42,
+                                end: 51,
+                            },
+                            DataConstructorApp(
+                                QualifiedName(
+                                    Symbol(
+                                        "Tuple",
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 48,
+                                            end: 49,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 50,
+                                            end: 51,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "b",
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                        expr: Located(
+                            SourceSpan {
+                                start: 54,
+                                end: 55,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "y",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        ],
+        body: Located(
+            SourceSpan {
+                start: 59,
+                end: 70,
+            },
+            Lam(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 60,
+                            end: 61,
+                        },
+                        Var(
+                            Symbol(
+                                "z",
+                            ),
+                        ),
+                    ),
+                ],
+                Located(
+                    SourceSpan {
+                        start: 65,
+                        end: 70,
+                    },
+                    Infix(
+                        Located(
+                            SourceSpan {
+                                start: 65,
+                                end: 66,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "x",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            (
+                                Symbol(
+                                    "+",
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 69,
+                                        end: 70,
+                                    },
+                                    Var(
+                                        QualifiedName(
+                                            Symbol(
+                                                "z",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+        ),
+    },
+)
