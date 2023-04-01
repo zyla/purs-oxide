@@ -210,18 +210,42 @@ pub Expr = ExprV<"full">;
 
 ExprV<Variant> = Located<ExprKind<Variant>>;
 
-ExprKind<Variant>: ExprKind = Expr0<Variant>;
+ExprKind<Variant>: ExprKind = ExprN1<Variant>;
+
+// if, let, etc.
+ExprN1<Variant>: ExprKind = {
+  Expr0<Variant>,
+  LambdaLike if Variant == "full",
+  <f:Located<Expr2<Variant>>> <x:Located<LambdaLike>> if Variant == "full" => super::normalize_app(f, x),
+};
+
+LambdaLike: ExprKind = {
+  "\\" <params:AsPat<Located<PrimaryExpr<"full">>>+> "->" <body:Box<Expr>>
+    => ExprKind::Lam(params, body),
+  "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Expr>>
+    => ExprKind::If{ cond, then_, else_ },
+  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Expr>>
+    => ExprKind::Let{ decls, body },
+  "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>>
+    => ExprKind::Case{ expr, branches }
+};
 
 // Typed
-Expr0<Variant>: ExprKind = {
-  Expr1<Variant>,
-  <expr:Box<Located<Expr1<Variant>>>> "::" <type_:Type> if Variant != "case_pat" => ExprKind::Typed(expr, type_),
-};
+Expr0<Variant> = Expr1<Variant>;
 
 // Infix
 Expr1<Variant>: ExprKind = {
   Expr2<Variant>,
-  <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+> => ExprKind::Infix(first, rest),
+  <expr:Box<Located<Expr2<Variant>>>> "::" <type_:Type> if Variant == "full" => ExprKind::Typed(expr, type_),
+  <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+>
+    => ExprKind::Infix(first, rest),
+  <start:@L> <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+> <end:@R> "::" <type_:Type>
+    if Variant == "full" => ExprKind::Typed(Box::new(Located(SourceSpan{start, end}, ExprKind::Infix(first, rest))), type_),
+  <first:Box<Located<Expr2<Variant>>>> <mut rest:( <Operator> <Located<Expr2<"full">>> )*> <last:( <Operator> <Located<LambdaLike>> )>
+    if Variant == "full" => {
+      rest.push(last);
+      ExprKind::Infix(first, rest)
+    },
 };
 
 Operator: Symbol = {
@@ -239,23 +263,12 @@ Expr3<Variant> = Expr4<Variant>;
 // Apply
 Expr4<Variant>: ExprKind = {
   Expr5<Variant>,
-  <f:Located<Expr6<Variant>>> <mut args:Located<Expr6<"full">>*> <last:Located<Expr5<"full">>>
-    if Variant == "full" => {
-      args.push(last);
-      super::apply_record_updates(f, args)
-    },
-  <f:Located<PrimaryExpr<Variant>>> <args:Located<PrimaryExpr<"full">>+>
-    if Variant != "full" => super::apply_record_updates(f, args),
+  <f:Located<Expr5<Variant>>> <args:Located<Expr5<"full">>+>
+    => super::apply_record_updates(f, args),
 };
 
-// if, let, etc.
-Expr5<Variant>: ExprKind = {
-  Expr6<Variant>,
-  "\\" <params:AsPat<Located<PrimaryExpr<"full">>>+> "->" <body:Box<Located<Expr4<"full">>>>
-    if Variant == "full" => ExprKind::Lam(params, body),
-  "if" <cond:Box<Expr>> "then" <then_:Box<Expr>> "else" <else_:Box<Located<Expr5<"full">>>> => ExprKind::If{ cond, then_, else_ },
-  "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Located<Expr5<"full">>>> => ExprKind::Let{ decls, body },
-};
+// Was if, let etc. - moved up
+Expr5<Variant> = Expr6<Variant>;
 
 // Record update - handled elsewhere
 Expr6<Variant> = Expr7<Variant>;
@@ -273,18 +286,12 @@ PrimaryExpr<Variant>: ExprKind = {
   <name:LowerIdent> "@" <expr:Box<Located<PrimaryExpr<"full">>>> => ExprKind::NamedPat(name, expr),
   UpperQualifiedIdent => ExprKind::DataConstructor(<>),
   "(" <ExprKind<"full">> ")" => <>,
-  CaseExpr,
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
 }
 
 RecordUpdate: (Symbol, Expr) = {
   <label:Label> "=" <expr:Expr> => (label, expr)
-};
-
-CaseExpr: ExprKind = {
-  "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>> =>
-    ExprKind::Case{ expr, branches }
 };
 
 CaseBranch: CaseBranch = {

@@ -145,6 +145,16 @@ pub(self) fn lit_expr_to_pat(lit: Literal<Expr>) -> Result<Literal<Pat>, String>
     })
 }
 
+pub(self) fn normalize_app(f: Expr, x: Expr) -> ExprKind {
+    match f {
+        Located(_, ExprKind::App(f0, mut args)) => {
+            args.push(x);
+            ExprKind::App(f0, args)
+        }
+        _ => ExprKind::App(Box::new(f), vec![x]),
+    }
+}
+
 type ParseResult<'a, T> = (
     Vec<ErrorRecovery<usize, Token, &'a str>>,
     Result<T, ParseError<usize, Token, lexer::Error>>,
@@ -673,6 +683,21 @@ mod tests {
     #[test]
     fn test_block_argument() {
         assert_debug_snapshot!(parse_expr("f \\x -> y"));
+    }
+
+    #[test]
+    fn test_block_argument_2() {
+        assert_debug_snapshot!(parse_expr("f 1 \\x -> y"));
+    }
+
+    #[test]
+    fn test_lambda_infix() {
+        assert_debug_snapshot!(parse_expr("1 + \\x -> y + 2"));
+    }
+
+    #[test]
+    fn test_lambda_typed() {
+        assert_debug_snapshot!(parse_expr("\\x -> 1 :: Int"));
     }
 
     #[test]
