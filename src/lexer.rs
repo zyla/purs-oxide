@@ -1,5 +1,6 @@
 use std::iter::Peekable;
 use std::{collections::VecDeque, fmt::Display, str::CharIndices};
+use unicode_general_category::{get_general_category, GeneralCategory::*};
 
 use crate::token::{Token, TokenInfo};
 
@@ -598,6 +599,9 @@ fn is_ident_char(c: char) -> bool {
 
 fn is_operator_char(c: char) -> bool {
     ":!#$%&*+./<=>?@\\^|-~".contains(c)
+        || (!c.is_ascii()
+            && [MathSymbol, CurrencySymbol, ModifierSymbol, OtherSymbol]
+                .contains(&get_general_category(c)))
 }
 
 fn is_digit(c: char) -> bool {
@@ -1345,6 +1349,21 @@ mod tests {
                 ),
                 LowerIdentifier(
                     "jaźń",
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_utf8_operator() {
+        assert_debug_snapshot!(
+        lex("∘"),
+        @r###"
+        Ok(
+            [
+                Operator(
+                    "∘",
                 ),
             ],
         )
