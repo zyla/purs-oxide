@@ -167,6 +167,7 @@ pub enum Associativity {
 #[derive(Debug)]
 pub enum OperatorTarget {
     Type(Symbol),
+    DataConstructor(Symbol),
     Value(Symbol),
 }
 

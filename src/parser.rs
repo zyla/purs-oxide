@@ -1072,6 +1072,7 @@ mod tests {
         infix 1 f as !#
         infixl 2 g as $%#
         infixr 3 h as <@#%
+        infix 1 Foo as ^%
         "
         )));
     }

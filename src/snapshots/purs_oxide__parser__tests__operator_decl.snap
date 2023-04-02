@@ -1,11 +1,11 @@
 ---
 source: src/parser.rs
-expression: "parse_module(indoc!(\"\n        module Test where\n        infix 1 f as !#\n        infixl 2 g as $%#\n        infixr 3 h as <@#%\n        \"))"
+expression: "parse_module(indoc!(\"\n        module Test where\n        infix 1 f as !#\n        infixl 2 g as $%#\n        infixr 3 h as <@#%\n        infix 1 Foo as ^%\n        \"))"
 ---
 Located(
     SourceSpan {
         start: 0,
-        end: 71,
+        end: 89,
     },
     Commented(
         [],
@@ -77,6 +77,27 @@ Located(
                             ),
                             operator: Symbol(
                                 "<@#%",
+                            ),
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 71,
+                        end: 88,
+                    },
+                    Commented(
+                        [],
+                        Operator {
+                            associativity: None,
+                            precedence: 1,
+                            name: DataConstructor(
+                                Symbol(
+                                    "Foo",
+                                ),
+                            ),
+                            operator: Symbol(
+                                "^%",
                             ),
                         },
                     ),

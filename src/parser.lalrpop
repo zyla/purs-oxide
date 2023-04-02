@@ -152,6 +152,7 @@ Associativity: Associativity = {
 
 OperatorTarget: OperatorTarget = {
   <LowerIdent> => OperatorTarget::Value(<>),
+  <UpperIdent> => OperatorTarget::DataConstructor(<>),
   "type" <UpperIdent> => OperatorTarget::Type(<>),
 };
 
