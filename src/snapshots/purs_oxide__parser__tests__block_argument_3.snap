@@ -24,7 +24,9 @@ Located(
         [
             (
                 Symbol(
-                    "$",
+                    Symbol(
+                        "$",
+                    ),
                 ),
                 Located(
                     SourceSpan {

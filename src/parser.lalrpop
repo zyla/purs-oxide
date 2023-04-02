@@ -242,11 +242,11 @@ Expr1<Variant>: ExprKind = {
   Expr2<Variant>,
   ApplyLambda<Expr2<Variant>> if Variant == "full",
   <expr:Box<Located<Expr2<Variant>>>> "::" <type_:Type> if Variant == "full" => ExprKind::Typed(expr, type_),
-  <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+>
+  <first:Box<Located<Expr2<Variant>>>> <rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )+>
     => ExprKind::Infix(first, rest),
-  <start:@L> <first:Box<Located<Expr2<Variant>>>> <rest:( <Operator> <Located<Expr2<"full">>> )+> <end:@R> "::" <type_:Type>
+  <start:@L> <first:Box<Located<Expr2<Variant>>>> <rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )+> <end:@R> "::" <type_:Type>
     if Variant == "full" => ExprKind::Typed(Box::new(Located(SourceSpan{start, end}, ExprKind::Infix(first, rest))), type_),
-  <first:Box<Located<Expr2<Variant>>>> <mut rest:( <Operator> <Located<Expr2<"full">>> )*> <last:( <Operator> <Located<ApplyLambda<Expr2<"full">>>> )>
+  <first:Box<Located<Expr2<Variant>>>> <mut rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )*> <last:( <InfixOp<Variant>> <Located<ApplyLambda<Expr2<"full">>>> )>
     if Variant == "full" => {
       rest.push(last);
       ExprKind::Infix(first, rest)
@@ -259,7 +259,12 @@ Operator: Symbol = {
   "=>" => Symbol::new("=>".into()),
 };
 
-// Backtick
+InfixOp<Variant>: InfixOp = {
+  <Operator> => InfixOp::Symbol(<>),
+  "`" <Box<Located<Expr1<"backtick">>>> "`" if Variant != "backtick" => InfixOp::Backtick(<>),
+};
+
+// Backtick - handled above
 Expr2<Variant> = Expr3<Variant>;
 
 // Negate
@@ -293,7 +298,7 @@ PrimaryExpr<Variant>: ExprKind = {
   "(" <ExprKind<"full">> ")" => <>,
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
-  "(" <Operator> ")" => ExprKind::Operator(<>),
+  "(" <InfixOp<"full">> ")" => ExprKind::Operator(<>),
 }
 
 RecordUpdate: (Symbol, Expr) = {

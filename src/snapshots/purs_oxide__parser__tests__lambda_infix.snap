@@ -22,7 +22,9 @@ Located(
         [
             (
                 Symbol(
-                    "+",
+                    Symbol(
+                        "+",
+                    ),
                 ),
                 Located(
                     SourceSpan {
@@ -65,7 +67,9 @@ Located(
                                 [
                                     (
                                         Symbol(
-                                            "+",
+                                            Symbol(
+                                                "+",
+                                            ),
                                         ),
                                         Located(
                                             SourceSpan {

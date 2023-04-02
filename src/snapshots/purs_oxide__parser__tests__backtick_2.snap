@@ -1,0 +1,76 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"1 `lift2 (+)` 2\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 15,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Literal(
+                Integer(
+                    1,
+                ),
+            ),
+        ),
+        [
+            (
+                Backtick(
+                    Located(
+                        SourceSpan {
+                            start: 3,
+                            end: 12,
+                        },
+                        App(
+                            Located(
+                                SourceSpan {
+                                    start: 3,
+                                    end: 8,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "lift2",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 9,
+                                        end: 12,
+                                    },
+                                    Operator(
+                                        Symbol(
+                                            Symbol(
+                                                "+",
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 14,
+                        end: 15,
+                    },
+                    Literal(
+                        Integer(
+                            2,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

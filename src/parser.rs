@@ -1,3 +1,4 @@
+use crate::ast::InfixOp;
 use crate::ast::Literal;
 use crate::ast::Located;
 use crate::ast::Pat;
@@ -83,7 +84,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Infix(x, xs) => PatKind::Infix(
                 Box::new(expr_to_pat(*x)?),
                 xs.into_iter()
-                    .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
+                    .map(|(op, x)| Ok::<_, String>((infix_op_to_pat(op)?, expr_to_pat(x)?)))
                     .collect::<Result<_, _>>()?,
             ),
             ExprKind::Accessor(_, _) => return Err("Illegal record accessor in pattern".into()),
@@ -124,6 +125,13 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
         },
     ))
+}
+
+pub(self) fn infix_op_to_pat(op: InfixOp) -> Result<Symbol, String> {
+    match op {
+        InfixOp::Symbol(s) => Ok(s),
+        InfixOp::Backtick(_) => Err("Illegal backtick operator in pattern".into()),
+    }
 }
 
 pub(self) fn lit_expr_to_pat(lit: Literal<Expr>) -> Result<Literal<Pat>, String> {
@@ -805,6 +813,50 @@ mod tests {
     #[test]
     fn test_standalone_operator() {
         assert_debug_snapshot!(parse_expr("(+)"));
+    }
+
+    #[test]
+    fn test_backtick_1() {
+        assert_debug_snapshot!(parse_expr("1 `mod` 2"));
+    }
+
+    #[test]
+    fn test_backtick_2() {
+        assert_debug_snapshot!(parse_expr("1 `lift2 (+)` 2"));
+    }
+
+    // I think we can't reasonably support this with the current parser,
+    // because then we could write:
+    // 1 `\x y -> x `mod` y` 2
+    //
+    // and that is super ambiguous - at the second "`"` we can't decide whether to end the backtick
+    // or start a new one. In fact these two parses would match:
+    //
+    // 1 `\x y -> (x `mod` y)` 2
+    // (1 `\x y -> x` mod) `y` 2
+    //
+    // We could play some tricks in the layout parser, since it keeps track of backticks already
+    // (weird!), but that would be even more complicated. I'm not sure there is code in the wild
+    // doing this.
+    //
+    // And if you really want to, use parens, this works:
+    // 1 `(\x y -> (x `mod` y))` 2
+    #[test]
+    #[ignore = "Super hard to implement, see comment"]
+    fn test_backtick_3() {
+        assert_debug_snapshot!(parse_expr("1 `\\x y -> x` 2"));
+    }
+
+    #[test]
+    fn test_backtick_4() {
+        assert_debug_snapshot!(parse_expr("1 `(\\x y -> x)` 2"));
+    }
+
+    // No idea why, but the original grammar explicitly permits infix operators
+    // directly inside a backtick.
+    #[test]
+    fn test_backtick_5() {
+        assert_debug_snapshot!(parse_expr("1 `2 + 2` 2"));
     }
 
     //

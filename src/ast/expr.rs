@@ -9,7 +9,7 @@ pub enum ExprKind {
     Literal(Literal<Expr>),
 
     /// Infix operator sequence with unknown precedence
-    Infix(Box<Expr>, Vec<(Symbol, Expr)>),
+    Infix(Box<Expr>, Vec<(InfixOp, Expr)>),
 
     /// Record field accessor
     Accessor(Box<Expr>, Symbol),
@@ -19,7 +19,7 @@ pub enum ExprKind {
     Var(QualifiedName),
 
     /// Standalone operator
-    Operator(Symbol),
+    Operator(InfixOp),
 
     DataConstructor(QualifiedName),
 
@@ -54,6 +54,12 @@ pub enum ExprKind {
     NamedPat(Symbol, Box<Expr>),
 
     Do(Vec<DoItem>),
+}
+
+#[derive(Debug)]
+pub enum InfixOp {
+    Symbol(Symbol),
+    Backtick(Box<Expr>),
 }
 
 #[derive(Debug)]

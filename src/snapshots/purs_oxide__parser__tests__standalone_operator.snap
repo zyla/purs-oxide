@@ -9,7 +9,9 @@ Located(
     },
     Operator(
         Symbol(
-            "+",
+            Symbol(
+                "+",
+            ),
         ),
     ),
 )

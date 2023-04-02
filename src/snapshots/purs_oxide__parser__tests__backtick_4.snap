@@ -1,0 +1,85 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"1 `(\\\\x y -> x)` 2\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 17,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Literal(
+                Integer(
+                    1,
+                ),
+            ),
+        ),
+        [
+            (
+                Backtick(
+                    Located(
+                        SourceSpan {
+                            start: 3,
+                            end: 14,
+                        },
+                        Lam(
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 5,
+                                        end: 6,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "x",
+                                        ),
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 7,
+                                        end: 8,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "y",
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            Located(
+                                SourceSpan {
+                                    start: 12,
+                                    end: 13,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "x",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 16,
+                        end: 17,
+                    },
+                    Literal(
+                        Integer(
+                            2,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+)
