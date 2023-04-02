@@ -173,12 +173,16 @@ impl<'a> Iterator for Lexer<'a> {
                 break;
             }
 
-            // where, of, else and commas end `do` or `case` blocks
+            // where, of, else and commas end `do` blocks;
+            // closing parens end blocks
             if matches!(
                 (&entry.token, &next_token.token),
                 (
                     Token::Do,
                     Token::Where | Token::Of | Token::Comma | Token::Else | Token::Arrow
+                ) | (
+                    Token::Do | Token::Ado | Token::Of,
+                    Token::RightParen | Token::RightBrace | Token::RightBracket
                 )
             ) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
                 && entry.after_patterns)
@@ -1331,6 +1335,18 @@ mod tests {
         x = [];
         x = ();
         y = 1}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_case_in_parens() {
+        assert_snapshot!(print_layout(indoc!("
+            f = (case x of
+                   _ -> 2) + 3
+        ")), @r###"
+        f = (case x of{
+               _ -> 2}) + 3
         <eof>
         "###);
     }
