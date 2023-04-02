@@ -8,58 +8,62 @@ Located(
         end: 62,
     },
     Case {
-        expr: Located(
-            SourceSpan {
-                start: 5,
-                end: 6,
-            },
-            Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
+        exprs: [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "x",
+                        ),
                     ),
                 ),
             ),
-        ),
+        ],
         branches: [
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 12,
-                        end: 17,
-                    },
-                    DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "C",
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 12,
+                            end: 17,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "C",
+                                ),
                             ),
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 14,
+                                        end: 15,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "a",
+                                        ),
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 16,
+                                        end: 17,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "b",
+                                        ),
+                                    ),
+                                ),
+                            ],
                         ),
-                        [
-                            Located(
-                                SourceSpan {
-                                    start: 14,
-                                    end: 15,
-                                },
-                                Var(
-                                    Symbol(
-                                        "a",
-                                    ),
-                                ),
-                            ),
-                            Located(
-                                SourceSpan {
-                                    start: 16,
-                                    end: 17,
-                                },
-                                Var(
-                                    Symbol(
-                                        "b",
-                                    ),
-                                ),
-                            ),
-                        ],
                     ),
-                ),
+                ],
                 expr: Unconditional(
                     Located(
                         SourceSpan {
@@ -75,54 +79,56 @@ Located(
                 ),
             },
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 29,
-                        end: 38,
-                    },
-                    DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "D",
-                            ),
-                        ),
-                        [
-                            Located(
-                                SourceSpan {
-                                    start: 31,
-                                    end: 36,
-                                },
-                                DataConstructorApp(
-                                    QualifiedName(
-                                        Symbol(
-                                            "A",
-                                        ),
-                                    ),
-                                    [
-                                        Located(
-                                            SourceSpan {
-                                                start: 34,
-                                                end: 35,
-                                            },
-                                            Var(
-                                                Symbol(
-                                                    "c",
-                                                ),
-                                            ),
-                                        ),
-                                    ],
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 29,
+                            end: 38,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "D",
                                 ),
                             ),
-                            Located(
-                                SourceSpan {
-                                    start: 37,
-                                    end: 38,
-                                },
-                                Wildcard,
-                            ),
-                        ],
+                            [
+                                Located(
+                                    SourceSpan {
+                                        start: 31,
+                                        end: 36,
+                                    },
+                                    DataConstructorApp(
+                                        QualifiedName(
+                                            Symbol(
+                                                "A",
+                                            ),
+                                        ),
+                                        [
+                                            Located(
+                                                SourceSpan {
+                                                    start: 34,
+                                                    end: 35,
+                                                },
+                                                Var(
+                                                    Symbol(
+                                                        "c",
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 37,
+                                        end: 38,
+                                    },
+                                    Wildcard,
+                                ),
+                            ],
+                        ),
                     ),
-                ),
+                ],
                 expr: Unconditional(
                     Located(
                         SourceSpan {
@@ -138,20 +144,22 @@ Located(
                 ),
             },
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 46,
-                        end: 47,
-                    },
-                    DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "E",
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 46,
+                            end: 47,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "E",
+                                ),
                             ),
+                            [],
                         ),
-                        [],
                     ),
-                ),
+                ],
                 expr: Unconditional(
                     Located(
                         SourceSpan {
@@ -167,13 +175,15 @@ Located(
                 ),
             },
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 55,
-                        end: 56,
-                    },
-                    Wildcard,
-                ),
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 55,
+                            end: 56,
+                        },
+                        Wildcard,
+                    ),
+                ],
                 expr: Unconditional(
                     Located(
                         SourceSpan {

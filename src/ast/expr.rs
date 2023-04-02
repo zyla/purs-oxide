@@ -28,7 +28,7 @@ pub enum ExprKind {
     Lam(Vec<Pat>, Box<Expr>),
 
     Case {
-        expr: Box<Expr>,
+        exprs: Vec<Expr>,
         branches: Vec<CaseBranch>,
     },
 
@@ -83,7 +83,7 @@ pub enum RecordLiteralOrUpdate {
 
 #[derive(Debug)]
 pub struct CaseBranch {
-    pub pat: Pat,
+    pub pats: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
 }
 
@@ -138,5 +138,6 @@ pub enum Literal<T> {
 
 #[test]
 fn test_size() {
-    assert_eq!(std::mem::size_of::<Expr>(), 56);
+    // Note: it was 56 before adding multi-case.
+    assert_eq!(std::mem::size_of::<Expr>(), 72);
 }

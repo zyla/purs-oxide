@@ -40,7 +40,13 @@ ImportDeclarationKind: ImportDeclarationKind = {
 };
 
 LowerIdent: Symbol = {
-  lower_ident => Symbol::new(<>)
+  lower_ident => Symbol::new(<>),
+// TODO: introduces ambiguity: "as" => Symbol::new("as".into()),
+// TODO: introduces ambiguity: "hiding" => Symbol::new("hiding".into()),
+  "role" => Symbol::new("role".into()),
+  "nominal" => Symbol::new("nominal".into()),
+  "representational" => Symbol::new("representational".into()),
+  "phantom" => Symbol::new("phantom".into()),
 };
 
 LowerQualifiedIdent: QualifiedName = {
@@ -102,12 +108,21 @@ DeclarationKind: DeclarationKind = {
   "type" <name:UpperIdent> "::" <kind:Type> =>
     DeclarationKind::KindSignature { for_type: KindSignatureFor::TypeSynonym, name, kind },
 
+  "type" "role" <ident:UpperIdent> <role:Role*> =>
+    DeclarationKind::Role(RoleDeclarationData{ ident, role }),
+
   "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
   ClassDeclaration,
   InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
   OperatorDeclaration,
 }
+
+Role: Role = {
+  "nominal" => Role::Nominal,
+  "representational" => Role::Representational,
+  "phantom" => Role::Phantom,
+};
 
 OperatorDeclaration: DeclarationKind = {
   <associativity:Associativity>
@@ -270,8 +285,8 @@ LambdaLike: ExprKind = {
     => ExprKind::If{ cond, then_, else_ },
   "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Expr>>
     => ExprKind::Let{ decls, body },
-  "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>>
-    => ExprKind::Case{ expr, branches },
+  "case" <exprs:SepBy1<Expr, ",">> "of" <branches:LayoutBlock<CaseBranch>>
+    => ExprKind::Case{ exprs, branches },
   "ado" <items:LayoutBlock<DoItem>> "in" <expr:Box<Expr>>
     => ExprKind::Ado(items, expr),
 };
@@ -358,7 +373,7 @@ RecordUpdate: (Symbol, Expr) = {
 };
 
 CaseBranch: CaseBranch = {
-  <pat:AsPat<ExprV<"case_pat">>> <expr:PossiblyGuarded<"->", Located<ExprWhere>>> => CaseBranch{ pat, expr }
+  <pats:SepBy1<AsPat<ExprV<"case_pat">>, ",">> <expr:PossiblyGuarded<"->", Located<ExprWhere>>> => CaseBranch{ pats, expr }
 };
 
 DoItem: DoItem = {
@@ -527,7 +542,6 @@ Label: Symbol = {
   string => Symbol::new(<>),
 
   "ado" => Symbol::new("ado".into()),
-  "as" => Symbol::new("as".into()),
   "case" => Symbol::new("case".into()),
   "class" => Symbol::new("class".into()),
   "data" => Symbol::new("data".into()),
@@ -537,7 +551,6 @@ Label: Symbol = {
   "false" => Symbol::new("false".into()),
   "forall" => Symbol::new("forall".into()),
   "foreign" => Symbol::new("foreign".into()),
-  "hiding" => Symbol::new("hiding".into()),
   "import" => Symbol::new("import".into()),
   "if" => Symbol::new("if".into()),
   "in" => Symbol::new("in".into()),
@@ -548,11 +561,7 @@ Label: Symbol = {
   "let" => Symbol::new("let".into()),
   "module" => Symbol::new("module".into()),
   "newtype" => Symbol::new("newtype".into()),
-//  "nominal" => Symbol::new("nominal".into()),
   "of" => Symbol::new("of".into()),
-// "phantom" => Symbol::new("phantom".into()),
-// "representational" => Symbol::new("representational".into()),
-//  "role" => Symbol::new("role".into()),
   "then" => Symbol::new("then".into()),
   "true" => Symbol::new("true".into()),
   "type" => Symbol::new("type".into()),
@@ -650,6 +659,10 @@ extern {
     "infix" => Token::Infix,
     "infixl" => Token::Infixl,
     "infixr" => Token::Infixr,
+    "role" => Token::Role,
+    "nominal" => Token::Nominal,
+    "representational" => Token::Representational,
+    "phantom" => Token::Phantom,
     "_" => Token::Wildcard,
   }
 }

@@ -1,0 +1,87 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          case x, y of\n            C, D -> 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 25,
+    },
+    Case {
+        exprs: [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "x",
+                        ),
+                    ),
+                ),
+            ),
+            Located(
+                SourceSpan {
+                    start: 8,
+                    end: 9,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "y",
+                        ),
+                    ),
+                ),
+            ),
+        ],
+        branches: [
+            CaseBranch {
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 15,
+                            end: 16,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "C",
+                                ),
+                            ),
+                            [],
+                        ),
+                    ),
+                    Located(
+                        SourceSpan {
+                            start: 18,
+                            end: 19,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "D",
+                                ),
+                            ),
+                            [],
+                        ),
+                    ),
+                ],
+                expr: Unconditional(
+                    Located(
+                        SourceSpan {
+                            start: 23,
+                            end: 24,
+                        },
+                        Literal(
+                            Integer(
+                                1,
+                            ),
+                        ),
+                    ),
+                ),
+            },
+        ],
+    },
+)

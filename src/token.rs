@@ -71,6 +71,10 @@ pub enum Token {
     Infix,
     Infixl,
     Infixr,
+    Role,
+    Nominal,
+    Representational,
+    Phantom,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,

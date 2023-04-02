@@ -627,6 +627,10 @@ fn ident_to_token(ident: &str, is_upper: bool) -> Token {
         "infix" => Token::Infix,
         "infixl" => Token::Infixl,
         "infixr" => Token::Infixr,
+        "role" => Token::Role,
+        "nominal" => Token::Nominal,
+        "representational" => Token::Representational,
+        "phantom" => Token::Phantom,
 
         "_" => Token::Wildcard,
         _ => {

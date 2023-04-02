@@ -1,0 +1,45 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n        module Test where\n        type role Foo phantom representational nominal\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 65,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 64,
+                    },
+                    Commented(
+                        [],
+                        Role(
+                            RoleDeclarationData {
+                                ident: Symbol(
+                                    "Foo",
+                                ),
+                                role: [
+                                    Phantom,
+                                    Representational,
+                                    Nominal,
+                                ],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

@@ -755,6 +755,16 @@ mod tests {
     }
 
     #[test]
+    fn test_case_multi() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          case x, y of
+            C, D -> 1
+        "
+        )));
+    }
+
+    #[test]
     fn test_typed_expr() {
         assert_debug_snapshot!(parse_expr("foo bar :: Int"));
     }
@@ -1052,6 +1062,16 @@ mod tests {
             "
         module Test where
         infixr 4 type NaturalTransformation as ~>
+        "
+        )));
+    }
+
+    #[test]
+    fn test_role_decl() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            "
+        module Test where
+        type role Foo phantom representational nominal
         "
         )));
     }

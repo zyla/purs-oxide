@@ -8,35 +8,39 @@ Located(
         end: 43,
     },
     Case {
-        expr: Located(
-            SourceSpan {
-                start: 5,
-                end: 6,
-            },
-            Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
+        exprs: [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "x",
+                        ),
                     ),
                 ),
             ),
-        ),
+        ],
         branches: [
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 12,
-                        end: 13,
-                    },
-                    DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "A",
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 12,
+                            end: 13,
+                        },
+                        DataConstructorApp(
+                            QualifiedName(
+                                Symbol(
+                                    "A",
+                                ),
                             ),
+                            [],
                         ),
-                        [],
                     ),
-                ),
+                ],
                 expr: Guarded(
                     [
                         GuardedExpr {

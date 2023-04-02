@@ -8,28 +8,32 @@ Located(
         end: 39,
     },
     Case {
-        expr: Located(
-            SourceSpan {
-                start: 5,
-                end: 6,
-            },
-            Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
+        exprs: [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "x",
+                        ),
                     ),
                 ),
             ),
-        ),
+        ],
         branches: [
             CaseBranch {
-                pat: Located(
-                    SourceSpan {
-                        start: 14,
-                        end: 15,
-                    },
-                    Wildcard,
-                ),
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 14,
+                            end: 15,
+                        },
+                        Wildcard,
+                    ),
+                ],
                 expr: Unconditional(
                     Located(
                         SourceSpan {
