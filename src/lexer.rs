@@ -33,6 +33,7 @@ fn make_lexer(input: &str) -> impl Iterator<Item = LexResult> + '_ {
         queue: Default::default(),
         last_token: None,
         indent_level: 0,
+        line: 0,
         line_start: 0,
         layout_stack: Default::default(),
     }
@@ -48,6 +49,7 @@ struct Lexer<'a> {
     queue: VecDeque<TokenInfo>,
     last_token: Option<TokenInfo>,
     layout_stack: Vec<LayoutEntry>,
+    line: usize,
     line_start: usize,
 
     indent_level: usize,
@@ -56,6 +58,7 @@ struct Lexer<'a> {
 #[derive(Debug)]
 struct LayoutEntry {
     indent_level: usize,
+    line: usize,
     token: Token,
 
     // For `of` blocks:
@@ -115,9 +118,12 @@ impl<'a> Iterator for Lexer<'a> {
             }
             // Update line position
             // Note: has to be done after single-line comment not to miss its newline
+            // TODO: update after multiline comments? (probably not necessary, we don't use it for
+            // location reporting, only layout)
             if !self.eof() && self.peek() == '\n' {
                 self.line_start = self.pos + 1;
                 line_start = Some(self.line_start);
+                self.line += 1;
             }
             self.next_char();
         }
@@ -149,6 +155,7 @@ impl<'a> Iterator for Lexer<'a> {
                 | Token::Then
                 | Token::Backslash => {
                     self.layout_push(LayoutEntry {
+                        line: next_token.line,
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -158,6 +165,7 @@ impl<'a> Iterator for Lexer<'a> {
                     if self.layout_stack.last().as_ref().map(|x| &x.token) == Some(&Token::Of) =>
                 {
                     self.layout_push(LayoutEntry {
+                        line: next_token.line,
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -169,6 +177,19 @@ impl<'a> Iterator for Lexer<'a> {
 
         let mut pushed_backtick = false;
         while let Some(entry) = self.layout_stack.last() {
+            // `in` ends `ado` blocks, and `let` on the same line
+            if matches!((&entry.token, &next_token.token), (Token::Ado, Token::In))
+                || (matches!((&entry.token, &next_token.token), (Token::Let, Token::In))
+                    && next_token.line == entry.line)
+            {
+                let token = self.make_token_info(Token::LayoutEnd);
+                self.enqueue(token);
+                trace!("in ends");
+                self.layout_pop();
+                // Use it only once, otherwise it ends all nested ado/let blocks
+                break;
+            }
+
             // dedent ends indented blocks
             if next_token.column < entry.indent_level && is_indented(&entry.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
@@ -176,16 +197,6 @@ impl<'a> Iterator for Lexer<'a> {
                 trace!("dedent");
                 self.layout_pop();
                 continue;
-            }
-
-            // `in` ends `let` and `ado` blocks
-            if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
-                let token = self.make_token_info(Token::LayoutEnd);
-                self.enqueue(token);
-                trace!("in ends");
-                self.layout_pop();
-                // Use it only once, otherwise it ends all nested ado/let blocks
-                break;
             }
 
             // End paren pairs
@@ -295,6 +306,7 @@ impl<'a> Iterator for Lexer<'a> {
                     }
                     None => {
                         self.layout_push(LayoutEntry {
+                            line: next_token.line,
                             indent_level: next_token.column,
                             token: Token::Backtick,
                             after_patterns: false,
@@ -340,6 +352,7 @@ impl<'a> Iterator for Lexer<'a> {
                 // Where doesn't need additional indentation
                 Token::Where => {
                     self.layout_push(LayoutEntry {
+                        line: next_token.line,
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -351,6 +364,7 @@ impl<'a> Iterator for Lexer<'a> {
                     if next_token.column > prev_token.indent_level =>
                 {
                     self.layout_push(LayoutEntry {
+                        line: next_token.line,
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -573,6 +587,7 @@ impl<'a> Lexer<'a> {
             end: token_end,
             trailing_space_end,
             indent_level: self.indent_level,
+            line: self.line,
             column: self.token_start - self.line_start,
         }
     }
@@ -1485,6 +1500,30 @@ mod tests {
         ")), @r###"
         do{
             [[], [1]]}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_let() {
+        assert_snapshot!(print_layout(indoc!("
+            removes =
+              let
+                loop =
+                  let
+                    tl = 2
+                  in
+                    foo
+              in bar
+        ")), @r###"
+        removes =
+          let{
+            loop =
+              let{
+                tl = 2}
+              in
+                foo}
+          in bar
         <eof>
         "###);
     }

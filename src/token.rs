@@ -96,6 +96,7 @@ pub struct TokenInfo {
     pub end: usize,
     /** Indentation level, i.e. column number of the first non-whitespace token on the line */
     pub indent_level: usize,
+    pub line: usize,
     /** Zero-based column number (offset since line start) */
     pub column: usize,
 }
