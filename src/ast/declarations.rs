@@ -173,6 +173,7 @@ pub struct TypeClassDeclaration {
     pub constraints: Vec<Type>,
     pub name: Symbol,
     pub params: Vec<TypeParameter>,
+    pub fundeps: Vec<Fundep>,
     pub methods: Vec<TypeDeclarationData>,
 }
 
@@ -187,16 +188,21 @@ pub struct InstanceDeclaration {
 }
 
 #[derive(Debug)]
+pub struct Fundep {
+    pub from: Vec<Symbol>,
+    pub to: Vec<Symbol>,
+}
+
+#[derive(Debug)]
 pub enum InstanceType {
     Plain,
     Derive,
     DeriveNewtype,
 }
 
+// Note: `data` and `newtype` signatures are actually declarations without constructors
 #[derive(Debug)]
 pub enum KindSignatureFor {
-    Data,
-    Newtype,
     TypeSynonym,
     Class,
 }

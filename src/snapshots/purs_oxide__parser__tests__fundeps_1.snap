@@ -1,11 +1,11 @@
 ---
 source: src/parser.rs
-expression: "parse_module(indoc!(r#\"\n            module Test where\n            class Foo a\n        \"#))"
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            class Foo a b | a -> b where\n        \"#))"
 ---
 Located(
     SourceSpan {
         start: 0,
-        end: 30,
+        end: 47,
     },
     Commented(
         [],
@@ -21,7 +21,7 @@ Located(
                 Located(
                     SourceSpan {
                         start: 18,
-                        end: 29,
+                        end: 47,
                     },
                     Commented(
                         [],
@@ -38,8 +38,27 @@ Located(
                                         ),
                                         None,
                                     ),
+                                    (
+                                        Symbol(
+                                            "b",
+                                        ),
+                                        None,
+                                    ),
                                 ],
-                                fundeps: [],
+                                fundeps: [
+                                    Fundep {
+                                        from: [
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ],
+                                        to: [
+                                            Symbol(
+                                                "b",
+                                            ),
+                                        ],
+                                    },
+                                ],
                                 methods: [],
                             },
                         ),

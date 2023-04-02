@@ -97,9 +97,13 @@ Declaration: Declaration = Located<Commented<DeclarationKind>>;
 DeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
+
   "type" <name:UpperIdent> <params:TypeParameter*> "=" <body:Type> => DeclarationKind::TypeSynonym{name, params, body},
+  "type" <name:UpperIdent> "::" <kind:Type> =>
+    DeclarationKind::KindSignature { for_type: KindSignatureFor::TypeSynonym, name, kind },
+
   "foreign" "import" <name:LowerIdent> "::" <type_:Type> => DeclarationKind::ForeignValue{name, type_},
-  ClassDeclaration => DeclarationKind::Class(<>),
+  ClassDeclaration,
   InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
   OperatorDeclaration,
@@ -159,23 +163,32 @@ DataDeclType: DataDeclType = {
   "newtype" => DataDeclType::Newtype,
 };
 
-ClassDeclaration: TypeClassDeclaration = {
+ClassDeclaration: DeclarationKind = {
+  "class" <name:UpperIdent> "::" <kind:Type> =>
+    DeclarationKind::KindSignature { for_type: KindSignatureFor::Class, name, kind },
+
   "class"
     <constraints:(<TypeClassConstraints> "<=")?>
     <head:Located<Constraint>>
+    <fundeps:( "|" <SepBy<Fundep, ",">> )?>
     <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
       let (name, params) = super::constraint_to_class_head(head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error
           error: lexer::Error("Invalid instance head".into())
         })?;
-      Ok(TypeClassDeclaration {
+      Ok(DeclarationKind::Class(TypeClassDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
         name,
         params,
+        fundeps: fundeps.unwrap_or_else(|| vec![]),
         methods: methods.unwrap_or_else(|| vec![]),
-      })
+      }))
     }
+};
+
+Fundep: Fundep = {
+  <from:LowerIdent+> "->" <to:LowerIdent+> => Fundep{from, to},
 };
 
 InstanceChain: Vec<InstanceDeclaration> = SepBy1<InstanceDeclaration, "else">;

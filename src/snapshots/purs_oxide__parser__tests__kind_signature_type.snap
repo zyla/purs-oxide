@@ -1,0 +1,73 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            type Qux :: Type -> Type\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 43,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 42,
+                    },
+                    Commented(
+                        [],
+                        KindSignature {
+                            for_type: TypeSynonym,
+                            name: Symbol(
+                                "Qux",
+                            ),
+                            kind: Located(
+                                SourceSpan {
+                                    start: 30,
+                                    end: 42,
+                                },
+                                FunctionType(
+                                    Located(
+                                        SourceSpan {
+                                            start: 30,
+                                            end: 34,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Type",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 38,
+                                            end: 42,
+                                        },
+                                        TypeConstructor(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Type",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+)

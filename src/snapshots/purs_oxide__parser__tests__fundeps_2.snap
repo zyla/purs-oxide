@@ -1,0 +1,94 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            class Foo a b c | a b -> c, a -> b c where\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 61,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 61,
+                    },
+                    Commented(
+                        [],
+                        Class(
+                            TypeClassDeclaration {
+                                constraints: [],
+                                name: Symbol(
+                                    "Foo",
+                                ),
+                                params: [
+                                    (
+                                        Symbol(
+                                            "a",
+                                        ),
+                                        None,
+                                    ),
+                                    (
+                                        Symbol(
+                                            "b",
+                                        ),
+                                        None,
+                                    ),
+                                    (
+                                        Symbol(
+                                            "c",
+                                        ),
+                                        None,
+                                    ),
+                                ],
+                                fundeps: [
+                                    Fundep {
+                                        from: [
+                                            Symbol(
+                                                "a",
+                                            ),
+                                            Symbol(
+                                                "b",
+                                            ),
+                                        ],
+                                        to: [
+                                            Symbol(
+                                                "c",
+                                            ),
+                                        ],
+                                    },
+                                    Fundep {
+                                        from: [
+                                            Symbol(
+                                                "a",
+                                            ),
+                                        ],
+                                        to: [
+                                            Symbol(
+                                                "b",
+                                            ),
+                                            Symbol(
+                                                "c",
+                                            ),
+                                        ],
+                                    },
+                                ],
+                                methods: [],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

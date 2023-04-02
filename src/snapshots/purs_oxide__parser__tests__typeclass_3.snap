@@ -104,6 +104,7 @@ Located(
                                         None,
                                     ),
                                 ],
+                                fundeps: [],
                                 methods: [
                                     TypeDeclarationData {
                                         ident: Symbol(

@@ -393,6 +393,57 @@ mod tests {
     }
 
     #[test]
+    fn test_fundeps_1() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            class Foo a b | a -> b where
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_fundeps_2() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            class Foo a b c | a b -> c, a -> b c where
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_kind_signature_class() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            class Category :: forall k. (k -> k -> Type) -> Constraint
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_kind_signature_data() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            data Foo :: Type
+            newtype Bar :: Type -> Type
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_kind_signature_type() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            type Qux :: Type -> Type
+        "#
+        )));
+    }
+
+    #[test]
     fn test_instance_1() {
         assert_debug_snapshot!(parse_module(indoc!(
             r#"
