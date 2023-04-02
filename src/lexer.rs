@@ -647,11 +647,17 @@ fn operator_to_token(s: &str) -> Token {
         "@" => Token::At,
         "-" => Token::Minus,
         "->" => Token::Arrow,
+        "→" => Token::Arrow,
         "=>" => Token::FatArrow,
+        "⇒" => Token::FatArrow,
         "<=" => Token::LeftFatArrow,
+        "⇐" => Token::LeftFatArrow,
         "::" => Token::TypeOf,
+        "∷" => Token::TypeOf,
         "<-" => Token::Bind,
+        "←" => Token::Bind,
         ".." => Token::DotDot,
+        "∀" => Token::Forall,
         _ => Token::Operator(s.into()),
     }
 }
@@ -1462,6 +1468,22 @@ mod tests {
                 Operator(
                     "∘",
                 ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_unicode_syntax() {
+        assert_debug_snapshot!(
+        lex("∀ ⇒ ∷ →"),
+        @r###"
+        Ok(
+            [
+                Forall,
+                FatArrow,
+                TypeOf,
+                Arrow,
             ],
         )
         "###);
