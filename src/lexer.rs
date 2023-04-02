@@ -1,3 +1,4 @@
+use log::trace;
 use std::iter::Peekable;
 use std::{collections::VecDeque, fmt::Display, str::CharIndices};
 use unicode_general_category::{get_general_category, GeneralCategory::*};
@@ -79,7 +80,8 @@ impl<'a> Iterator for Lexer<'a> {
         loop {
             if self.eof() {
                 // drain layout stack
-                while let Some(entry) = self.layout_stack.pop() {
+                trace!("eof, clearing layout stack");
+                while let Some(entry) = self.layout_pop() {
                     if is_indented(&entry.token) {
                         self.token_start = self.pos;
                         return Some(self.make_token(Token::LayoutEnd));
@@ -121,7 +123,7 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(result);
         };
 
-        //dbg!(&next_token.token, &self.layout_stack);
+        trace!("lexed token {:?}", next_token.token);
 
         let mut pushed_backtick = false;
         while let Some(entry) = self.layout_stack.last() {
@@ -129,7 +131,8 @@ impl<'a> Iterator for Lexer<'a> {
             if next_token.column < entry.indent_level && is_indented(&entry.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
-                self.layout_stack.pop();
+                trace!("dedent");
+                self.layout_pop();
                 continue;
             }
 
@@ -137,14 +140,17 @@ impl<'a> Iterator for Lexer<'a> {
             if let (Token::Let | Token::Ado, Token::In) = (&entry.token, &next_token.token) {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
-                self.layout_stack.pop();
+                trace!("in ends");
+                self.layout_pop();
                 // Use it only once, otherwise it ends all nested ado/let blocks
                 break;
             }
 
             // End paren pairs
+            // TODO: redundant? we are also closing parens above (but not all - not if, case etc.)
             if is_matching_paren_pair(&entry.token, &next_token.token) {
-                self.layout_stack.pop();
+                trace!("ending paren pair");
+                self.layout_pop();
 
                 if let Some(entry) = self.layout_stack.last() {
                     // Keep track of arrows in case patterns
@@ -181,21 +187,13 @@ impl<'a> Iterator for Lexer<'a> {
                     Token::Do,
                     Token::Where | Token::Of | Token::Comma | Token::Else | Token::Arrow
                 )
-            ) || (matches!(
-                (&entry.token, &next_token.token),
-                (
-                    Token::Do | Token::Ado | Token::Of,
-                    Token::RightParen | Token::RightBrace | Token::RightBracket
-                )
-            ) && (match &prev_token {
-                Some(prev_token) => !is_matching_paren_pair(&prev_token.token, &next_token.token),
-                None => false,
-            })) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
+            ) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
                 && entry.after_patterns)
             {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
-                self.layout_stack.pop();
+                trace!("ending block via {:?}", &next_token.token);
+                self.layout_pop();
                 // Recursively
                 continue;
             }
@@ -209,7 +207,8 @@ impl<'a> Iterator for Lexer<'a> {
                 {
                     let token = self.make_token_info(Token::LayoutEnd);
                     self.enqueue(token);
-                    self.layout_stack.pop();
+                    trace!("ending block via dedent");
+                    self.layout_pop();
                     continue;
                 }
                 if has_separators(&entry.token)
@@ -243,16 +242,18 @@ impl<'a> Iterator for Lexer<'a> {
                 match find_parent_backtick(&self.layout_stack) {
                     Some(num_blocks_to_drop) => {
                         for _ in 0..num_blocks_to_drop {
-                            self.layout_stack.pop();
+                            trace!("ending block via backtick");
+                            self.layout_pop();
                             let token = self.make_token_info(Token::LayoutEnd);
                             self.enqueue(token);
                         }
                         // Pop the backtick entry
-                        self.layout_stack.pop();
+                        trace!("ending backtick");
+                        self.layout_pop();
                         break;
                     }
                     None => {
-                        self.layout_stack.push(LayoutEntry {
+                        self.layout_push(LayoutEntry {
                             indent_level: next_token.column,
                             token: Token::Backtick,
                             after_patterns: false,
@@ -260,6 +261,28 @@ impl<'a> Iterator for Lexer<'a> {
                         pushed_backtick = true;
                         continue;
                     }
+                }
+            }
+
+            // Similarly, a closing paren ends all layout blocks up to the opening paren.
+            if matches!(
+                &next_token.token,
+                Token::RightParen | Token::RightBrace | Token::RightBracket
+            ) {
+                match find_parent_matching_paren(&self.layout_stack, &next_token.token) {
+                    Some(num_blocks_to_drop) => {
+                        for _ in 0..num_blocks_to_drop {
+                            trace!("ending block via closing paren");
+                            self.layout_pop();
+                            let token = self.make_token_info(Token::LayoutEnd);
+                            self.enqueue(token);
+                        }
+                        // Pop the backtick entry
+                        trace!("ending paren block");
+                        self.layout_pop();
+                        break;
+                    }
+                    None => {}
                 }
             }
 
@@ -272,7 +295,7 @@ impl<'a> Iterator for Lexer<'a> {
             match &prev_token.token {
                 // Where doesn't need additional indentation
                 Token::Where => {
-                    self.layout_stack.push(LayoutEntry {
+                    self.layout_push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -283,7 +306,7 @@ impl<'a> Iterator for Lexer<'a> {
                 Token::Do | Token::Let | Token::Of | Token::Ado
                     if next_token.column > prev_token.indent_level =>
                 {
-                    self.layout_stack.push(LayoutEntry {
+                    self.layout_push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -295,7 +318,8 @@ impl<'a> Iterator for Lexer<'a> {
                     if let (Token::Let | Token::Ado, Token::In) =
                         (&prev_token.token, &next_token.token)
                     {
-                        self.layout_stack.pop();
+                        trace!("ending empty let/ado");
+                        self.layout_pop();
                         let token = self.make_token_info(Token::LayoutEnd);
                         self.enqueue(token);
                     }
@@ -311,7 +335,7 @@ impl<'a> Iterator for Lexer<'a> {
                 | Token::Backslash
                     if !is_matching_paren_pair(&prev_token.token, &next_token.token) =>
                 {
-                    self.layout_stack.push(LayoutEntry {
+                    self.layout_push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -320,7 +344,7 @@ impl<'a> Iterator for Lexer<'a> {
                 Token::Pipe
                     if self.layout_stack.last().as_ref().map(|x| &x.token) == Some(&Token::Of) =>
                 {
-                    self.layout_stack.push(LayoutEntry {
+                    self.layout_push(LayoutEntry {
                         indent_level: next_token.column,
                         token: prev_token.token.clone(),
                         after_patterns: false,
@@ -336,6 +360,19 @@ impl<'a> Iterator for Lexer<'a> {
             return Some(Ok(queued_token));
         }
         Some(Ok(next_token))
+    }
+}
+
+impl<'a> Lexer<'a> {
+    fn layout_push(&mut self, entry: LayoutEntry) {
+        trace!("layout_push({:?})", entry);
+        self.layout_stack.push(entry);
+    }
+
+    fn layout_pop(&mut self) -> Option<LayoutEntry> {
+        let entry = self.layout_stack.pop();
+        trace!("layout_pop() -> {:?}", entry);
+        entry
     }
 }
 
@@ -360,6 +397,15 @@ fn find_parent_backtick(layout_stack: &[LayoutEntry]) -> Option<usize> {
         }
         if !is_indented(&entry.token) {
             return None;
+        }
+    }
+    None
+}
+
+fn find_parent_matching_paren(layout_stack: &[LayoutEntry], end_token: &Token) -> Option<usize> {
+    for (n, entry) in layout_stack.iter().rev().enumerate() {
+        if is_matching_paren_pair(&entry.token, end_token) {
+            return Some(n);
         }
     }
     None
@@ -1369,6 +1415,18 @@ mod tests {
         ")), @r###"
         do{
             []}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_empty_array_2() {
+        assert_snapshot!(print_layout(indoc!("
+            do
+                [[]]
+        ")), @r###"
+        do{
+            [[]]}
         <eof>
         "###);
     }

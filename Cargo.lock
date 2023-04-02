@@ -533,6 +533,7 @@ dependencies = [
  "insta",
  "lalrpop",
  "lalrpop-util",
+ "log",
  "num",
  "pretty_assertions",
  "regex",
