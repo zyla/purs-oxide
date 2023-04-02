@@ -1,0 +1,13 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"-42\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 3,
+    },
+    TypeLevelInt(
+        -42,
+    ),
+)

@@ -438,8 +438,9 @@ TypeConstructor: TypeKind = {
 AtomicType: TypeKind = {
   LowerIdent => TypeKind::Var(<>),
   "(" <TypeOperator> ")" => TypeKind::Operator(<>),
-  string=>TypeKind::TypeLevelString(<>),
-  int=>TypeKind::TypeLevelInt(<>.into()),
+  string => TypeKind::TypeLevelString(<>),
+  int => TypeKind::TypeLevelInt(<>.into()),
+  "-" <int> => TypeKind::TypeLevelInt((-(<> as i64)).into()),
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
   // TODO: hole
 

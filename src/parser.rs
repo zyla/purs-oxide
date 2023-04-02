@@ -499,6 +499,7 @@ mod tests {
         assert_debug_snapshot!(parse_type("42"));
         assert_debug_snapshot!(parse_type("Int"));
         assert_debug_snapshot!(parse_type("Prelude.Int"));
+        assert_debug_snapshot!(parse_type("-42"));
     }
 
     #[test]
