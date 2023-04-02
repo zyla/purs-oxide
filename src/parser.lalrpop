@@ -19,9 +19,15 @@ ModuleInner: ModuleInner = {
 
 ModuleGuts: (Vec<Import>, Vec<Declaration>) = {
   () => (vec![], vec![]),
-  LayoutStart <imports:SepBy<Import, LayoutSep>>
-    <declarations:SepBy<Declaration, LayoutSep>> LayoutEnd =>
-    (imports, declarations),
+  LayoutStart
+    <first:Import>
+    <mut imports:( LayoutSep <Import> )*>
+    <declarations:( LayoutSep <Declaration> )*>
+    LayoutEnd => {
+      imports.insert(0, first);
+      (imports, declarations)
+    },
+  LayoutStart <declarations:SepBy1<Declaration, LayoutSep>> LayoutEnd => (vec![], declarations),
 };
 
 Import: Import = Located<ImportInner>;
@@ -41,8 +47,8 @@ ImportDeclarationKind: ImportDeclarationKind = {
 
 LowerIdent: Symbol = {
   lower_ident => Symbol::new(<>),
-// TODO: introduces ambiguity: "as" => Symbol::new("as".into()),
-// TODO: introduces ambiguity: "hiding" => Symbol::new("hiding".into()),
+  "as" => Symbol::new("as".into()),
+  "hiding" => Symbol::new("hiding".into()),
   "role" => Symbol::new("role".into()),
   "nominal" => Symbol::new("nominal".into()),
   "representational" => Symbol::new("representational".into()),
