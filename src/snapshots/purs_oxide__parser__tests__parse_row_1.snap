@@ -1,11 +1,11 @@
 ---
 source: src/parser.rs
-expression: "parse_type(\"( foo :: Int, \\\"Bar\\\" :: String )\")"
+expression: "parse_type(\"( foo :: Int, \\\"Bar\\\" :: String, data :: Int )\")"
 ---
 Located(
     SourceSpan {
         start: 0,
-        end: 31,
+        end: 44,
     },
     Row {
         fields: [
@@ -40,6 +40,24 @@ Located(
                         QualifiedName(
                             Symbol(
                                 "String",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            (
+                Symbol(
+                    "data",
+                ),
+                Located(
+                    SourceSpan {
+                        start: 39,
+                        end: 42,
+                    },
+                    TypeConstructor(
+                        QualifiedName(
+                            Symbol(
+                                "Int",
                             ),
                         ),
                     ),

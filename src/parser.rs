@@ -524,7 +524,7 @@ mod tests {
 
     #[test]
     fn test_parse_row_1() {
-        assert_debug_snapshot!(parse_type("( foo :: Int, \"Bar\" :: String )"));
+        assert_debug_snapshot!(parse_type("( foo :: Int, \"Bar\" :: String, data :: Int )"));
     }
 
     #[test]
@@ -598,6 +598,11 @@ mod tests {
     #[test]
     fn test_parse_accessor_2() {
         assert_debug_snapshot!(parse_expr(r#" foo."Bar" "#));
+    }
+
+    #[test]
+    fn test_parse_accessor_3() {
+        assert_debug_snapshot!(parse_expr(r#" foo.if "#));
     }
 
     #[test]
