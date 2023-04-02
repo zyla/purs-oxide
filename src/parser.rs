@@ -552,6 +552,17 @@ mod tests {
     }
 
     #[test]
+    fn test_instance_chain_2() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            instance Foo Int else
+            instance Foo a
+        "#
+        )));
+    }
+
+    #[test]
     fn test_data_decl() {
         assert_debug_snapshot!(parse_module(indoc!(
             r#"

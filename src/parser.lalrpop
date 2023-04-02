@@ -218,7 +218,7 @@ Fundep: Fundep = {
   <from:LowerIdent+> "->" <to:LowerIdent+> => Fundep{from, to},
 };
 
-InstanceChain: Vec<InstanceDeclaration> = SepBy1<InstanceDeclaration, "else">;
+InstanceChain: Vec<InstanceDeclaration> = SepBy1<InstanceDeclaration, ("else" LayoutSep?)>;
 
 InstanceDeclaration: InstanceDeclaration = {
   <instance_type:InstanceType>
