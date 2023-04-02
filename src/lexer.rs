@@ -97,6 +97,17 @@ impl<'a> Iterator for Lexer<'a> {
                         self.next_char();
                     }
                 }
+                // Multi-line comment
+                '{' if self.can_peek2() && self.peek2() == '-' => {
+                    while !self.eof()
+                        && !(self.peek() == '-' && self.can_peek2() && self.peek2() == '}')
+                    {
+                        self.next_char();
+                    }
+                    if !self.eof() {
+                        self.next_char();
+                    }
+                }
                 c if !c.is_whitespace() => {
                     break;
                 }
@@ -933,6 +944,18 @@ mod tests {
             Ok(vec![Token::If, Token::IntegerLiteral(1)]),
         );
         test_lex("if--comment", Ok(vec![Token::If]));
+    }
+
+    #[test]
+    fn test_multiline_comment() {
+        test_lex(
+            "
+            if {- This is a comment
+            it spans many lines - hello
+            -}1
+            ",
+            Ok(vec![Token::If, Token::IntegerLiteral(1)]),
+        );
     }
 
     #[test]
