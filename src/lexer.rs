@@ -180,11 +180,17 @@ impl<'a> Iterator for Lexer<'a> {
                 (
                     Token::Do,
                     Token::Where | Token::Of | Token::Comma | Token::Else | Token::Arrow
-                ) | (
+                )
+            ) || (matches!(
+                (&entry.token, &next_token.token),
+                (
                     Token::Do | Token::Ado | Token::Of,
                     Token::RightParen | Token::RightBrace | Token::RightBracket
                 )
-            ) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
+            ) && (match &prev_token {
+                Some(prev_token) => !is_matching_paren_pair(&prev_token.token, &next_token.token),
+                None => false,
+            })) || (matches!((&entry.token, &next_token.token), (Token::Of, Token::Comma))
                 && entry.after_patterns)
             {
                 let token = self.make_token_info(Token::LayoutEnd);
@@ -1347,6 +1353,18 @@ mod tests {
         ")), @r###"
         f = (case x of{
                _ -> 2}) + 3
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_empty_array() {
+        assert_snapshot!(print_layout(indoc!("
+            do
+                []
+        ")), @r###"
+        do{
+            []}
         <eof>
         "###);
     }
