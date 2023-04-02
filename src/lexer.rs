@@ -125,6 +125,37 @@ impl<'a> Iterator for Lexer<'a> {
 
         trace!("lexed token {:?}", next_token.token);
 
+        // Starting a new paren block
+        if let Some(prev_token) = &prev_token {
+            match &prev_token.token {
+                // Various parens introduce a stack entry, but not layout tokens.
+                // Also: case..of, if..then, then..else, \..->
+                Token::LeftBrace
+                | Token::LeftParen
+                | Token::LeftBracket
+                | Token::Case
+                | Token::If
+                | Token::Then
+                | Token::Backslash => {
+                    self.layout_push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                        after_patterns: false,
+                    });
+                }
+                Token::Pipe
+                    if self.layout_stack.last().as_ref().map(|x| &x.token) == Some(&Token::Of) =>
+                {
+                    self.layout_push(LayoutEntry {
+                        indent_level: next_token.column,
+                        token: prev_token.token.clone(),
+                        after_patterns: false,
+                    });
+                }
+                _ => {}
+            }
+        }
+
         let mut pushed_backtick = false;
         while let Some(entry) = self.layout_stack.last() {
             // dedent ends indented blocks
@@ -180,7 +211,6 @@ impl<'a> Iterator for Lexer<'a> {
             }
 
             // where, of, else and commas end `do` blocks;
-            // closing parens end blocks
             if matches!(
                 (&entry.token, &next_token.token),
                 (
@@ -326,32 +356,6 @@ impl<'a> Iterator for Lexer<'a> {
                         let token = self.make_token_info(Token::LayoutEnd);
                         self.enqueue(token);
                     }
-                }
-                // Various parens introduce a stack entry, but not layout tokens.
-                // Also: case..of, if..then, then..else, \..->
-                Token::LeftBrace
-                | Token::LeftParen
-                | Token::LeftBracket
-                | Token::Case
-                | Token::If
-                | Token::Then
-                | Token::Backslash
-                    if !is_matching_paren_pair(&prev_token.token, &next_token.token) =>
-                {
-                    self.layout_push(LayoutEntry {
-                        indent_level: next_token.column,
-                        token: prev_token.token.clone(),
-                        after_patterns: false,
-                    });
-                }
-                Token::Pipe
-                    if self.layout_stack.last().as_ref().map(|x| &x.token) == Some(&Token::Of) =>
-                {
-                    self.layout_push(LayoutEntry {
-                        indent_level: next_token.column,
-                        token: prev_token.token.clone(),
-                        after_patterns: false,
-                    });
                 }
                 _ => {}
             }
@@ -762,6 +766,10 @@ mod tests {
 
     use super::{Error, Token, TokenInfo};
 
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
+
     fn try_collect<T, E>(iter: impl Iterator<Item = Result<T, E>>) -> Result<Vec<T>, E> {
         let mut result = vec![];
         for item in iter {
@@ -779,6 +787,7 @@ mod tests {
     }
 
     fn lex(input: &str) -> Result<Vec<Token>, Error> {
+        init();
         try_collect(super::make_lexer(input).map(|v| v.map(|v| v.token)))
     }
 
@@ -973,6 +982,7 @@ mod tests {
     }
 
     fn print_layout(input: &str) -> String {
+        init();
         let result = try_collect(super::make_lexer(input)).unwrap();
         // We need to preserve trailing whitespace.
         // Since layout tokens have broken positions (which arguably we could fix, but it's not
@@ -1436,11 +1446,22 @@ mod tests {
 
     #[test]
     fn test_layout_paren_nesting() {
-        let _ = env_logger::builder().is_test(true).try_init();
         assert_snapshot!(print_layout(indoc!("
             [ { foo: [], bar: 1 } ]
         ")), @r###"
         [ { foo: [], bar: 1 } ]
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_list() {
+        assert_snapshot!(print_layout(indoc!("
+        do
+            [[], [1]]
+        ")), @r###"
+        do{
+            [[], [1]]}
         <eof>
         "###);
     }
