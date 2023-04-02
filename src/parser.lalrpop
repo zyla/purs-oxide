@@ -201,7 +201,7 @@ ClassDeclaration: DeclarationKind = {
       let (name, params) = super::constraint_to_class_head(head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error
-          error: lexer::Error("Invalid instance head".into())
+          error: lexer::Error("Invalid class head".into())
         })?;
       Ok(DeclarationKind::Class(TypeClassDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),

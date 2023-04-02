@@ -1,0 +1,65 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            class Foo (a :: Symbol)\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 42,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 41,
+                    },
+                    Commented(
+                        [],
+                        Class(
+                            TypeClassDeclaration {
+                                constraints: [],
+                                name: Symbol(
+                                    "Foo",
+                                ),
+                                params: [
+                                    (
+                                        Symbol(
+                                            "a",
+                                        ),
+                                        Some(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 34,
+                                                    end: 40,
+                                                },
+                                                TypeConstructor(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "Symbol",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                fundeps: [],
+                                methods: [],
+                            },
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)

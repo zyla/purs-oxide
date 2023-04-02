@@ -49,7 +49,17 @@ pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParame
                     params.push((v, None));
                     t = *f;
                 }
-                // TODO: handle kinded types
+                Located(
+                    _,
+                    TypeKind::Row {
+                        mut fields,
+                        rest: None,
+                    },
+                ) if fields.len() == 1 => {
+                    let (v, k) = fields.pop().expect("should be non-empty");
+                    params.push((v, Some(k)));
+                    t = *f;
+                }
                 _ => return None,
             },
             _ => return None,
@@ -388,6 +398,16 @@ mod tests {
             r#"
             module Test where
             class Foo a
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_typeclass_var_kind() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            class Foo (a :: Symbol)
         "#
         )));
     }
