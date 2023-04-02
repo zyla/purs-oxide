@@ -254,6 +254,11 @@ Expr1<Variant>: ExprKind = {
     },
 };
 
+TypeInfixOperator: Symbol = {
+  operator => Symbol::new(<>),
+  "-" => Symbol::new("-".into()),
+}
+
 Operator: Symbol = {
   operator => Symbol::new(<>),
   "<=" => Symbol::new("<=".into()),
@@ -414,17 +419,24 @@ Type1: TypeKind = {
   // Here it seems to work. I have no idea why.
   "forall" <vars:OneOrMore<ForallVar>> "." <body:Type> =>
     TypeKind::ForAll{vars,body:Box::new(body),skolem_scope:None},
-  <constraint:Located<TypeApp>> "=>" <body:Type> =>
+  <constraint:Located<TypeInfix>> "=>" <body:Type> =>
     TypeKind::Constrained{constraint:Box::new(constraint),body:Box::new(body)},
-  <arg:Located<TypeApp>> "->" <result:Type> =>
+  <arg:Located<TypeInfix>> "->" <result:Type> =>
     TypeKind::FunctionType(Box::new(arg), Box::new(result)),
-  TypeApp
+  TypeInfix
 }
 
 Constraint: TypeKind = {
   <l:Located<Constraint>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
   TypeConstructor
 };
+
+TypeInfix: TypeKind = {
+  TypeApp,
+  <first:Box<Located<TypeApp>>> <next:( <TypeInfixOperator> <Located<TypeApp>> )> =>
+    // TODO: normalize
+    TypeKind::Infix(first, vec![next]),
+}
 
 TypeApp: TypeKind = {
   <l:Located<TypeApp>> <r:Located<AtomicType>> => TypeKind::TypeApp(Box::new(l), Box::new(r)),
@@ -440,7 +452,7 @@ AtomicType: TypeKind = {
   "(" <TypeOperator> ")" => TypeKind::Operator(<>),
   string => TypeKind::TypeLevelString(<>),
   int => TypeKind::TypeLevelInt(<>.into()),
-  "-" <int> => TypeKind::TypeLevelInt((-(<> as i64)).into()),
+  "(" "-" <int> ")" => TypeKind::TypeLevelInt((-(<> as i64)).into()),
   "_" => TypeKind::Wildcard(WildcardKind::Unnamed),
   // TODO: hole
 

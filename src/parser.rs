@@ -499,7 +499,7 @@ mod tests {
         assert_debug_snapshot!(parse_type("42"));
         assert_debug_snapshot!(parse_type("Int"));
         assert_debug_snapshot!(parse_type("Prelude.Int"));
-        assert_debug_snapshot!(parse_type("-42"));
+        assert_debug_snapshot!(parse_type("(-42)"));
     }
 
     #[test]
@@ -557,6 +557,21 @@ mod tests {
     #[test]
     fn test_function_as_type_operator() {
         assert_debug_snapshot!(parse_type("(->)"));
+    }
+
+    #[test]
+    fn test_type_operator() {
+        assert_debug_snapshot!(parse_type("a + b"));
+    }
+
+    #[test]
+    fn test_type_operator_2() {
+        assert_debug_snapshot!(parse_type("a -> b ~> c -> d"));
+    }
+
+    #[test]
+    fn test_type_operator_3() {
+        assert_debug_snapshot!(parse_type("a - b"));
     }
 
     #[test]

@@ -1,0 +1,79 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"a -> b ~> c -> d\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 16,
+    },
+    FunctionType(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Var(
+                Symbol(
+                    "a",
+                ),
+            ),
+        ),
+        Located(
+            SourceSpan {
+                start: 5,
+                end: 16,
+            },
+            FunctionType(
+                Located(
+                    SourceSpan {
+                        start: 5,
+                        end: 11,
+                    },
+                    Infix(
+                        Located(
+                            SourceSpan {
+                                start: 5,
+                                end: 6,
+                            },
+                            Var(
+                                Symbol(
+                                    "b",
+                                ),
+                            ),
+                        ),
+                        [
+                            (
+                                Symbol(
+                                    "~>",
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 10,
+                                        end: 11,
+                                    },
+                                    Var(
+                                        Symbol(
+                                            "c",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 15,
+                        end: 16,
+                    },
+                    Var(
+                        Symbol(
+                            "d",
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ),
+)

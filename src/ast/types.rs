@@ -42,8 +42,10 @@ pub enum TypeKind {
         r#type: Box<Type>,
         kind: Box<Type>,
     },
-    BinaryNoParensType(Box<Type>, Box<Type>, Box<Type>),
     Parens(Box<Type>),
+
+    /// Infix operator sequence with unknown precedence
+    Infix(Box<Type>, Vec<(Symbol, Type)>),
 }
 
 #[derive(Debug)]
