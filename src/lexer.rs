@@ -504,16 +504,63 @@ impl<'a> Lexer<'a> {
     }
 
     fn parse_string_literal(&mut self) -> Result<String, Error> {
+        #[derive(PartialEq, Eq)]
+        enum State {
+            Beginning,
+            Normal,
+            Raw,
+        }
+        use State::*;
+
         let mut content = String::new();
+        let mut state = Beginning;
+        let mut num_quotes: u8 = 1;
         loop {
             if self.eof() {
                 return Err(Error("Unterminated string literal".to_string()));
             }
             if self.peek() == '"' {
                 self.next_char();
-                break;
+                match state {
+                    Beginning => {
+                        if !self.eof() && self.peek() == '"' {
+                            self.next_char();
+                            state = Raw;
+                            num_quotes = 0;
+                            continue;
+                        } else {
+                            break;
+                        }
+                    }
+                    Normal => {
+                        break;
+                    }
+                    Raw => {
+                        num_quotes += 1;
+                        if num_quotes == 3 {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
+                }
             }
-            content.push(self.parse_possibly_escaped_char()?);
+            if state == Beginning {
+                state = Normal;
+            }
+            if state == Raw {
+                for _ in 0..num_quotes {
+                    content.push('"');
+                }
+                num_quotes = 0;
+                if self.eof() {
+                    return Err(Error("Unterminated string literal".to_string()));
+                }
+                content.push(self.peek());
+                self.next_char();
+            } else {
+                content.push(self.parse_possibly_escaped_char()?);
+            }
         }
         Ok(content)
     }
@@ -696,6 +743,36 @@ mod tests {
         test_lex(
             r#" "a\n\"\\" "#,
             Ok(vec![Token::StringLiteral("a\n\"\\".to_string())]),
+        );
+    }
+
+    #[test]
+    fn test_raw_string_literal() {
+        test_lex(
+            r#" """ Hello "world" """1 "#,
+            Ok(vec![
+                Token::StringLiteral(" Hello \"world\" ".to_string()),
+                Token::IntegerLiteral(1),
+            ]),
+        );
+    }
+
+    #[test]
+    fn test_raw_string_literal_2() {
+        test_lex(
+            r#" " "" " "#,
+            Ok(vec![
+                Token::StringLiteral(" ".to_string()),
+                Token::StringLiteral(" ".to_string()),
+            ]),
+        );
+    }
+
+    #[test]
+    fn test_raw_string_literal_3() {
+        test_lex(
+            r#" """.+@.+\..+""" "#,
+            Ok(vec![Token::StringLiteral(".+@.+\\..+".to_string())]),
         );
     }
 
