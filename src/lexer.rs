@@ -58,6 +58,7 @@ struct Lexer<'a> {
 #[derive(Debug)]
 struct LayoutEntry {
     indent_level: usize,
+    #[allow(dead_code)]
     line: usize,
     token: Token,
 
@@ -176,11 +177,22 @@ impl<'a> Iterator for Lexer<'a> {
         }
 
         let mut pushed_backtick = false;
+        let mut dedented = false;
         while let Some(entry) = self.layout_stack.last() {
-            // `in` ends `ado` blocks, and `let` on the same line
+            // dedent ends indented blocks
+            if next_token.column < entry.indent_level && is_indented(&entry.token) {
+                let token = self.make_token_info(Token::LayoutEnd);
+                self.enqueue(token);
+                trace!("dedent");
+                self.layout_pop();
+                dedented = true;
+                continue;
+            }
+
+            // `in` ends `ado` blocks, and `let` if indented more
             if matches!((&entry.token, &next_token.token), (Token::Ado, Token::In))
-                || (matches!((&entry.token, &next_token.token), (Token::Let, Token::In))
-                    && next_token.line == entry.line)
+                || (!dedented
+                    && matches!((&entry.token, &next_token.token), (Token::Let, Token::In)))
             {
                 let token = self.make_token_info(Token::LayoutEnd);
                 self.enqueue(token);
@@ -188,15 +200,6 @@ impl<'a> Iterator for Lexer<'a> {
                 self.layout_pop();
                 // Use it only once, otherwise it ends all nested ado/let blocks
                 break;
-            }
-
-            // dedent ends indented blocks
-            if next_token.column < entry.indent_level && is_indented(&entry.token) {
-                let token = self.make_token_info(Token::LayoutEnd);
-                self.enqueue(token);
-                trace!("dedent");
-                self.layout_pop();
-                continue;
             }
 
             // End paren pairs
@@ -1523,6 +1526,36 @@ mod tests {
                 tl = 2}
               in
                 foo}
+          in bar
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_let_2() {
+        assert_snapshot!(print_layout(indoc!("
+          let x = 1
+              y = 2 in
+          foo
+        ")), @r###"
+        let {x = 1;
+            y = 2 }in
+        foo
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_let_3() {
+        assert_snapshot!(print_layout(indoc!("
+          test = ado
+            baz
+            let foo = bar
+            in bar
+        ")), @r###"
+        test = ado{
+          baz;
+          let {foo = bar}}
           in bar
         <eof>
         "###);
