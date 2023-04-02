@@ -4,6 +4,12 @@ pub struct SourceSpan {
     pub end: usize,
 }
 
+impl SourceSpan {
+    pub fn new(start: usize, end: usize) -> Self {
+        Self { start, end }
+    }
+}
+
 #[derive(Debug)]
 pub struct Located<T>(pub SourceSpan, pub T);
 
