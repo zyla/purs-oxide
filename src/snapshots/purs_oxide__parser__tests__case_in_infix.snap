@@ -1,0 +1,123 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n            case x of\n                _ -> y\n        <>\n            case x of\n                _ -> y\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 4,
+        end: 61,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 4,
+                end: 31,
+            },
+            Case {
+                exprs: [
+                    Located(
+                        SourceSpan {
+                            start: 9,
+                            end: 10,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "x",
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+                branches: [
+                    CaseBranch {
+                        pats: [
+                            Located(
+                                SourceSpan {
+                                    start: 22,
+                                    end: 23,
+                                },
+                                Wildcard,
+                            ),
+                        ],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 27,
+                                    end: 28,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "y",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        ),
+        [
+            (
+                Symbol(
+                    Symbol(
+                        "<>",
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 36,
+                        end: 61,
+                    },
+                    Case {
+                        exprs: [
+                            Located(
+                                SourceSpan {
+                                    start: 41,
+                                    end: 42,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "x",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                        branches: [
+                            CaseBranch {
+                                pats: [
+                                    Located(
+                                        SourceSpan {
+                                            start: 54,
+                                            end: 55,
+                                        },
+                                        Wildcard,
+                                    ),
+                                ],
+                                expr: Unconditional(
+                                    Located(
+                                        SourceSpan {
+                                            start: 59,
+                                            end: 60,
+                                        },
+                                        Var(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "y",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ],
+                    },
+                ),
+            ),
+        ],
+    ),
+)

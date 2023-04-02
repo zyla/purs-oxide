@@ -1012,6 +1012,19 @@ mod tests {
     }
 
     #[test]
+    fn test_case_in_infix() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+            case x of
+                _ -> y
+        <>
+            case x of
+                _ -> y
+        "
+        )));
+    }
+
+    #[test]
     fn test_standalone_operator() {
         assert_debug_snapshot!(parse_expr("(+)"));
     }

@@ -293,8 +293,6 @@ LambdaLike: ExprKind = {
     => ExprKind::If{ cond, then_, else_ },
   "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Expr>>
     => ExprKind::Let{ decls, body },
-  "case" <exprs:SepBy1<Expr, ",">> "of" <branches:LayoutBlock<CaseBranch>>
-    => ExprKind::Case{ exprs, branches },
   "ado" <items:LayoutBlock<DoItem>> "in" <expr:Box<Expr>>
     => ExprKind::Ado(items, expr),
 };
@@ -375,6 +373,8 @@ PrimaryExpr<Variant>: ExprKind = {
   "_" => ExprKind::Wildcard,
   "do" <LayoutBlock<DoItem>> => ExprKind::Do(<>),
   "(" <InfixOp<"full">> ")" => ExprKind::Operator(<>),
+  "case" <exprs:SepBy1<Expr, ",">> "of" <branches:LayoutBlock<CaseBranch>>
+    => ExprKind::Case{ exprs, branches },
 }
 
 RecordUpdate: (Symbol, Expr) = {
