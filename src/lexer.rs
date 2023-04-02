@@ -670,6 +670,29 @@ impl<'a> Lexer<'a> {
                 match self.peek() {
                     'n' => '\n',
                     't' => '\t',
+                    'r' => '\r',
+                    'x' => {
+                        self.next_char();
+                        let mut num_digits = 0;
+                        let mut value = 0;
+                        while num_digits < 6 {
+                            if self.eof() {
+                                return Err(Error("Unterminated string literal".to_string()));
+                            }
+                            let c = self.peek();
+                            if !c.is_ascii_hexdigit() {
+                                break;
+                            }
+                            value = value << 4 | (hex_value(c) as u32);
+                            num_digits += 1;
+                            self.next_char();
+                        }
+                        if num_digits == 0 {
+                            return Err(Error("Invalid character escape".to_string()));
+                        }
+                        return char::from_u32(value)
+                            .ok_or_else(|| Error("character out of range".to_string()));
+                    }
                     c => c,
                 }
             }
@@ -760,6 +783,14 @@ fn operator_to_token(s: &str) -> Token {
 
 fn digit_value(c: char) -> usize {
     c as usize - '0' as usize
+}
+
+fn hex_value(c: char) -> u8 {
+    if is_digit(c) {
+        c as u8 - '0' as u8
+    } else {
+        c.to_ascii_lowercase() as u8 - 'a' as u8 + 10
+    }
 }
 
 fn is_ident_start(c: char) -> bool {
@@ -1710,6 +1741,30 @@ mod tests {
                 FatArrow,
                 TypeOf,
                 Arrow,
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_unicode_escapes() {
+        assert_debug_snapshot!(
+        lex("'\\x0' '\\x2713' '\\x02713' '\\x10ffff'"),
+        @r###"
+        Ok(
+            [
+                CharLiteral(
+                    '\0',
+                ),
+                CharLiteral(
+                    '✓',
+                ),
+                CharLiteral(
+                    '✓',
+                ),
+                CharLiteral(
+                    '\u{10ffff}',
+                ),
             ],
         )
         "###);
