@@ -4,6 +4,7 @@ use crate::ast::*;
 use crate::symbol::*;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
+use std::str::FromStr;
 
 grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 
@@ -327,7 +328,11 @@ AsPat<E>: Pat = {
 
 Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<>),
-  // float => Literal::Float(<>),
+  float =>? Ok(Literal::Float(f64::from_str(&<>)
+        .map_err(|_| ParseError::User {
+            // TODO: make it not a lexer error
+            error: lexer::Error("invalid floating-point number".into())
+        })?)),
   string => Literal::String(<>),
   char => Literal::Char(<>),
   "true" => Literal::Boolean(true),
@@ -471,7 +476,8 @@ extern {
   type Error = lexer::Error;
 
   enum Token {
-    int => Token::IntegerLiteral(<i32>),
+    int => Token::IntegerLiteral(<u64>),
+    float => Token::FloatLiteral(<String>),
     string => Token::StringLiteral(<String>),
     char => Token::CharLiteral(<char>),
     lower_ident => Token::LowerIdentifier(<String>),

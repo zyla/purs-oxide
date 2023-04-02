@@ -2,7 +2,8 @@ use std::fmt::Display;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Token {
-    IntegerLiteral(i32),
+    IntegerLiteral(u64),
+    FloatLiteral(String),
     StringLiteral(String),
     CharLiteral(char),
     LowerIdentifier(String),

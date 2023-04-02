@@ -403,13 +403,32 @@ impl<'a> Lexer<'a> {
             }
             c if is_digit(c) => {
                 let mut value = digit_value(c);
-                while !self.eof() && is_integer_literal_char(self.peek()) {
+                let is_float = loop {
+                    if self.eof() {
+                        break false;
+                    }
+                    if self.peek() == '.' {
+                        break true;
+                    }
+                    if !is_integer_literal_char(self.peek()) {
+                        break false;
+                    }
                     if is_digit(self.peek()) {
                         value = value * 10 + digit_value(self.peek());
                     }
                     self.next_char();
+                };
+                if is_float {
+                    self.next_char();
+                    while !self.eof() && is_integer_literal_char(self.peek()) {
+                        self.next_char();
+                    }
+                    self.make_token(Token::FloatLiteral(
+                        self.input[self.token_start..self.pos].into(),
+                    ))
+                } else {
+                    self.make_token(Token::IntegerLiteral(value as u64))
                 }
-                self.make_token(Token::IntegerLiteral(value as i32)) // FIXME: handle overflow
             }
             '"' => {
                 let s = self.parse_string_literal()?;

@@ -105,7 +105,7 @@ pub enum PatKind {
 
 #[derive(Debug)]
 pub enum Literal<T> {
-    Integer(i32),
+    Integer(u64),
     Float(f64),
     String(String),
     Char(char),

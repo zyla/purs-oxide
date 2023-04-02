@@ -566,6 +566,11 @@ mod tests {
     }
 
     #[test]
+    fn test_float_literal() {
+        assert_debug_snapshot!(parse_expr("12.34"));
+    }
+
+    #[test]
     fn test_parse_array() {
         assert_debug_snapshot!(parse_expr(r#" [] "#));
         assert_debug_snapshot!(parse_expr(r#" [1] "#));
