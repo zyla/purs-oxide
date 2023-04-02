@@ -1,0 +1,51 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          ado\n            x <- f\n            in 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 19,
+    },
+    Ado(
+        [
+            Bind(
+                Located(
+                    SourceSpan {
+                        start: 6,
+                        end: 7,
+                    },
+                    Var(
+                        Symbol(
+                            "x",
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 11,
+                        end: 12,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ],
+        Located(
+            SourceSpan {
+                start: 18,
+                end: 19,
+            },
+            Literal(
+                Integer(
+                    1,
+                ),
+            ),
+        ),
+    ),
+)

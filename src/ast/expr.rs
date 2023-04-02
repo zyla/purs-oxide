@@ -55,6 +55,8 @@ pub enum ExprKind {
 
     Do(Vec<DoItem>),
 
+    Ado(Vec<DoItem>, Box<Expr>),
+
     Negate(Box<Expr>),
 }
 

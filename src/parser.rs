@@ -121,6 +121,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                 return Err("Illegal record update in pattern".into())
             }
             ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
+            ExprKind::Ado(_, _) => return Err("Illegal ado in pattern".into()),
             ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
             ExprKind::Negate(_) => return Err("Illegal negation in pattern".into()),
@@ -852,6 +853,41 @@ mod tests {
           do
             x :: Int <- foo
             pure 2
+        "
+        )));
+    }
+
+    #[test]
+    fn test_ado_simple() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          ado
+            x <- f
+            in 1
+        "
+        )));
+    }
+
+    #[test]
+    fn test_ado_let() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          ado
+            let x = 1
+            in 2
+        "
+        )));
+    }
+
+    #[test]
+    fn test_ado_full() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          ado
+            let x = 1
+            y <- f z
+            g a
+            in 2
         "
         )));
     }

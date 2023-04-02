@@ -1,0 +1,146 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          ado\n            let x = 1\n            y <- f z\n            g a\n            in 2\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 39,
+    },
+    Ado(
+        [
+            Let(
+                [
+                    Located(
+                        SourceSpan {
+                            start: 10,
+                            end: 15,
+                        },
+                        Commented(
+                            [],
+                            ValueDeclaration(
+                                ValueDeclaration {
+                                    ident: Symbol(
+                                        "x",
+                                    ),
+                                    params: [],
+                                    expr: Unconditional(
+                                        Located(
+                                            SourceSpan {
+                                                start: 14,
+                                                end: 15,
+                                            },
+                                            Literal(
+                                                Integer(
+                                                    1,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+            Bind(
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 19,
+                    },
+                    Var(
+                        Symbol(
+                            "y",
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 23,
+                        end: 26,
+                    },
+                    App(
+                        Located(
+                            SourceSpan {
+                                start: 23,
+                                end: 24,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "f",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 25,
+                                    end: 26,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "z",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+            Expr(
+                Located(
+                    SourceSpan {
+                        start: 29,
+                        end: 32,
+                    },
+                    App(
+                        Located(
+                            SourceSpan {
+                                start: 29,
+                                end: 30,
+                            },
+                            Var(
+                                QualifiedName(
+                                    Symbol(
+                                        "g",
+                                    ),
+                                ),
+                            ),
+                        ),
+                        [
+                            Located(
+                                SourceSpan {
+                                    start: 31,
+                                    end: 32,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "a",
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+        ],
+        Located(
+            SourceSpan {
+                start: 38,
+                end: 39,
+            },
+            Literal(
+                Integer(
+                    2,
+                ),
+            ),
+        ),
+    ),
+)

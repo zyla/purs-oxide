@@ -232,7 +232,9 @@ LambdaLike: ExprKind = {
   "let" <decls:LayoutBlock<LetDeclaration>> "in" <body:Box<Expr>>
     => ExprKind::Let{ decls, body },
   "case" <expr:Box<Expr>> "of" <branches:LayoutBlock<CaseBranch>>
-    => ExprKind::Case{ expr, branches }
+    => ExprKind::Case{ expr, branches },
+  "ado" <items:LayoutBlock<DoItem>> "in" <expr:Box<Expr>>
+    => ExprKind::Ado(items, expr),
 };
 
 // Typed
