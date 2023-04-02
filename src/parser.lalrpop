@@ -359,7 +359,16 @@ RecordShortcutExpr: (Symbol, Expr) = {
 
 PossiblyGuarded<Sep, E>: PossiblyGuardedExpr = {
   Sep <E> => PossiblyGuardedExpr::Unconditional(<>),
-  // TOO
+  <GuardedExpr<Sep, E>+> => PossiblyGuardedExpr::Guarded(<>),
+};
+
+GuardedExpr<Sep, E>: GuardedExpr = {
+  "|" <guards:SepBy1<Guard, ",">> Sep <expr:E> => GuardedExpr{ guards, expr }
+};
+
+Guard: Guard = {
+  <ExprV<"case_pat">> => Guard::Expr(<>),
+  <pat:AsPat<ExprV<"case_pat">>> "<-" <expr:ExprV<"case_pat">> => Guard::Bind(pat, expr),
 };
 
 // TODO: extract the comments

@@ -1,0 +1,146 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n          case x of\n            A | true, Just x <- foo + bar -> 1\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 47,
+    },
+    Case {
+        expr: Located(
+            SourceSpan {
+                start: 5,
+                end: 6,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+        branches: [
+            CaseBranch {
+                pat: Located(
+                    SourceSpan {
+                        start: 12,
+                        end: 13,
+                    },
+                    DataConstructorApp(
+                        QualifiedName(
+                            Symbol(
+                                "A",
+                            ),
+                        ),
+                        [],
+                    ),
+                ),
+                expr: Guarded(
+                    [
+                        GuardedExpr {
+                            guards: [
+                                Expr(
+                                    Located(
+                                        SourceSpan {
+                                            start: 16,
+                                            end: 20,
+                                        },
+                                        Literal(
+                                            Boolean(
+                                                true,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                Bind(
+                                    Located(
+                                        SourceSpan {
+                                            start: 22,
+                                            end: 28,
+                                        },
+                                        DataConstructorApp(
+                                            QualifiedName(
+                                                Symbol(
+                                                    "Just",
+                                                ),
+                                            ),
+                                            [
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 27,
+                                                        end: 28,
+                                                    },
+                                                    Var(
+                                                        Symbol(
+                                                            "x",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 32,
+                                            end: 41,
+                                        },
+                                        Infix(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 32,
+                                                    end: 35,
+                                                },
+                                                Var(
+                                                    QualifiedName(
+                                                        Symbol(
+                                                            "foo",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            [
+                                                (
+                                                    Symbol(
+                                                        Symbol(
+                                                            "+",
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 38,
+                                                            end: 41,
+                                                        },
+                                                        Var(
+                                                            QualifiedName(
+                                                                Symbol(
+                                                                    "bar",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            expr: Located(
+                                SourceSpan {
+                                    start: 45,
+                                    end: 46,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        },
+                    ],
+                ),
+            },
+        ],
+    },
+)

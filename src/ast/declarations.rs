@@ -1,4 +1,4 @@
-use super::{Commented, Expr, Located, Pat, PossiblyGuardedExpr, Type};
+use super::{Commented, Located, Pat, PossiblyGuardedExpr, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -212,15 +212,4 @@ pub struct ValueDeclaration {
     // pub name: NameKind
     pub params: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
-}
-
-#[derive(Debug)]
-pub struct GuardedExpr {
-    pub guards: Vec<Guard>,
-    pub expr: Expr,
-}
-
-#[derive(Debug)]
-pub enum Guard {
-    // TODO
 }

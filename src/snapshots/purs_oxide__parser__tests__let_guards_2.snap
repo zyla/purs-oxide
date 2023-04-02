@@ -1,0 +1,96 @@
+---
+source: src/parser.rs
+expression: "parse_expr(indoc!(\"\n            let Just x | true = 1\n            in x\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 26,
+    },
+    Let {
+        decls: [
+            Located(
+                SourceSpan {
+                    start: 4,
+                    end: 21,
+                },
+                Commented(
+                    [],
+                    Destructuring {
+                        pat: Located(
+                            SourceSpan {
+                                start: 4,
+                                end: 10,
+                            },
+                            DataConstructorApp(
+                                QualifiedName(
+                                    Symbol(
+                                        "Just",
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 9,
+                                            end: 10,
+                                        },
+                                        Var(
+                                            Symbol(
+                                                "x",
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                        expr: Guarded(
+                            [
+                                GuardedExpr {
+                                    guards: [
+                                        Expr(
+                                            Located(
+                                                SourceSpan {
+                                                    start: 13,
+                                                    end: 17,
+                                                },
+                                                Literal(
+                                                    Boolean(
+                                                        true,
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    expr: Located(
+                                        SourceSpan {
+                                            start: 20,
+                                            end: 21,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
+                                            ),
+                                        ),
+                                    ),
+                                },
+                            ],
+                        ),
+                    },
+                ),
+            ),
+        ],
+        body: Located(
+            SourceSpan {
+                start: 25,
+                end: 26,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+    },
+)

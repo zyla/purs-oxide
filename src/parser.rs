@@ -660,6 +660,27 @@ mod tests {
     }
 
     #[test]
+    fn test_case_guards_1() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          case x of
+            A | true -> 1
+              | false -> 2
+        "
+        )));
+    }
+
+    #[test]
+    fn test_case_guards_2() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+          case x of
+            A | true, Just x <- foo + bar -> 1
+        "
+        )));
+    }
+
+    #[test]
     fn test_typed_expr() {
         assert_debug_snapshot!(parse_expr("foo bar :: Int"));
     }
@@ -685,6 +706,26 @@ mod tests {
                 y = 2
                 Tuple a b = y
             in \\z -> x + z
+        "
+        )));
+    }
+
+    #[test]
+    fn test_let_guards() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+            let x | true = 1
+            in x
+        "
+        )));
+    }
+
+    #[test]
+    fn test_let_guards_2() {
+        assert_debug_snapshot!(parse_expr(indoc!(
+            "
+            let Just x | true = 1
+            in x
         "
         )));
     }
