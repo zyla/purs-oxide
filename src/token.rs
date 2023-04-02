@@ -1,11 +1,13 @@
+use crate::string::PSChar;
+use crate::string::PSString;
 use std::fmt::Display;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum Token {
     IntegerLiteral(u64),
     FloatLiteral(String),
-    StringLiteral(String),
-    CharLiteral(char),
+    StringLiteral(PSString),
+    CharLiteral(PSChar),
     LowerIdentifier(String),
     QualifiedLowerIdentifier(String),
     UpperIdentifier(String),

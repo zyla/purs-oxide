@@ -8,6 +8,15 @@ Located(
         end: 8,
     },
     TypeLevelString(
-        "string",
+        PSString(
+            [
+                115,
+                116,
+                114,
+                105,
+                110,
+                103,
+            ],
+        ),
     ),
 )

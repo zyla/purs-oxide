@@ -1,5 +1,7 @@
 use super::{Declaration, Located, Type};
 use crate::ast::QualifiedName;
+use crate::string::PSChar;
+use crate::string::PSString;
 use crate::symbol::Symbol;
 
 pub type Expr = Located<ExprKind>;
@@ -129,8 +131,8 @@ pub enum PatKind {
 pub enum Literal<T> {
     Integer(u64),
     Float(f64),
-    String(String),
-    Char(char),
+    String(PSString),
+    Char(PSChar),
     Boolean(bool),
     Array(Vec<T>),
     Object(Vec<(Symbol, T)>),

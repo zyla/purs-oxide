@@ -1,3 +1,4 @@
+use crate::string::{PSChar, PSString};
 use log::trace;
 use std::iter::Peekable;
 use std::{collections::VecDeque, fmt::Display, str::CharIndices};
@@ -595,7 +596,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    fn parse_string_literal(&mut self) -> Result<String, Error> {
+    fn parse_string_literal(&mut self) -> Result<PSString, Error> {
         #[derive(PartialEq, Eq)]
         enum State {
             Beginning,
@@ -604,7 +605,7 @@ impl<'a> Lexer<'a> {
         }
         use State::*;
 
-        let mut content = String::new();
+        let mut content = vec![];
         let mut state = Beginning;
         let mut num_quotes: u8 = 1;
         loop {
@@ -642,22 +643,22 @@ impl<'a> Lexer<'a> {
             }
             if state == Raw {
                 for _ in 0..num_quotes {
-                    content.push('"');
+                    content.push('"' as PSChar);
                 }
                 num_quotes = 0;
                 if self.eof() {
                     return Err(Error("Unterminated string literal".to_string()));
                 }
-                content.push(self.peek());
+                content.push(self.peek() as PSChar);
                 self.next_char();
             } else {
                 content.push(self.parse_possibly_escaped_char()?);
             }
         }
-        Ok(content)
+        Ok(PSString(content))
     }
 
-    fn parse_possibly_escaped_char(&mut self) -> Result<char, Error> {
+    fn parse_possibly_escaped_char(&mut self) -> Result<PSChar, Error> {
         if self.eof() {
             return Err(Error("Unterminated string literal".to_string()));
         }
@@ -668,9 +669,9 @@ impl<'a> Lexer<'a> {
                     return Err(Error("Unterminated string literal".to_string()));
                 }
                 match self.peek() {
-                    'n' => '\n',
-                    't' => '\t',
-                    'r' => '\r',
+                    'n' => '\n' as PSChar,
+                    't' => '\t' as PSChar,
+                    'r' => '\r' as PSChar,
                     'x' => {
                         self.next_char();
                         let mut num_digits = 0;
@@ -690,13 +691,15 @@ impl<'a> Lexer<'a> {
                         if num_digits == 0 {
                             return Err(Error("Invalid character escape".to_string()));
                         }
-                        return char::from_u32(value)
-                            .ok_or_else(|| Error("character out of range".to_string()));
+                        if value > 0x10ffff {
+                            return Err(Error(format!("character out of range: {:02x}", value)));
+                        }
+                        return Ok(value);
                     }
-                    c => c,
+                    c => c as PSChar,
                 }
             }
-            c => c,
+            c => c as PSChar,
         };
         self.next_char();
         Ok(c)
@@ -878,14 +881,14 @@ mod tests {
 
     #[test]
     fn test_string_literal() {
-        test_lex(r#" "" "#, Ok(vec![Token::StringLiteral("".to_string())]));
+        test_lex(r#" "" "#, Ok(vec![Token::StringLiteral("".into())]));
         test_lex(
             r#" "Hello" "#,
-            Ok(vec![Token::StringLiteral("Hello".to_string())]),
+            Ok(vec![Token::StringLiteral("Hello".into())]),
         );
         test_lex(
             r#" "a\n\"\\" "#,
-            Ok(vec![Token::StringLiteral("a\n\"\\".to_string())]),
+            Ok(vec![Token::StringLiteral("a\n\"\\".into())]),
         );
     }
 
@@ -894,7 +897,7 @@ mod tests {
         test_lex(
             r#" """ Hello "world" """1 "#,
             Ok(vec![
-                Token::StringLiteral(" Hello \"world\" ".to_string()),
+                Token::StringLiteral(" Hello \"world\" ".into()),
                 Token::IntegerLiteral(1),
             ]),
         );
@@ -905,8 +908,8 @@ mod tests {
         test_lex(
             r#" " "" " "#,
             Ok(vec![
-                Token::StringLiteral(" ".to_string()),
-                Token::StringLiteral(" ".to_string()),
+                Token::StringLiteral(" ".into()),
+                Token::StringLiteral(" ".into()),
             ]),
         );
     }
@@ -915,7 +918,7 @@ mod tests {
     fn test_raw_string_literal_3() {
         test_lex(
             r#" """.+@.+\..+""" "#,
-            Ok(vec![Token::StringLiteral(".+@.+\\..+".to_string())]),
+            Ok(vec![Token::StringLiteral(".+@.+\\..+".into())]),
         );
     }
 
@@ -1211,7 +1214,7 @@ mod tests {
         Ok(
             [
                 CharLiteral(
-                    'a',
+                    97,
                 ),
             ],
         )
@@ -1653,7 +1656,13 @@ mod tests {
                 ),
                 Dot,
                 StringLiteral(
-                    "Baz",
+                    PSString(
+                        [
+                            66,
+                            97,
+                            122,
+                        ],
+                    ),
                 ),
             ],
         )
@@ -1754,16 +1763,31 @@ mod tests {
         Ok(
             [
                 CharLiteral(
-                    '\0',
+                    0,
                 ),
                 CharLiteral(
-                    '✓',
+                    10003,
                 ),
                 CharLiteral(
-                    '✓',
+                    10003,
                 ),
                 CharLiteral(
-                    '\u{10ffff}',
+                    1114111,
+                ),
+            ],
+        )
+        "###);
+    }
+
+    #[test]
+    fn test_non_usv_char() {
+        assert_debug_snapshot!(
+        lex("'\\xdc00'"),
+        @r###"
+        Ok(
+            [
+                CharLiteral(
+                    56320,
                 ),
             ],
         )

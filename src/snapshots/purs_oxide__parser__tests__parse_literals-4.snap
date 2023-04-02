@@ -9,7 +9,7 @@ Located(
     },
     Literal(
         Char(
-            'a',
+            97,
         ),
     ),
 )

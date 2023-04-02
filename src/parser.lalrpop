@@ -2,6 +2,7 @@ use crate::token::Token;
 use crate::lexer;
 use crate::ast::*;
 use crate::symbol::*;
+use crate::string::*;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 use std::str::FromStr;
@@ -547,7 +548,10 @@ RowRest: Box<Type> = {
 /// A record field label
 Label: Symbol = {
   LowerIdent,
-  string => Symbol::new(<>),
+  string =>? Ok(Symbol::new(<>.try_into().map_err(|NonUsvChar| ParseError::User {
+    // TODO: make it not a lexer error
+    error: lexer::Error("non-USV character in string label".into())
+  })?)),
 
   "ado" => Symbol::new("ado".into()),
   "case" => Symbol::new("case".into()),
@@ -600,8 +604,8 @@ extern {
   enum Token {
     int => Token::IntegerLiteral(<u64>),
     float => Token::FloatLiteral(<String>),
-    string => Token::StringLiteral(<String>),
-    char => Token::CharLiteral(<char>),
+    string => Token::StringLiteral(<PSString>),
+    char => Token::CharLiteral(<PSChar>),
     lower_ident => Token::LowerIdentifier(<String>),
     lower_qualified_ident => Token::QualifiedLowerIdentifier(<String>),
     upper_ident => Token::UpperIdentifier(<String>),

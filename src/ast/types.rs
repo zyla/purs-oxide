@@ -1,4 +1,5 @@
 use super::{Located, QualifiedName, Symbol};
+use crate::string::PSString;
 
 pub type Type = Located<TypeKind>;
 
@@ -8,7 +9,7 @@ pub enum TypeKind {
     Var(Symbol),
     /// Standalone operator
     Operator(Symbol),
-    TypeLevelString(String),
+    TypeLevelString(PSString),
     TypeLevelInt(num::BigInt),
     Wildcard(WildcardKind),
     TypeConstructor(QualifiedName),

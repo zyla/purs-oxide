@@ -273,7 +273,13 @@ Located(
                                         },
                                         Literal(
                                             String(
-                                                "foo",
+                                                PSString(
+                                                    [
+                                                        102,
+                                                        111,
+                                                        111,
+                                                    ],
+                                                ),
                                             ),
                                         ),
                                     ),
