@@ -327,6 +327,7 @@ Operator: Symbol = {
   "=>" => Symbol::new("=>".into()),
   "-" => Symbol::new("-".into()),
   ":" => Symbol::new(":".into()),
+  ".." => Symbol::new("..".into()),
 };
 
 InfixOp<Variant>: InfixOp = {
