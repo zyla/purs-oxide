@@ -134,7 +134,10 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Ado(_, _) => return Err("Illegal ado in pattern".into()),
             ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
-            ExprKind::Negate(_) => return Err("Illegal negation in pattern".into()),
+            ExprKind::Negate(x) => match x.into_inner() {
+                ExprKind::Literal(Literal::Integer(x)) => PatKind::Literal(Literal::Integer(-x)),
+                    _ => return Err("Illegal negation in pattern".into()),
+            }
         },
     ))
 }
@@ -1131,6 +1134,11 @@ mod tests {
         type role Foo phantom representational nominal
         "
         )));
+    }
+
+    #[test]
+    fn test_neg_pattern() {
+        assert_debug_snapshot!(parse_expr("case x of -1 -> 1"));
     }
 
     //

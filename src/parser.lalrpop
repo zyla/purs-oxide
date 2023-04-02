@@ -402,7 +402,7 @@ AsPat<E>: Pat = {
 };
 
 Literal<T, RecordShortcut>: Literal<T> = {
-  int => Literal::Integer(<>),
+  int => Literal::Integer(<> as i64),
   float =>? Ok(Literal::Float(f64::from_str(&<>)
         .map_err(|_| ParseError::User {
             // TODO: make it not a lexer error

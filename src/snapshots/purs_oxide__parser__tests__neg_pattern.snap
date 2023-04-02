@@ -1,0 +1,57 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"case x of -1 -> 1\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 17,
+    },
+    Case {
+        exprs: [
+            Located(
+                SourceSpan {
+                    start: 5,
+                    end: 6,
+                },
+                Var(
+                    QualifiedName(
+                        Symbol(
+                            "x",
+                        ),
+                    ),
+                ),
+            ),
+        ],
+        branches: [
+            CaseBranch {
+                pats: [
+                    Located(
+                        SourceSpan {
+                            start: 10,
+                            end: 12,
+                        },
+                        Literal(
+                            Integer(
+                                -1,
+                            ),
+                        ),
+                    ),
+                ],
+                expr: Unconditional(
+                    Located(
+                        SourceSpan {
+                            start: 16,
+                            end: 17,
+                        },
+                        Literal(
+                            Integer(
+                                1,
+                            ),
+                        ),
+                    ),
+                ),
+            },
+        ],
+    },
+)
