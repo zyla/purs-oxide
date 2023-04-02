@@ -38,7 +38,7 @@ pub enum ExprKind {
         else_: Box<Expr>,
     },
 
-    Typed(Box<Expr>, Type),
+    Typed(Box<Expr>, Box<Type>),
 
     Let {
         decls: Vec<Declaration>,
@@ -120,7 +120,7 @@ pub enum PatKind {
 
     Named(Symbol, Box<Pat>),
 
-    Typed(Box<Pat>, Type),
+    Typed(Box<Pat>, Box<Type>),
 }
 
 #[derive(Debug)]
@@ -132,4 +132,9 @@ pub enum Literal<T> {
     Boolean(bool),
     Array(Vec<T>),
     Object(Vec<(Symbol, T)>),
+}
+
+#[test]
+fn test_size() {
+    assert_eq!(std::mem::size_of::<Expr>(), 56);
 }
