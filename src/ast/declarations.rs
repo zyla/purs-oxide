@@ -191,7 +191,7 @@ pub struct InstanceDeclaration {
     pub instance_name: Option<Symbol>,
     pub class: QualifiedName,
     pub args: Vec<Type>,
-    pub body: Vec<ValueDeclaration>,
+    pub body: Vec<Declaration>,
 }
 
 #[derive(Debug)]

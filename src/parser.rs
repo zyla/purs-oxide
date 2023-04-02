@@ -136,8 +136,8 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
             ExprKind::Negate(x) => match x.into_inner() {
                 ExprKind::Literal(Literal::Integer(x)) => PatKind::Literal(Literal::Integer(-x)),
-                    _ => return Err("Illegal negation in pattern".into()),
-            }
+                _ => return Err("Illegal negation in pattern".into()),
+            },
         },
     ))
 }
@@ -561,6 +561,29 @@ mod tests {
             module Test where
             instance Foo Int else
             instance Foo a
+        "#
+        )));
+    }
+
+    #[test]
+    fn test_instance_method_sig() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            instance Foo Int where
+                x :: Int
+        "#
+        )));
+    }
+
+    #[test]
+    #[ignore = "Not implemented yet"]
+    fn test_instance_method_infix() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            r#"
+            module Test where
+            instance Semigroup Int where
+                x <> y = z
         "#
         )));
     }

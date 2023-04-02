@@ -227,7 +227,7 @@ InstanceDeclaration: InstanceDeclaration = {
     <instance_name:(<LowerIdent> "::")?>
     <constraints:(<TypeClassConstraints> "=>")?>
     <head:Located<Constraint>>
-    <body:("where" <MaybeLayoutBlock<ValueDeclaration>>)?> =>? {
+    <body:("where" <MaybeLayoutBlock<LetDeclaration>>)?> =>? {
       let (class, args) = super::constraint_to_instance_head(head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error

@@ -52,25 +52,36 @@ Located(
                                         ),
                                     ],
                                     body: [
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "x",
-                                            ),
-                                            params: [],
-                                            expr: Unconditional(
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 47,
-                                                        end: 48,
-                                                    },
-                                                    Literal(
-                                                        Integer(
-                                                            1,
+                                        Located(
+                                            SourceSpan {
+                                                start: 43,
+                                                end: 48,
+                                            },
+                                            Commented(
+                                                [],
+                                                ValueDeclaration(
+                                                    ValueDeclaration {
+                                                        ident: Symbol(
+                                                            "x",
                                                         ),
-                                                    ),
+                                                        params: [],
+                                                        expr: Unconditional(
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 47,
+                                                                    end: 48,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
                                                 ),
                                             ),
-                                        },
+                                        ),
                                     ],
                                 },
                                 InstanceDeclaration {
@@ -96,25 +107,36 @@ Located(
                                         ),
                                     ],
                                     body: [
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "x",
-                                            ),
-                                            params: [],
-                                            expr: Unconditional(
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 81,
-                                                        end: 82,
-                                                    },
-                                                    Literal(
-                                                        Integer(
-                                                            2,
+                                        Located(
+                                            SourceSpan {
+                                                start: 77,
+                                                end: 82,
+                                            },
+                                            Commented(
+                                                [],
+                                                ValueDeclaration(
+                                                    ValueDeclaration {
+                                                        ident: Symbol(
+                                                            "x",
                                                         ),
-                                                    ),
+                                                        params: [],
+                                                        expr: Unconditional(
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 81,
+                                                                    end: 82,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        2,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
                                                 ),
                                             ),
-                                        },
+                                        ),
                                     ],
                                 },
                             ],

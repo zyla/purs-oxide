@@ -52,56 +52,78 @@ Located(
                                         ),
                                     ],
                                     body: [
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "foo",
-                                            ),
-                                            params: [
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 47,
-                                                        end: 48,
-                                                    },
-                                                    Var(
-                                                        Symbol(
-                                                            "x",
+                                        Located(
+                                            SourceSpan {
+                                                start: 43,
+                                                end: 52,
+                                            },
+                                            Commented(
+                                                [],
+                                                ValueDeclaration(
+                                                    ValueDeclaration {
+                                                        ident: Symbol(
+                                                            "foo",
                                                         ),
-                                                    ),
-                                                ),
-                                            ],
-                                            expr: Unconditional(
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 51,
-                                                        end: 52,
-                                                    },
-                                                    Literal(
-                                                        Integer(
-                                                            1,
+                                                        params: [
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 47,
+                                                                    end: 48,
+                                                                },
+                                                                Var(
+                                                                    Symbol(
+                                                                        "x",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        expr: Unconditional(
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 51,
+                                                                    end: 52,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
                                                         ),
-                                                    ),
-                                                ),
-                                            ),
-                                        },
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "bar",
-                                            ),
-                                            params: [],
-                                            expr: Unconditional(
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 61,
-                                                        end: 62,
                                                     },
-                                                    Literal(
-                                                        Integer(
-                                                            2,
-                                                        ),
-                                                    ),
                                                 ),
                                             ),
-                                        },
+                                        ),
+                                        Located(
+                                            SourceSpan {
+                                                start: 55,
+                                                end: 62,
+                                            },
+                                            Commented(
+                                                [],
+                                                ValueDeclaration(
+                                                    ValueDeclaration {
+                                                        ident: Symbol(
+                                                            "bar",
+                                                        ),
+                                                        params: [],
+                                                        expr: Unconditional(
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 61,
+                                                                    end: 62,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        2,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
                                     ],
                                 },
                             ],

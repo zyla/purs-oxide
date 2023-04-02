@@ -117,25 +117,36 @@ Located(
                                         ),
                                     ],
                                     body: [
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "bar",
-                                            ),
-                                            params: [],
-                                            expr: Unconditional(
-                                                Located(
-                                                    SourceSpan {
-                                                        start: 67,
-                                                        end: 68,
-                                                    },
-                                                    Literal(
-                                                        Integer(
-                                                            1,
+                                        Located(
+                                            SourceSpan {
+                                                start: 61,
+                                                end: 68,
+                                            },
+                                            Commented(
+                                                [],
+                                                ValueDeclaration(
+                                                    ValueDeclaration {
+                                                        ident: Symbol(
+                                                            "bar",
                                                         ),
-                                                    ),
+                                                        params: [],
+                                                        expr: Unconditional(
+                                                            Located(
+                                                                SourceSpan {
+                                                                    start: 67,
+                                                                    end: 68,
+                                                                },
+                                                                Literal(
+                                                                    Integer(
+                                                                        1,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
                                                 ),
                                             ),
-                                        },
+                                        ),
                                     ],
                                 },
                             ],

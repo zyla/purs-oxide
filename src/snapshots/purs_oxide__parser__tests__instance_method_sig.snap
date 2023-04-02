@@ -1,0 +1,93 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(r#\"\n            module Test where\n            instance Foo Int where\n                x :: Int\n        \"#))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 54,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 54,
+                    },
+                    Commented(
+                        [],
+                        InstanceChain(
+                            [
+                                InstanceDeclaration {
+                                    constraints: [],
+                                    instance_type: Plain,
+                                    instance_name: None,
+                                    class: QualifiedName(
+                                        Symbol(
+                                            "Foo",
+                                        ),
+                                    ),
+                                    args: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 31,
+                                                end: 34,
+                                            },
+                                            TypeConstructor(
+                                                QualifiedName(
+                                                    Symbol(
+                                                        "Int",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                    body: [
+                                        Located(
+                                            SourceSpan {
+                                                start: 45,
+                                                end: 53,
+                                            },
+                                            Commented(
+                                                [],
+                                                TypeSignature(
+                                                    TypeDeclarationData {
+                                                        ident: Symbol(
+                                                            "x",
+                                                        ),
+                                                        type: Located(
+                                                            SourceSpan {
+                                                                start: 50,
+                                                                end: 53,
+                                                            },
+                                                            TypeConstructor(
+                                                                QualifiedName(
+                                                                    Symbol(
+                                                                        "Int",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    ],
+                                },
+                            ],
+                        ),
+                    ),
+                ),
+            ],
+        },
+    ),
+)
