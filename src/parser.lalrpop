@@ -112,7 +112,7 @@ DeclarationKind: DeclarationKind = {
 OperatorDeclaration: DeclarationKind = {
   <associativity:Associativity>
   <precedence:int>
-  <name:LowerIdent>
+  <name:OperatorTarget>
   "as"
   <operator:Operator>
     => DeclarationKind::Operator {
@@ -127,6 +127,11 @@ Associativity: Associativity = {
   "infix" => Associativity::None,
   "infixl" => Associativity::Left,
   "infixr" => Associativity::Right,
+};
+
+OperatorTarget: OperatorTarget = {
+  <LowerIdent> => OperatorTarget::Value(<>),
+  "type" <UpperIdent> => OperatorTarget::Type(<>),
 };
 
 LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
@@ -300,6 +305,7 @@ Operator: Symbol = {
   "<=" => Symbol::new("<=".into()),
   "=>" => Symbol::new("=>".into()),
   "-" => Symbol::new("-".into()),
+  ":" => Symbol::new(":".into()),
 };
 
 InfixOp<Variant>: InfixOp = {

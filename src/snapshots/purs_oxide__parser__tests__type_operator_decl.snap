@@ -1,0 +1,45 @@
+---
+source: src/parser.rs
+expression: "parse_module(indoc!(\"\n        module Test where\n        infixr 4 type NaturalTransformation as ~>\n        \"))"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 60,
+    },
+    Commented(
+        [],
+        ModuleInner {
+            name: QualifiedName(
+                Symbol(
+                    "Test",
+                ),
+            ),
+            exports: None,
+            imports: [],
+            declarations: [
+                Located(
+                    SourceSpan {
+                        start: 18,
+                        end: 59,
+                    },
+                    Commented(
+                        [],
+                        Operator {
+                            associativity: Right,
+                            precedence: 4,
+                            name: Type(
+                                Symbol(
+                                    "NaturalTransformation",
+                                ),
+                            ),
+                            operator: Symbol(
+                                "~>",
+                            ),
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+)

@@ -28,8 +28,10 @@ Located(
                         Operator {
                             associativity: None,
                             precedence: 1,
-                            name: Symbol(
-                                "f",
+                            name: Value(
+                                Symbol(
+                                    "f",
+                                ),
                             ),
                             operator: Symbol(
                                 "!#",
@@ -47,8 +49,10 @@ Located(
                         Operator {
                             associativity: Left,
                             precedence: 2,
-                            name: Symbol(
-                                "g",
+                            name: Value(
+                                Symbol(
+                                    "g",
+                                ),
                             ),
                             operator: Symbol(
                                 "$%#",
@@ -66,8 +70,10 @@ Located(
                         Operator {
                             associativity: Right,
                             precedence: 3,
-                            name: Symbol(
-                                "h",
+                            name: Value(
+                                Symbol(
+                                    "h",
+                                ),
                             ),
                             operator: Symbol(
                                 "<@#%",

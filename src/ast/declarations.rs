@@ -152,7 +152,7 @@ pub enum DeclarationKind {
     Operator {
         associativity: Associativity,
         precedence: u8,
-        name: Symbol,
+        name: OperatorTarget,
         operator: Symbol,
     },
 }
@@ -162,6 +162,12 @@ pub enum Associativity {
     None,
     Left,
     Right,
+}
+
+#[derive(Debug)]
+pub enum OperatorTarget {
+    Type(Symbol),
+    Value(Symbol),
 }
 
 pub type Kind = Type;

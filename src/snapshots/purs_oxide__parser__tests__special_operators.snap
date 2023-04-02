@@ -1,0 +1,47 @@
+---
+source: src/parser.rs
+expression: "parse_expr(r#\"x : y\"#)"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 5,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Var(
+                QualifiedName(
+                    Symbol(
+                        "x",
+                    ),
+                ),
+            ),
+        ),
+        [
+            (
+                Symbol(
+                    Symbol(
+                        ":",
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 4,
+                        end: 5,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "y",
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

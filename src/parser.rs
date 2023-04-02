@@ -715,6 +715,11 @@ mod tests {
     }
 
     #[test]
+    fn test_special_operators() {
+        assert_debug_snapshot!(parse_expr(r#"x : y"#));
+    }
+
+    #[test]
     fn test_case() {
         assert_debug_snapshot!(parse_expr(indoc!(
             "
@@ -1037,6 +1042,16 @@ mod tests {
         infix 1 f as !#
         infixl 2 g as $%#
         infixr 3 h as <@#%
+        "
+        )));
+    }
+
+    #[test]
+    fn test_type_operator_decl() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            "
+        module Test where
+        infixr 4 type NaturalTransformation as ~>
         "
         )));
     }
