@@ -20,8 +20,6 @@ Some issues there:
 
 - The layout rules are quite complicated and I frankly don't understand how this works anymore, but it seems to pass the [layout test suite](https://github.com/purescript/purescript/tree/master/tests/purs/layout) from the original compiler.
 
-- Operates on byte slices, not strings, so probably UTF-8 handling is broken. Identifier rules are simple ASCII.
-
 - Tokens store `String`s instead of slices, so they are not Copy and we allocate a lot of stuff.
 
 ### AST
