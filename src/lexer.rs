@@ -2,7 +2,7 @@ use std::iter::Peekable;
 use std::{collections::VecDeque, fmt::Display, str::CharIndices};
 use unicode_general_category::{get_general_category, GeneralCategory::*};
 
-use crate::token::{Token, TokenInfo};
+pub use crate::token::{Token, TokenInfo};
 
 #[derive(PartialEq, Eq, Debug)]
 pub struct Error(pub String);
@@ -641,6 +641,7 @@ fn operator_to_token(s: &str) -> Token {
         "." => Token::Dot,
         "\\" => Token::Backslash,
         "@" => Token::At,
+        "-" => Token::Minus,
         "->" => Token::Arrow,
         "=>" => Token::FatArrow,
         "<=" => Token::LeftFatArrow,
@@ -813,9 +814,7 @@ mod tests {
                 Operator(
                     "+",
                 ),
-                Operator(
-                    "-",
-                ),
+                Minus,
                 Operator(
                     "<$>",
                 ),
@@ -861,9 +860,7 @@ mod tests {
         @r###"
         Ok(
             [
-                Operator(
-                    "-",
-                ),
+                Minus,
             ],
         )
         "###

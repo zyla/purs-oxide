@@ -54,6 +54,8 @@ pub enum ExprKind {
     NamedPat(Symbol, Box<Expr>),
 
     Do(Vec<DoItem>),
+
+    Negate(Box<Expr>),
 }
 
 #[derive(Debug)]

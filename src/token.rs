@@ -32,6 +32,7 @@ pub enum Token {
     Dot,
     Backslash,
     At,
+    Minus,
 
     Arrow,        // ->
     FatArrow,     // =>

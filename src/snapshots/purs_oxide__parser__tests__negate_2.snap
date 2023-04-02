@@ -1,0 +1,48 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"-f x\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 4,
+    },
+    Negate(
+        Located(
+            SourceSpan {
+                start: 1,
+                end: 4,
+            },
+            App(
+                Located(
+                    SourceSpan {
+                        start: 1,
+                        end: 2,
+                    },
+                    Var(
+                        QualifiedName(
+                            Symbol(
+                                "f",
+                            ),
+                        ),
+                    ),
+                ),
+                [
+                    Located(
+                        SourceSpan {
+                            start: 3,
+                            end: 4,
+                        },
+                        Var(
+                            QualifiedName(
+                                Symbol(
+                                    "x",
+                                ),
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+        ),
+    ),
+)

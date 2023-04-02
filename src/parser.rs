@@ -123,6 +123,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
             ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
+            ExprKind::Negate(_) => return Err("Illegal negation in pattern".into()),
         },
     ))
 }
@@ -908,6 +909,21 @@ mod tests {
     #[test]
     fn test_backtick_5() {
         assert_debug_snapshot!(parse_expr("1 `2 + 2` 2"));
+    }
+
+    #[test]
+    fn test_negate_1() {
+        assert_debug_snapshot!(parse_expr("-5"));
+    }
+
+    #[test]
+    fn test_negate_2() {
+        assert_debug_snapshot!(parse_expr("-f x"));
+    }
+
+    #[test]
+    fn test_minus_op() {
+        assert_debug_snapshot!(parse_expr("x - y"));
     }
 
     //

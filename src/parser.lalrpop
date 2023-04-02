@@ -258,6 +258,7 @@ Operator: Symbol = {
   operator => Symbol::new(<>),
   "<=" => Symbol::new("<=".into()),
   "=>" => Symbol::new("=>".into()),
+  "-" => Symbol::new("-".into()),
 };
 
 InfixOp<Variant>: InfixOp = {
@@ -269,7 +270,10 @@ InfixOp<Variant>: InfixOp = {
 Expr2<Variant> = Expr3<Variant>;
 
 // Negate
-Expr3<Variant> = Expr4<Variant>;
+Expr3<Variant>: ExprKind = {
+  Expr4<Variant>,
+  "-" <Box<Located<Expr4<Variant>>>> => ExprKind::Negate(<>),
+};
 
 // Apply
 Expr4<Variant>: ExprKind = {
@@ -552,6 +556,7 @@ extern {
     "." => Token::Dot,
     "\\" => Token::Backslash,
     "@" => Token::At,
+    "-" => Token::Minus,
 
     "->" => Token::Arrow,
     "=>" => Token::FatArrow,
