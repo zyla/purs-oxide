@@ -978,5 +978,17 @@ mod tests {
         assert_debug_snapshot!(parse_expr("x - y"));
     }
 
+    #[test]
+    fn test_operator_decl() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            "
+        module Test where
+        infix 1 f as !#
+        infixl 2 g as $%#
+        infixr 3 h as <@#%
+        "
+        )));
+    }
+
     //
 }

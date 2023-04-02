@@ -102,7 +102,28 @@ DeclarationKind: DeclarationKind = {
   ClassDeclaration => DeclarationKind::Class(<>),
   InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
+  OperatorDeclaration,
 }
+
+OperatorDeclaration: DeclarationKind = {
+  <associativity:Associativity>
+  <precedence:int>
+  <name:LowerIdent>
+  "as"
+  <operator:Operator>
+    => DeclarationKind::Operator {
+        associativity,
+        precedence: precedence as u8,
+        name,
+        operator,
+    },
+};
+
+Associativity: Associativity = {
+  "infix" => Associativity::None,
+  "infixl" => Associativity::Left,
+  "infixr" => Associativity::Right,
+};
 
 LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
 
@@ -501,9 +522,9 @@ Label: Symbol = {
   "import" => Symbol::new("import".into()),
   "if" => Symbol::new("if".into()),
   "in" => Symbol::new("in".into()),
-// "infix" => Symbol::new("infix".into()),
-// "infixl" => Symbol::new("infixl".into()),
-// "infixr" => Symbol::new("infixr".into()),
+  "infix" => Symbol::new("infix".into()),
+  "infixl" => Symbol::new("infixl".into()),
+  "infixr" => Symbol::new("infixr".into()),
   "instance" => Symbol::new("instance".into()),
   "let" => Symbol::new("let".into()),
   "module" => Symbol::new("module".into()),
@@ -607,6 +628,9 @@ extern {
     "derive" => Token::Derive,
     "newtype" => Token::Newtype,
     "data" => Token::Data,
+    "infix" => Token::Infix,
+    "infixl" => Token::Infixl,
+    "infixr" => Token::Infixr,
     "_" => Token::Wildcard,
   }
 }

@@ -148,6 +148,20 @@ pub enum DeclarationKind {
     Class(TypeClassDeclaration),
 
     InstanceChain(Vec<InstanceDeclaration>),
+
+    Operator {
+        associativity: Associativity,
+        precedence: u8,
+        name: Symbol,
+        operator: Symbol,
+    },
+}
+
+#[derive(Debug)]
+pub enum Associativity {
+    None,
+    Left,
+    Right,
 }
 
 pub type Kind = Type;

@@ -614,6 +614,10 @@ fn ident_to_token(ident: &str, is_upper: bool) -> Token {
         "derive" => Token::Derive,
         "newtype" => Token::Newtype,
         "data" => Token::Data,
+        "infix" => Token::Infix,
+        "infixl" => Token::Infixl,
+        "infixr" => Token::Infixr,
+
         "_" => Token::Wildcard,
         _ => {
             let str = ident.to_string();

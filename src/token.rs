@@ -68,6 +68,9 @@ pub enum Token {
     Derive,
     Newtype,
     Data,
+    Infix,
+    Infixl,
+    Infixr,
 
     // Not exactly a keyword, but a special identifier
     Wildcard,
