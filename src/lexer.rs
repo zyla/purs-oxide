@@ -268,7 +268,10 @@ impl<'a> Iterator for Lexer<'a> {
             if matches!(
                 &next_token.token,
                 Token::RightParen | Token::RightBrace | Token::RightBracket
-            ) {
+            ) && (match &prev_token {
+                Some(prev_token) => !is_matching_paren_pair(&prev_token.token, &next_token.token),
+                None => false,
+            }) {
                 match find_parent_matching_paren(&self.layout_stack, &next_token.token) {
                     Some(num_blocks_to_drop) => {
                         for _ in 0..num_blocks_to_drop {
@@ -1427,6 +1430,17 @@ mod tests {
         ")), @r###"
         do{
             [[]]}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_paren_nesting() {
+        let _ = env_logger::builder().is_test(true).try_init();
+        assert_snapshot!(print_layout(indoc!("
+            [ { foo: [], bar: 1 } ]
+        ")), @r###"
+        [ { foo: [], bar: 1 } ]
         <eof>
         "###);
     }
