@@ -60,22 +60,19 @@ Located(
                                     "x",
                                 ),
                                 params: [],
-                                expr: [
-                                    GuardedExpr {
-                                        guards: [],
-                                        expr: Located(
-                                            SourceSpan {
-                                                start: 30,
-                                                end: 31,
-                                            },
-                                            Literal(
-                                                Integer(
-                                                    1,
-                                                ),
+                                expr: Unconditional(
+                                    Located(
+                                        SourceSpan {
+                                            start: 30,
+                                            end: 31,
+                                        },
+                                        Literal(
+                                            Integer(
+                                                1,
                                             ),
                                         ),
-                                    },
-                                ],
+                                    ),
+                                ),
                             },
                         ),
                     ),

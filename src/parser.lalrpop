@@ -109,7 +109,7 @@ LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;
 LetDeclarationKind: DeclarationKind = {
   ValueDeclaration => DeclarationKind::ValueDeclaration(<>),
   TypeDeclaration => DeclarationKind::TypeSignature(<>),
-  <pat:AsPat<ExprV<"let_pat">>> "=" <expr:Located<ExprWhere>> => DeclarationKind::Destructuring { pat, expr },
+  <pat:AsPat<ExprV<"let_pat">>> <expr:PossiblyGuarded<"=", Located<ExprWhere>>> => DeclarationKind::Destructuring { pat, expr },
 }
 
 DataDeclaration: DeclarationKind = {
@@ -199,8 +199,8 @@ TypeParameter: TypeParameter = {
 };
 
 ValueDeclaration: ValueDeclaration = {
-  <ident:LowerIdent> <params:AsPat<Located<PrimaryExpr<"full">>>*> "=" <expr:Located<ExprWhere>> =>
-    ValueDeclaration{ident, params, expr: vec![GuardedExpr{guards: vec![], expr}]},
+  <ident:LowerIdent> <params:AsPat<Located<PrimaryExpr<"full">>>*> <expr:PossiblyGuarded<"=", Located<ExprWhere>>> =>
+    ValueDeclaration{ ident, params, expr },
 }
 
 TypeDeclaration: TypeDeclarationData = {
@@ -307,7 +307,7 @@ RecordUpdate: (Symbol, Expr) = {
 };
 
 CaseBranch: CaseBranch = {
-  <pat:AsPat<ExprV<"case_pat">>> "->" <expr:Located<ExprWhere>> => CaseBranch{ pat, expr }
+  <pat:AsPat<ExprV<"case_pat">>> <expr:PossiblyGuarded<"->", Located<ExprWhere>>> => CaseBranch{ pat, expr }
 };
 
 DoItem: DoItem = {
@@ -355,6 +355,11 @@ RecordShortcutExpr: (Symbol, Expr) = {
       Located(SourceSpan{start, end}, ExprKind::Var(QualifiedName(label)))
     )
   }
+};
+
+PossiblyGuarded<Sep, E>: PossiblyGuardedExpr = {
+  Sep <E> => PossiblyGuardedExpr::Unconditional(<>),
+  // TOO
 };
 
 // TODO: extract the comments

@@ -1,4 +1,4 @@
-use super::{Commented, Expr, Located, Pat, Type};
+use super::{Commented, Expr, Located, Pat, PossiblyGuardedExpr, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 
@@ -137,7 +137,7 @@ pub enum DeclarationKind {
     // C x y = z, used in `let`
     Destructuring {
         pat: Pat,
-        expr: Expr,
+        expr: PossiblyGuardedExpr,
     },
 
     ForeignValue {
@@ -211,7 +211,7 @@ pub struct ValueDeclaration {
     // TODO: what is this?
     // pub name: NameKind
     pub params: Vec<Pat>,
-    pub expr: Vec<GuardedExpr>,
+    pub expr: PossiblyGuardedExpr,
 }
 
 #[derive(Debug)]

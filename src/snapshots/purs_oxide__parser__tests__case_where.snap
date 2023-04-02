@@ -30,30 +30,29 @@ Located(
                     },
                     Wildcard,
                 ),
-                expr: Located(
-                    SourceSpan {
-                        start: 19,
-                        end: 39,
-                    },
-                    Let {
-                        decls: [
-                            Located(
-                                SourceSpan {
-                                    start: 33,
-                                    end: 38,
-                                },
-                                Commented(
-                                    [],
-                                    ValueDeclaration(
-                                        ValueDeclaration {
-                                            ident: Symbol(
-                                                "y",
-                                            ),
-                                            params: [],
-                                            expr: [
-                                                GuardedExpr {
-                                                    guards: [],
-                                                    expr: Located(
+                expr: Unconditional(
+                    Located(
+                        SourceSpan {
+                            start: 19,
+                            end: 39,
+                        },
+                        Let {
+                            decls: [
+                                Located(
+                                    SourceSpan {
+                                        start: 33,
+                                        end: 38,
+                                    },
+                                    Commented(
+                                        [],
+                                        ValueDeclaration(
+                                            ValueDeclaration {
+                                                ident: Symbol(
+                                                    "y",
+                                                ),
+                                                params: [],
+                                                expr: Unconditional(
+                                                    Located(
                                                         SourceSpan {
                                                             start: 37,
                                                             end: 38,
@@ -64,27 +63,27 @@ Located(
                                                             ),
                                                         ),
                                                     ),
-                                                },
-                                            ],
-                                        },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            body: Located(
+                                SourceSpan {
+                                    start: 19,
+                                    end: 20,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "y",
+                                        ),
                                     ),
                                 ),
                             ),
-                        ],
-                        body: Located(
-                            SourceSpan {
-                                start: 19,
-                                end: 20,
-                            },
-                            Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "y",
-                                    ),
-                                ),
-                            ),
-                        ),
-                    },
+                        },
+                    ),
                 ),
             },
         ],

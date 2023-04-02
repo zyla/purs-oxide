@@ -51,22 +51,19 @@ Located(
                                 "x",
                             ),
                             params: [],
-                            expr: [
-                                GuardedExpr {
-                                    guards: [],
-                                    expr: Located(
-                                        SourceSpan {
-                                            start: 25,
-                                            end: 26,
-                                        },
-                                        Literal(
-                                            Integer(
-                                                1,
-                                            ),
+                            expr: Unconditional(
+                                Located(
+                                    SourceSpan {
+                                        start: 25,
+                                        end: 26,
+                                    },
+                                    Literal(
+                                        Integer(
+                                            1,
                                         ),
                                     ),
-                                },
-                            ],
+                                ),
+                            ),
                         },
                     ),
                 ),
@@ -84,22 +81,19 @@ Located(
                                 "y",
                             ),
                             params: [],
-                            expr: [
-                                GuardedExpr {
-                                    guards: [],
-                                    expr: Located(
-                                        SourceSpan {
-                                            start: 36,
-                                            end: 37,
-                                        },
-                                        Literal(
-                                            Integer(
-                                                2,
-                                            ),
+                            expr: Unconditional(
+                                Located(
+                                    SourceSpan {
+                                        start: 36,
+                                        end: 37,
+                                    },
+                                    Literal(
+                                        Integer(
+                                            2,
                                         ),
                                     ),
-                                },
-                            ],
+                                ),
+                            ),
                         },
                     ),
                 ),
@@ -149,15 +143,17 @@ Located(
                                 ],
                             ),
                         ),
-                        expr: Located(
-                            SourceSpan {
-                                start: 54,
-                                end: 55,
-                            },
-                            Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "y",
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 54,
+                                    end: 55,
+                                },
+                                Var(
+                                    QualifiedName(
+                                        Symbol(
+                                            "y",
+                                        ),
                                     ),
                                 ),
                             ),

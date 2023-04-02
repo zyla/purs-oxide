@@ -80,7 +80,25 @@ pub enum RecordLiteralOrUpdate {
 #[derive(Debug)]
 pub struct CaseBranch {
     pub pat: Pat,
+    pub expr: PossiblyGuardedExpr,
+}
+
+#[derive(Debug)]
+pub enum PossiblyGuardedExpr {
+    Unconditional(Expr),
+    Guarded(Vec<GuardedExpr>),
+}
+
+#[derive(Debug)]
+pub struct GuardedExpr {
+    pub guards: Vec<Guard>,
     pub expr: Expr,
+}
+
+#[derive(Debug)]
+pub enum Guard {
+    Expr(Expr),
+    Bind(Pat, Expr),
 }
 
 pub type Pat = Located<PatKind>;

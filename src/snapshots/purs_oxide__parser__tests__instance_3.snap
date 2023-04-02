@@ -122,22 +122,19 @@ Located(
                                                 "bar",
                                             ),
                                             params: [],
-                                            expr: [
-                                                GuardedExpr {
-                                                    guards: [],
-                                                    expr: Located(
-                                                        SourceSpan {
-                                                            start: 67,
-                                                            end: 68,
-                                                        },
-                                                        Literal(
-                                                            Integer(
-                                                                1,
-                                                            ),
+                                            expr: Unconditional(
+                                                Located(
+                                                    SourceSpan {
+                                                        start: 67,
+                                                        end: 68,
+                                                    },
+                                                    Literal(
+                                                        Integer(
+                                                            1,
                                                         ),
                                                     ),
-                                                },
-                                            ],
+                                                ),
+                                            ),
                                         },
                                     ],
                                 },
