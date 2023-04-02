@@ -152,9 +152,9 @@ Associativity: Associativity = {
 };
 
 OperatorTarget: OperatorTarget = {
-  <LowerIdent> => OperatorTarget::Value(<>),
-  <UpperIdent> => OperatorTarget::DataConstructor(<>),
-  "type" <UpperIdent> => OperatorTarget::Type(<>),
+  <LowerQualifiedIdent> => OperatorTarget::Value(<>),
+  <UpperQualifiedIdent> => OperatorTarget::DataConstructor(<>),
+  "type" <UpperQualifiedIdent> => OperatorTarget::Type(<>),
 };
 
 LetDeclaration: Declaration = Located<Commented<LetDeclarationKind>>;

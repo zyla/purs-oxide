@@ -29,8 +29,10 @@ Located(
                             associativity: Right,
                             precedence: 4,
                             name: Type(
-                                Symbol(
-                                    "NaturalTransformation",
+                                QualifiedName(
+                                    Symbol(
+                                        "NaturalTransformation",
+                                    ),
                                 ),
                             ),
                             operator: Symbol(

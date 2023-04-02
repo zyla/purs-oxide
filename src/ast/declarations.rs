@@ -166,9 +166,9 @@ pub enum Associativity {
 
 #[derive(Debug)]
 pub enum OperatorTarget {
-    Type(Symbol),
-    DataConstructor(Symbol),
-    Value(Symbol),
+    Type(QualifiedName),
+    DataConstructor(QualifiedName),
+    Value(QualifiedName),
 }
 
 pub type Kind = Type;

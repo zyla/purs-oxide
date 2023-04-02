@@ -1112,6 +1112,18 @@ mod tests {
     }
 
     #[test]
+    fn test_operator_decl_qualified() {
+        assert_debug_snapshot!(parse_module(indoc!(
+            "
+        module Test where
+        infix 1 Foo.f as !#
+        infix 2 Bar.X as ^%
+        infix 3 type Bar.X as $^%
+        "
+        )));
+    }
+
+    #[test]
     fn test_role_decl() {
         assert_debug_snapshot!(parse_module(indoc!(
             "
