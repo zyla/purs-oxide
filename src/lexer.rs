@@ -1570,6 +1570,21 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Doesn't work yet"]
+    fn test_layout_do_weird_indent() {
+        assert_snapshot!(print_layout(indoc!("
+        f [
+              ] do
+          x
+        ")), @r###"
+        f [
+              ] do{
+          x}
+        <eof>
+        "###);
+    }
+
+    #[test]
     fn test_layout_let() {
         assert_snapshot!(print_layout(indoc!("
             removes =
