@@ -499,9 +499,8 @@ Constraint: TypeKind = {
 
 TypeInfix: TypeKind = {
   TypeApp,
-  <first:Box<Located<TypeApp>>> <next:( <TypeInfixOperator> <Located<TypeApp>> )> =>
-    // TODO: normalize
-    TypeKind::Infix(first, vec![next]),
+  <first:Box<Located<TypeApp>>> <next:( <TypeInfixOperator> <Located<TypeApp>> )+> =>
+    TypeKind::Infix(first, next),
 }
 
 TypeApp: TypeKind = {

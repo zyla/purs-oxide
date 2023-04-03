@@ -1,0 +1,57 @@
+---
+source: src/parser.rs
+expression: "parse_type(\"a + b + c\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 9,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Var(
+                Symbol(
+                    "a",
+                ),
+            ),
+        ),
+        [
+            (
+                Symbol(
+                    "+",
+                ),
+                Located(
+                    SourceSpan {
+                        start: 4,
+                        end: 5,
+                    },
+                    Var(
+                        Symbol(
+                            "b",
+                        ),
+                    ),
+                ),
+            ),
+            (
+                Symbol(
+                    "+",
+                ),
+                Located(
+                    SourceSpan {
+                        start: 8,
+                        end: 9,
+                    },
+                    Var(
+                        Symbol(
+                            "c",
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

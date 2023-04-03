@@ -684,6 +684,11 @@ mod tests {
     }
 
     #[test]
+    fn test_type_operator_4() {
+        assert_debug_snapshot!(parse_type("a + b + c"));
+    }
+
+    #[test]
     fn test_parse_literals() {
         assert_debug_snapshot!(parse_expr("123"));
         assert_debug_snapshot!(parse_expr(r#" "hello" "#));
