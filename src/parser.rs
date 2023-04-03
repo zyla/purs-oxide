@@ -1179,5 +1179,11 @@ mod tests {
         assert_debug_snapshot!(parse_expr("case x of -1 -> 1"));
     }
 
+    #[test]
+    fn test_range_operator() {
+        // Should not be confused with float literal and a dot
+        assert_debug_snapshot!(parse_expr("1..5"));
+    }
+
     //
 }

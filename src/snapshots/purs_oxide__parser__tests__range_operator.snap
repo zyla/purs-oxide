@@ -1,0 +1,45 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"1..5\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 4,
+    },
+    Infix(
+        Located(
+            SourceSpan {
+                start: 0,
+                end: 1,
+            },
+            Literal(
+                Integer(
+                    1,
+                ),
+            ),
+        ),
+        [
+            (
+                Symbol(
+                    QualifiedName(
+                        Symbol(
+                            "..",
+                        ),
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 3,
+                        end: 4,
+                    },
+                    Literal(
+                        Integer(
+                            5,
+                        ),
+                    ),
+                ),
+            ),
+        ],
+    ),
+)

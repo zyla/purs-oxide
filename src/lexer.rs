@@ -510,7 +510,10 @@ impl<'a> Lexer<'a> {
                     if self.eof() {
                         break false;
                     }
-                    if self.peek() == '.' {
+                    if self.peek() == '.' &&
+                        // Double dot is actually an operator, don't parse float literal if so
+                        !(self.can_peek2() && self.peek2() == '.')
+                    {
                         break true;
                     }
                     if !is_integer_literal_char(self.peek()) {
