@@ -365,7 +365,7 @@ impl<'a> Iterator for Lexer<'a> {
                     self.enqueue(token);
                 }
                 Token::Do | Token::Let | Token::Of | Token::Ado
-                    if next_token.column > prev_token.indent_level =>
+                    if next_token.column >= prev_token.indent_level =>
                 {
                     self.layout_push(LayoutEntry {
                         line: next_token.line,
@@ -1126,6 +1126,20 @@ mod tests {
         test = do{
             foo bar;
             baz}
+        <eof>
+        "###);
+    }
+
+    #[test]
+    fn test_layout_do_4() {
+        assert_snapshot!(print_layout(indoc!("
+        x =
+          f $ do
+          bar
+        ")), @r###"
+        x =
+          f $ do{
+          bar}
         <eof>
         "###);
     }
