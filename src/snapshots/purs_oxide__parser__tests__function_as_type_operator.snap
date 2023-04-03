@@ -8,8 +8,10 @@ Located(
         end: 4,
     },
     Operator(
-        Symbol(
-            "->",
+        QualifiedName(
+            Symbol(
+                "->",
+            ),
         ),
     ),
 )

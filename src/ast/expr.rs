@@ -64,7 +64,7 @@ pub enum ExprKind {
 
 #[derive(Debug)]
 pub enum InfixOp {
-    Symbol(Symbol),
+    Symbol(QualifiedName),
     Backtick(Box<Expr>),
 }
 
@@ -114,7 +114,7 @@ pub enum PatKind {
     Literal(Literal<Pat>),
 
     /// Infix operator sequence with unknown precedence
-    Infix(Box<Pat>, Vec<(Symbol, Pat)>),
+    Infix(Box<Pat>, Vec<(QualifiedName, Pat)>),
 
     Var(Symbol),
 

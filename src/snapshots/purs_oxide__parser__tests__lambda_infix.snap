@@ -22,8 +22,10 @@ Located(
         [
             (
                 Symbol(
-                    Symbol(
-                        "+",
+                    QualifiedName(
+                        Symbol(
+                            "+",
+                        ),
                     ),
                 ),
                 Located(
@@ -67,8 +69,10 @@ Located(
                                 [
                                     (
                                         Symbol(
-                                            Symbol(
-                                                "+",
+                                            QualifiedName(
+                                                Symbol(
+                                                    "+",
+                                                ),
                                             ),
                                         ),
                                         Located(

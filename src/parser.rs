@@ -98,12 +98,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                     .collect::<Result<_, _>>()?,
             ),
             ExprKind::Accessor(_, _) => return Err("Illegal record accessor in pattern".into()),
-            ExprKind::RecordUpdate(x, xs) => PatKind::Infix(
-                Box::new(expr_to_pat(*x)?),
-                xs.into_iter()
-                    .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
-                    .collect::<Result<_, _>>()?,
-            ),
+            ExprKind::RecordUpdate(_, _) => return Err("Illegal record update in pattern".into()),
             ExprKind::Var(name) => {
                 if name.is_actually_qualified() {
                     return Err("Illegal qualified name in pattern".into());
@@ -147,7 +142,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
     ))
 }
 
-pub(self) fn infix_op_to_pat(op: InfixOp) -> Result<Symbol, String> {
+pub(self) fn infix_op_to_pat(op: InfixOp) -> Result<QualifiedName, String> {
     match op {
         InfixOp::Symbol(s) => Ok(s),
         InfixOp::Backtick(_) => Err("Illegal backtick operator in pattern".into()),
@@ -729,6 +724,11 @@ mod tests {
     #[test]
     fn test_parse_infix_expr() {
         assert_debug_snapshot!(parse_expr(r#" 1 %+ 2 <$> 3 "#));
+    }
+
+    #[test]
+    fn test_infix_qualified() {
+        assert_debug_snapshot!(parse_expr(r#" x List.: xs "#));
     }
 
     #[test]

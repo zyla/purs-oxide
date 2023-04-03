@@ -107,8 +107,10 @@ Located(
                                             [
                                                 (
                                                     Symbol(
-                                                        Symbol(
-                                                            "+",
+                                                        QualifiedName(
+                                                            Symbol(
+                                                                "+",
+                                                            ),
                                                         ),
                                                     ),
                                                     Located(

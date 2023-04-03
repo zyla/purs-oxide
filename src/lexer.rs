@@ -476,14 +476,25 @@ impl<'a> Lexer<'a> {
         match c {
             c if is_ident_start(c) => {
                 let mut current_segment_is_upper = c.is_uppercase();
+                let mut prev = c;
                 while !self.eof() {
                     if is_ident_char(self.peek()) {
+                        prev = self.peek();
                         self.next_char();
                         continue;
                     } else if current_segment_is_upper && self.peek() == '.' {
+                        prev = self.peek();
                         self.next_char();
                         current_segment_is_upper = !self.eof() && self.peek().is_uppercase();
                         continue;
+                    } else if prev == '.' && is_operator_char(self.peek()) {
+                        // Qualified operator
+                        while !self.eof() && is_operator_char(self.peek()) {
+                            self.next_char();
+                        }
+                        return self.make_token(Token::QualifiedOperator(
+                            self.input[self.token_start..self.pos].into(),
+                        ));
                     } else {
                         break;
                     }

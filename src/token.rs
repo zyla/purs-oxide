@@ -44,6 +44,7 @@ pub enum Token {
     DotDot,       // ..
 
     Operator(String),
+    QualifiedOperator(String),
 
     // Keywords
     If,

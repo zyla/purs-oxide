@@ -9,8 +9,10 @@ Located(
     },
     Operator(
         Symbol(
-            Symbol(
-                "+",
+            QualifiedName(
+                Symbol(
+                    "+",
+                ),
             ),
         ),
     ),

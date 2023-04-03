@@ -316,6 +316,11 @@ Expr1<Variant>: ExprKind = {
     },
 };
 
+QualifiedOp<Op>: QualifiedName = {
+  Op => QualifiedName(<>),
+  qualified_operator => QualifiedName(Symbol::new(<>)),
+};
+
 TypeInfixOperator: Symbol = {
   operator => Symbol::new(<>),
   "-" => Symbol::new("-".into()),
@@ -331,7 +336,7 @@ Operator: Symbol = {
 };
 
 InfixOp<Variant>: InfixOp = {
-  <Operator> => InfixOp::Symbol(<>),
+  <QualifiedOp<Operator>> => InfixOp::Symbol(<>),
   "`" <Box<Located<Expr1<"backtick">>>> "`" if Variant != "backtick" => InfixOp::Backtick(<>),
 };
 
@@ -499,7 +504,7 @@ Constraint: TypeKind = {
 
 TypeInfix: TypeKind = {
   TypeApp,
-  <first:Box<Located<TypeApp>>> <next:( <TypeInfixOperator> <Located<TypeApp>> )+> =>
+  <first:Box<Located<TypeApp>>> <next:( <QualifiedOp<TypeInfixOperator>> <Located<TypeApp>> )+> =>
     TypeKind::Infix(first, next),
 }
 
@@ -514,7 +519,7 @@ TypeConstructor: TypeKind = {
 
 AtomicType: TypeKind = {
   LowerIdent => TypeKind::Var(<>),
-  "(" <TypeOperator> ")" => TypeKind::Operator(<>),
+  "(" <QualifiedOp<TypeOperator>> ")" => TypeKind::Operator(<>),
   string => TypeKind::TypeLevelString(<>),
   int => TypeKind::TypeLevelInt(<>.into()),
   "(" "-" <int> ")" => TypeKind::TypeLevelInt((-(<> as i64)).into()),
@@ -641,6 +646,7 @@ extern {
     ".." => Token::DotDot,
 
     operator => Token::Operator(<String>),
+    qualified_operator => Token::QualifiedOperator(<String>),
 
     // Keywords
     "if" => Token::If,

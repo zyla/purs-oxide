@@ -21,8 +21,10 @@ Located(
         ),
         [
             (
-                Symbol(
-                    "+",
+                QualifiedName(
+                    Symbol(
+                        "+",
+                    ),
                 ),
                 Located(
                     SourceSpan {
@@ -37,8 +39,10 @@ Located(
                 ),
             ),
             (
-                Symbol(
-                    "+",
+                QualifiedName(
+                    Symbol(
+                        "+",
+                    ),
                 ),
                 Located(
                     SourceSpan {

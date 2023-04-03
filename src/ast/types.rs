@@ -8,7 +8,7 @@ pub enum TypeKind {
     Unknown(u64),
     Var(Symbol),
     /// Standalone operator
-    Operator(Symbol),
+    Operator(QualifiedName),
     TypeLevelString(PSString),
     TypeLevelInt(num::BigInt),
     Wildcard(WildcardKind),
@@ -46,7 +46,7 @@ pub enum TypeKind {
     Parens(Box<Type>),
 
     /// Infix operator sequence with unknown precedence
-    Infix(Box<Type>, Vec<(Symbol, Type)>),
+    Infix(Box<Type>, Vec<(QualifiedName, Type)>),
 }
 
 #[derive(Debug)]
