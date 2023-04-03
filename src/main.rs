@@ -3,25 +3,32 @@ use std::{fmt::Display, fs::File, io::Read};
 
 fn main() -> std::io::Result<()> {
     for filename in std::env::args().skip(1) {
-        let mut input = String::new();
-        File::open(&filename)?.read_to_string(&mut input)?;
-        let (errs, result) = purs_oxide::parser::parse_module(&input);
-        if !errs.is_empty() {
-            for err in errs.iter().take(1) {
-                println!("FAIL {} error: {}", filename, fmt_error(&err.error));
-            }
-            continue;
+        if let Err(err) = process_file(&filename) {
+            println!("FAIL {} error: {}", filename, err);
         }
-        match result {
-            Err(err) => {
-                println!("FAIL {} error: {}", filename, fmt_error(&err));
-                println!("{}", err);
-                continue;
-            }
-            Ok(_) => {}
-        }
-        println!("OK {}", filename);
     }
+    Ok(())
+}
+
+fn process_file(filename: &str) -> std::io::Result<()> {
+    let mut input = String::new();
+    File::open(&filename)?.read_to_string(&mut input)?;
+    let (errs, result) = purs_oxide::parser::parse_module(&input);
+    if !errs.is_empty() {
+        for err in errs.iter().take(1) {
+            println!("FAIL {} error: {}", filename, fmt_error(&err.error));
+        }
+        return Ok(());
+    }
+    match result {
+        Err(err) => {
+            println!("FAIL {} error: {}", filename, fmt_error(&err));
+            println!("{}", err);
+            return Ok(());
+        }
+        Ok(_) => {}
+    }
+    println!("OK {}", filename);
     Ok(())
 }
 
