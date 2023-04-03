@@ -516,7 +516,10 @@ impl<'a> Lexer<'a> {
                         self.next_char();
                     }
                     self.make_token(Token::FloatLiteral(
-                        self.input[self.token_start..self.pos].into(),
+                        self.input[self.token_start..self.pos]
+                            .chars()
+                            .filter(|c| *c != '_')
+                            .collect(),
                     ))
                 } else {
                     self.make_token(Token::IntegerLiteral(value as u64))

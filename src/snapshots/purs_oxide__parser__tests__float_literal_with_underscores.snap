@@ -1,0 +1,15 @@
+---
+source: src/parser.rs
+expression: "parse_expr(\"15_000.0\")"
+---
+Located(
+    SourceSpan {
+        start: 0,
+        end: 8,
+    },
+    Literal(
+        Float(
+            15000.0,
+        ),
+    ),
+)
