@@ -119,7 +119,12 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                         .map(|x| expr_to_pat(x))
                         .collect::<Result<_, _>>()?,
                 ),
-                _ => return Err("illegal pattern in data constructor position".into()),
+                f => {
+                    return Err(format!(
+                        "illegal pattern in data constructor position: {:?}",
+                        f
+                    ))
+                }
             },
             ExprKind::Lam(_, _) => return Err("Illegal lambda in pattern".into()),
             ExprKind::Case { .. } => return Err("Illegal case in pattern".into()),
