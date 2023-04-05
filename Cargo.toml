@@ -15,6 +15,12 @@ num = "0.4.0"
 regex = "1"
 unicode-general-category = "0.6.0"
 
+derive-new = "0.5.9"
+salsa = { git = "https://github.com/salsa-rs/salsa.git", package = "salsa-2022" }
+dashmap = "5.4.0"
+anyhow = "1.0.70"
+ordered-float = "3.6.0"
+
 [dev-dependencies]
 insta = "1.14.0"
 indoc = "1.0"

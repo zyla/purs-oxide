@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct SourceSpan {
     pub start: usize,
     pub end: usize,
@@ -10,7 +10,7 @@ impl SourceSpan {
     }
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct Located<T>(pub SourceSpan, pub T);
 
 impl<T> Located<T> {
@@ -19,8 +19,8 @@ impl<T> Located<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct Comment(pub String);
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct Commented<T>(pub Vec<Comment>, pub T);

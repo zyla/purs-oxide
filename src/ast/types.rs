@@ -3,7 +3,7 @@ use crate::string::PSString;
 
 pub type Type = Located<TypeKind>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum TypeKind {
     Unknown(u64),
     Var(Symbol),
@@ -49,14 +49,14 @@ pub enum TypeKind {
     Infix(Box<Type>, Vec<(QualifiedName, Type)>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum WildcardKind {
     Hole(Symbol),
     Unnamed,
     Ignored,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct SkolemScope(pub u64);
 
 pub type Constraint = Box<Type>;

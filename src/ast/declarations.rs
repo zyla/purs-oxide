@@ -4,7 +4,7 @@ use crate::symbol::Symbol;
 
 pub type Module = Located<Commented<ModuleInner>>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct ModuleInner {
     pub name: ModuleName,
     pub exports: Option<Vec<DeclarationRef>>,
@@ -14,7 +14,7 @@ pub struct ModuleInner {
 
 pub type Import = Located<ImportInner>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct ImportInner {
     pub module: ModuleName,
     pub kind: ImportDeclarationKind,
@@ -23,7 +23,7 @@ pub struct ImportInner {
 
 pub type DeclarationRef = Located<DeclarationRefKind>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum NameSource {
     UserNamed,
     CompilerNamed,
@@ -31,7 +31,7 @@ pub enum NameSource {
 
 pub type ModuleName = QualifiedName;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum DeclarationRefKind {
     TypeClass {
         name: Symbol,
@@ -63,33 +63,33 @@ pub enum DeclarationRefKind {
     },
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum DeclarationRefConstructors {
     All,
     Some(Vec<Symbol>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum ImportDeclarationKind {
     Implicit,
     Explicit(Vec<DeclarationRef>),
     Hiding(Vec<DeclarationRef>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct RoleDeclarationData {
     pub ident: Symbol,
     pub role: Vec<Role>,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum Role {
     Nominal,
     Representational,
     Phantom,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct TypeDeclarationData {
     pub ident: Symbol,
     pub r#type: Type,
@@ -103,7 +103,7 @@ impl TypeDeclarationData {
 
 pub type Declaration = Located<Commented<DeclarationKind>>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum DeclarationKind {
     Data {
         type_: DataDeclType,
@@ -157,14 +157,14 @@ pub enum DeclarationKind {
     },
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum Associativity {
     None,
     Left,
     Right,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum OperatorTarget {
     Type(QualifiedName),
     DataConstructor(QualifiedName),
@@ -175,7 +175,7 @@ pub type Kind = Type;
 
 pub type TypeParameter = (Symbol, Option<Kind>);
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct TypeClassDeclaration {
     pub constraints: Vec<Type>,
     pub name: Symbol,
@@ -184,7 +184,7 @@ pub struct TypeClassDeclaration {
     pub methods: Vec<TypeDeclarationData>,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct InstanceDeclaration {
     pub constraints: Vec<Type>,
     pub instance_type: InstanceType,
@@ -194,13 +194,13 @@ pub struct InstanceDeclaration {
     pub body: Vec<Declaration>,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct Fundep {
     pub from: Vec<Symbol>,
     pub to: Vec<Symbol>,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum InstanceType {
     Plain,
     Derive,
@@ -208,7 +208,7 @@ pub enum InstanceType {
 }
 
 // Note: `data` and `newtype` signatures are actually declarations without constructors
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum KindSignatureFor {
     TypeSynonym,
     Class,
@@ -216,7 +216,7 @@ pub enum KindSignatureFor {
 
 pub type DataConstructorDeclaration = Located<Commented<DataConstructorDeclarationData>>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct DataConstructorDeclarationData {
     pub name: Symbol,
 
@@ -224,14 +224,14 @@ pub struct DataConstructorDeclarationData {
     pub fields: Vec<Type>,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum DataDeclType {
     Data,
     ForeignData,
     Newtype,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct ValueDeclaration {
     pub ident: Symbol,
 

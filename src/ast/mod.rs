@@ -9,7 +9,7 @@ pub use expr::*;
 pub use meta::*;
 pub use types::*;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct QualifiedName(pub Symbol);
 
 impl QualifiedName {

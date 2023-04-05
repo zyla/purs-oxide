@@ -3,10 +3,11 @@ use crate::ast::QualifiedName;
 use crate::string::PSChar;
 use crate::string::PSString;
 use crate::symbol::Symbol;
+use ordered_float::OrderedFloat;
 
 pub type Expr = Located<ExprKind>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum ExprKind {
     Literal(Literal<Expr>),
 
@@ -62,13 +63,13 @@ pub enum ExprKind {
     Negate(Box<Expr>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum InfixOp {
     Symbol(QualifiedName),
     Backtick(Box<Expr>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum DoItem {
     Let(Vec<Declaration>),
     Expr(Expr),
@@ -77,31 +78,31 @@ pub enum DoItem {
 
 type RecordUpdate = Vec<(Symbol, Expr)>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum RecordLiteralOrUpdate {
     Literal(Vec<(Symbol, Expr)>),
     Update(Vec<(Symbol, Expr)>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct CaseBranch {
     pub pats: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum PossiblyGuardedExpr {
     Unconditional(Expr),
     Guarded(Vec<GuardedExpr>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct GuardedExpr {
     pub guards: Vec<Guard>,
     pub expr: Expr,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum Guard {
     Expr(Expr),
     Bind(Pat, Expr),
@@ -109,7 +110,7 @@ pub enum Guard {
 
 pub type Pat = Located<PatKind>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum PatKind {
     Literal(Literal<Pat>),
 
@@ -127,10 +128,10 @@ pub enum PatKind {
     Typed(Box<Pat>, Box<Type>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub enum Literal<T> {
     Integer(i64),
-    Float(f64),
+    Float(OrderedFloat<f64>),
     String(PSString),
     Char(PSChar),
     Boolean(bool),

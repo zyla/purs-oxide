@@ -412,7 +412,7 @@ Literal<T, RecordShortcut>: Literal<T> = {
         .map_err(|_| ParseError::User {
             // TODO: make it not a lexer error
             error: lexer::Error("invalid floating-point number".into())
-        })?)),
+        })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
   "true" => Literal::Boolean(true),
