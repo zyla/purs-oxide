@@ -10,10 +10,20 @@ pub use meta::*;
 pub use types::*;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone)]
-pub struct QualifiedName(pub Symbol);
+pub struct QualifiedName {
+    pub symbol: Symbol,
+    pub actually_qualified: bool,
+}
 
 impl QualifiedName {
     pub fn is_actually_qualified(&self) -> bool {
-        self.0 .0.contains('.')
+        self.actually_qualified
+    }
+
+    pub fn new(db: &dyn crate::Db, symbol: Symbol) -> Self {
+        Self {
+            symbol,
+            actually_qualified: symbol.text(db).contains('.'),
+        }
     }
 }

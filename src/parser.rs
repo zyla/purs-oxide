@@ -42,7 +42,7 @@ pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParame
                     return None;
                 }
                 params.reverse();
-                return Some((con.0, params));
+                return Some((con.symbol, params));
             }
             TypeKind::TypeApp(f, x) => match *x {
                 Located(_, TypeKind::Var(v)) => {
@@ -103,7 +103,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                 if name.is_actually_qualified() {
                     return Err("Illegal qualified name in pattern".into());
                 } else {
-                    PatKind::Var(name.0)
+                    PatKind::Var(name.symbol)
                 }
             }
             ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(name, vec![]),
@@ -184,10 +184,10 @@ type ParseResult<'a, T> = (
     Result<T, ParseError<usize, Token, lexer::Error>>,
 );
 
-pub fn parse_module(input: &str) -> ParseResult<Module> {
+pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ModuleParser::new().parse(&mut errors, lexer);
+    let result = parser::ModuleParser::new().parse(db, &mut errors, lexer);
     (errors, result)
 }
 
@@ -207,17 +207,17 @@ pub fn parse_module_name(input: &str) -> Option<String> {
     }
 }
 
-pub fn parse_type(input: &str) -> ParseResult<Type> {
+pub fn parse_type<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Type> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::TypeParser::new().parse(&mut errors, lexer);
+    let result = parser::TypeParser::new().parse(db, &mut errors, lexer);
     (errors, result)
 }
 
-pub fn parse_expr(input: &str) -> ParseResult<Expr> {
+pub fn parse_expr<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Expr> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ExprParser::new().parse(&mut errors, lexer);
+    let result = parser::ExprParser::new().parse(db, &mut errors, lexer);
     (errors, result)
 }
 
@@ -233,13 +233,13 @@ mod tests {
     }
 
     fn parse_module(input: &str) -> crate::ast::Module {
-        expect_success(super::parse_module(input))
+        expect_success(super::parse_module(&crate::Database::new(), input))
     }
     fn parse_type(input: &str) -> crate::ast::Type {
-        expect_success(super::parse_type(input))
+        expect_success(super::parse_type(&crate::Database::new(), input))
     }
     fn parse_expr(input: &str) -> crate::ast::Expr {
-        expect_success(super::parse_expr(input))
+        expect_success(super::parse_expr(&crate::Database::new(), input))
     }
 
     #[test]

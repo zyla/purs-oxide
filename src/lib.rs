@@ -8,7 +8,12 @@ use std::sync::Arc;
 extern crate lalrpop_util;
 
 #[salsa::jar(db = Db)]
-pub struct Jar(crate::ModuleSource, crate::ModuleId, crate::parsed_module);
+pub struct Jar(
+    crate::ModuleSource,
+    crate::ModuleId,
+    crate::parsed_module,
+    crate::symbol::Symbol,
+);
 
 #[salsa::input]
 pub struct ModuleSource {
@@ -25,7 +30,7 @@ pub struct ModuleId {
 #[salsa::tracked]
 pub fn parsed_module(db: &dyn Db, module: ModuleId) -> crate::ast::Module {
     let (filename, input) = &db.module_source(module).contents(db).as_ref().unwrap();
-    let (errs, result) = crate::parser::parse_module(input);
+    let (errs, result) = crate::parser::parse_module(db, input);
     if !errs.is_empty() {
         for err in errs.iter().take(1) {
             println!(
