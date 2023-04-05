@@ -15,11 +15,14 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],
@@ -52,7 +55,9 @@ Located(
                                         ValueDeclaration(
                                             ValueDeclaration {
                                                 ident: Symbol(
-                                                    "y",
+                                                    Id {
+                                                        value: 2,
+                                                    },
                                                 ),
                                                 params: [],
                                                 expr: Unconditional(
@@ -79,11 +84,14 @@ Located(
                                     end: 20,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "y",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 2,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         },

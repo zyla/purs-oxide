@@ -21,7 +21,9 @@ Located(
                             ValueDeclaration(
                                 ValueDeclaration {
                                     ident: Symbol(
-                                        "x",
+                                        Id {
+                                            value: 1,
+                                        },
                                     ),
                                     params: [],
                                     expr: Unconditional(
@@ -51,7 +53,9 @@ Located(
                     },
                     Var(
                         Symbol(
-                            "y",
+                            Id {
+                                value: 2,
+                            },
                         ),
                     ),
                 ),
@@ -67,11 +71,14 @@ Located(
                                 end: 24,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "f",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 3,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
@@ -81,11 +88,14 @@ Located(
                                     end: 26,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "z",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 4,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ],
@@ -105,11 +115,14 @@ Located(
                                 end: 30,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "g",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
@@ -119,11 +132,14 @@ Located(
                                     end: 32,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "a",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 6,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ],

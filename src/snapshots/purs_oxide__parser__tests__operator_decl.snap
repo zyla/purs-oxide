@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,14 +32,19 @@ Located(
                             associativity: None,
                             precedence: 1,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "f",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                             operator: Symbol(
-                                "!#",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                         },
                     ),
@@ -52,14 +60,19 @@ Located(
                             associativity: Left,
                             precedence: 2,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "g",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 4,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                             operator: Symbol(
-                                "$%#",
+                                Id {
+                                    value: 5,
+                                },
                             ),
                         },
                     ),
@@ -75,14 +88,19 @@ Located(
                             associativity: Right,
                             precedence: 3,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "h",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 6,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                             operator: Symbol(
-                                "<@#%",
+                                Id {
+                                    value: 7,
+                                },
                             ),
                         },
                     ),
@@ -98,14 +116,19 @@ Located(
                             associativity: None,
                             precedence: 1,
                             name: DataConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Foo",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 8,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                             operator: Symbol(
-                                "^%",
+                                Id {
+                                    value: 9,
+                                },
                             ),
                         },
                     ),

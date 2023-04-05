@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -28,12 +31,16 @@ Located(
                         Data {
                             type_: Data,
                             name: Symbol(
-                                "Maybe",
+                                Id {
+                                    value: 2,
+                                },
                             ),
                             params: [
                                 (
                                     Symbol(
-                                        "a",
+                                        Id {
+                                            value: 3,
+                                        },
                                     ),
                                     None,
                                 ),
@@ -49,7 +56,9 @@ Located(
                                         [],
                                         DataConstructorDeclarationData {
                                             name: Symbol(
-                                                "Nothing",
+                                                Id {
+                                                    value: 4,
+                                                },
                                             ),
                                             fields: [],
                                         },
@@ -64,7 +73,9 @@ Located(
                                         [],
                                         DataConstructorDeclarationData {
                                             name: Symbol(
-                                                "Just",
+                                                Id {
+                                                    value: 5,
+                                                },
                                             ),
                                             fields: [
                                                 Located(
@@ -74,7 +85,9 @@ Located(
                                                     },
                                                     Var(
                                                         Symbol(
-                                                            "a",
+                                                            Id {
+                                                                value: 3,
+                                                            },
                                                         ),
                                                     ),
                                                 ),
@@ -96,7 +109,9 @@ Located(
                         Data {
                             type_: Newtype,
                             name: Symbol(
-                                "Foo",
+                                Id {
+                                    value: 6,
+                                },
                             ),
                             params: [],
                             kind: None,
@@ -110,7 +125,9 @@ Located(
                                         [],
                                         DataConstructorDeclarationData {
                                             name: Symbol(
-                                                "Foo",
+                                                Id {
+                                                    value: 6,
+                                                },
                                             ),
                                             fields: [
                                                 Located(
@@ -119,11 +136,14 @@ Located(
                                                         end: 71,
                                                     },
                                                     TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Int",
+                                                        QualifiedName {
+                                                            symbol: Symbol(
+                                                                Id {
+                                                                    value: 7,
+                                                                },
                                                             ),
-                                                        ),
+                                                            actually_qualified: false,
+                                                        },
                                                     ),
                                                 ),
                                             ],
@@ -144,7 +164,9 @@ Located(
                         Data {
                             type_: ForeignData,
                             name: Symbol(
-                                "X",
+                                Id {
+                                    value: 8,
+                                },
                             ),
                             params: [],
                             kind: None,
@@ -162,7 +184,9 @@ Located(
                         Data {
                             type_: ForeignData,
                             name: Symbol(
-                                "X",
+                                Id {
+                                    value: 8,
+                                },
                             ),
                             params: [],
                             kind: Some(
@@ -172,11 +196,14 @@ Located(
                                         end: 123,
                                     },
                                     TypeConstructor(
-                                        QualifiedName(
-                                            Symbol(
-                                                "Type",
+                                        QualifiedName {
+                                            symbol: Symbol(
+                                                Id {
+                                                    value: 9,
+                                                },
                                             ),
-                                        ),
+                                            actually_qualified: false,
+                                        },
                                     ),
                                 ),
                             ),

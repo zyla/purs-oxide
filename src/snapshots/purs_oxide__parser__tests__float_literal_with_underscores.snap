@@ -9,7 +9,9 @@ Located(
     },
     Literal(
         Float(
-            15000.0,
+            OrderedFloat(
+                15000.0,
+            ),
         ),
     ),
 )

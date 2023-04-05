@@ -34,11 +34,14 @@ Located(
                                     end: 8,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "lift2",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 1,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                             [
@@ -49,11 +52,14 @@ Located(
                                     },
                                     Operator(
                                         Symbol(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "+",
+                                            QualifiedName {
+                                                symbol: Symbol(
+                                                    Id {
+                                                        value: 2,
+                                                    },
                                                 ),
-                                            ),
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                 ),

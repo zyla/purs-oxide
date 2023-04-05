@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Control.Applicative",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: true,
+            },
             exports: Some(
                 [
                     Located(
@@ -24,7 +27,9 @@ Located(
                         },
                         TypeClass {
                             name: Symbol(
-                                "Applicative",
+                                Id {
+                                    value: 2,
+                                },
                             ),
                         },
                     ),
@@ -35,7 +40,9 @@ Located(
                         },
                         Value {
                             name: Symbol(
-                                "pure",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                         },
                     ),
@@ -45,11 +52,14 @@ Located(
                             end: 81,
                         },
                         Module {
-                            name: QualifiedName(
-                                Symbol(
-                                    "Data.Functor",
+                            name: QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 4,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: true,
+                            },
                         },
                     ),
                     Located(
@@ -59,7 +69,9 @@ Located(
                         },
                         Type {
                             name: Symbol(
-                                "Either",
+                                Id {
+                                    value: 5,
+                                },
                             ),
                             constructors: None,
                         },
@@ -71,7 +83,9 @@ Located(
                         },
                         Type {
                             name: Symbol(
-                                "Foo",
+                                Id {
+                                    value: 6,
+                                },
                             ),
                             constructors: Some(
                                 All,
@@ -85,16 +99,22 @@ Located(
                         },
                         Type {
                             name: Symbol(
-                                "Maybe",
+                                Id {
+                                    value: 7,
+                                },
                             ),
                             constructors: Some(
                                 Some(
                                     [
                                         Symbol(
-                                            "Just",
+                                            Id {
+                                                value: 8,
+                                            },
                                         ),
                                         Symbol(
-                                            "Nothing",
+                                            Id {
+                                                value: 9,
+                                            },
                                         ),
                                     ],
                                 ),
@@ -108,7 +128,9 @@ Located(
                         },
                         ValueOp {
                             name: Symbol(
-                                "+~",
+                                Id {
+                                    value: 10,
+                                },
                             ),
                         },
                     ),
@@ -119,7 +141,9 @@ Located(
                         },
                         TypeOp {
                             name: Symbol(
-                                "<>",
+                                Id {
+                                    value: 11,
+                                },
                             ),
                         },
                     ),

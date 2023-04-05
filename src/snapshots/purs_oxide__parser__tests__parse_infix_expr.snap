@@ -22,11 +22,14 @@ Located(
         [
             (
                 Symbol(
-                    QualifiedName(
-                        Symbol(
-                            "%+",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -42,11 +45,14 @@ Located(
             ),
             (
                 Symbol(
-                    QualifiedName(
-                        Symbol(
-                            "<$>",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 2,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
                 Located(
                     SourceSpan {

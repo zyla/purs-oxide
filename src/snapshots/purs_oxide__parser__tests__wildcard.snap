@@ -16,7 +16,9 @@ Located(
             Wildcard,
         ),
         Symbol(
-            "foo",
+            Id {
+                value: 1,
+            },
         ),
     ),
 )

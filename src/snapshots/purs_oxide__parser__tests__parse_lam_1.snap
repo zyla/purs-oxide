@@ -16,7 +16,9 @@ Located(
                 },
                 Var(
                     Symbol(
-                        "x",
+                        Id {
+                            value: 1,
+                        },
                     ),
                 ),
             ),
@@ -27,11 +29,14 @@ Located(
                 end: 7,
             },
             Var(
-                QualifiedName(
-                    Symbol(
-                        "y",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 2,
+                        },
                     ),
-                ),
+                    actually_qualified: false,
+                },
             ),
         ),
     ),

@@ -15,11 +15,14 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],
@@ -32,11 +35,14 @@ Located(
                             end: 13,
                         },
                         DataConstructorApp(
-                            QualifiedName(
-                                Symbol(
-                                    "A",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                             [],
                         ),
                     ),
@@ -65,11 +71,14 @@ Located(
                                             end: 28,
                                         },
                                         DataConstructorApp(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Just",
+                                            QualifiedName {
+                                                symbol: Symbol(
+                                                    Id {
+                                                        value: 3,
+                                                    },
                                                 ),
-                                            ),
+                                                actually_qualified: false,
+                                            },
                                             [
                                                 Located(
                                                     SourceSpan {
@@ -78,7 +87,9 @@ Located(
                                                     },
                                                     Var(
                                                         Symbol(
-                                                            "x",
+                                                            Id {
+                                                                value: 1,
+                                                            },
                                                         ),
                                                     ),
                                                 ),
@@ -97,21 +108,27 @@ Located(
                                                     end: 35,
                                                 },
                                                 Var(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "foo",
+                                                    QualifiedName {
+                                                        symbol: Symbol(
+                                                            Id {
+                                                                value: 4,
+                                                            },
                                                         ),
-                                                    ),
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                             [
                                                 (
                                                     Symbol(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "+",
+                                                        QualifiedName {
+                                                            symbol: Symbol(
+                                                                Id {
+                                                                    value: 5,
+                                                                },
                                                             ),
-                                                        ),
+                                                            actually_qualified: false,
+                                                        },
                                                     ),
                                                     Located(
                                                         SourceSpan {
@@ -119,11 +136,14 @@ Located(
                                                             end: 41,
                                                         },
                                                         Var(
-                                                            QualifiedName(
-                                                                Symbol(
-                                                                    "bar",
+                                                            QualifiedName {
+                                                                symbol: Symbol(
+                                                                    Id {
+                                                                        value: 6,
+                                                                    },
                                                                 ),
-                                                            ),
+                                                                actually_qualified: false,
+                                                            },
                                                         ),
                                                     ),
                                                 ),

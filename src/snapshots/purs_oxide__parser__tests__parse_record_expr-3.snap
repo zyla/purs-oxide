@@ -12,7 +12,9 @@ Located(
             [
                 (
                     Symbol(
-                        "foo",
+                        Id {
+                            value: 1,
+                        },
                     ),
                     Located(
                         SourceSpan {
@@ -20,11 +22,14 @@ Located(
                             end: 6,
                         },
                         Var(
-                            QualifiedName(
-                                Symbol(
-                                    "foo",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 1,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     ),
                 ),

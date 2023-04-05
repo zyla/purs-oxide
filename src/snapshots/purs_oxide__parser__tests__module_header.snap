@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Foo",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [],

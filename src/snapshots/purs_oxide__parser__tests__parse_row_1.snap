@@ -11,7 +11,9 @@ Located(
         fields: [
             (
                 Symbol(
-                    "foo",
+                    Id {
+                        value: 1,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -19,17 +21,22 @@ Located(
                         end: 12,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "Int",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 2,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
             (
                 Symbol(
-                    "Bar",
+                    Id {
+                        value: 3,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -37,17 +44,22 @@ Located(
                         end: 29,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "String",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 4,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
             (
                 Symbol(
-                    "data",
+                    Id {
+                        value: 5,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -55,11 +67,14 @@ Located(
                         end: 42,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "Int",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 2,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),

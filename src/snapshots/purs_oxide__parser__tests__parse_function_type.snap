@@ -14,11 +14,14 @@ Located(
                 end: 1,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "A",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 1,
+                        },
                     ),
-                ),
+                    actually_qualified: false,
+                },
             ),
         ),
         Located(
@@ -33,11 +36,14 @@ Located(
                         end: 6,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "B",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 2,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 Located(
@@ -46,11 +52,14 @@ Located(
                         end: 11,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "C",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 3,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),

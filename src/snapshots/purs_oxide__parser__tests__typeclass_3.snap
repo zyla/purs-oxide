@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -40,11 +43,14 @@ Located(
                                                     end: 28,
                                                 },
                                                 TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Bar",
+                                                    QualifiedName {
+                                                        symbol: Symbol(
+                                                            Id {
+                                                                value: 2,
+                                                            },
                                                         ),
-                                                    ),
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                             Located(
@@ -54,7 +60,9 @@ Located(
                                                 },
                                                 Var(
                                                     Symbol(
-                                                        "a",
+                                                        Id {
+                                                            value: 3,
+                                                        },
                                                     ),
                                                 ),
                                             ),
@@ -72,11 +80,14 @@ Located(
                                                     end: 35,
                                                 },
                                                 TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Baz",
+                                                    QualifiedName {
+                                                        symbol: Symbol(
+                                                            Id {
+                                                                value: 4,
+                                                            },
                                                         ),
-                                                    ),
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                             Located(
@@ -86,7 +97,9 @@ Located(
                                                 },
                                                 Var(
                                                     Symbol(
-                                                        "b",
+                                                        Id {
+                                                            value: 5,
+                                                        },
                                                     ),
                                                 ),
                                             ),
@@ -94,12 +107,16 @@ Located(
                                     ),
                                 ],
                                 name: Symbol(
-                                    "Foo",
+                                    Id {
+                                        value: 6,
+                                    },
                                 ),
                                 params: [
                                     (
                                         Symbol(
-                                            "a",
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
                                         None,
                                     ),
@@ -108,7 +125,9 @@ Located(
                                 methods: [
                                     TypeDeclarationData {
                                         ident: Symbol(
-                                            "bar",
+                                            Id {
+                                                value: 7,
+                                            },
                                         ),
                                         type: Located(
                                             SourceSpan {
@@ -117,7 +136,9 @@ Located(
                                             },
                                             Var(
                                                 Symbol(
-                                                    "a",
+                                                    Id {
+                                                        value: 3,
+                                                    },
                                                 ),
                                             ),
                                         ),

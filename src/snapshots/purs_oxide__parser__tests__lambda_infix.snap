@@ -22,11 +22,14 @@ Located(
         [
             (
                 Symbol(
-                    QualifiedName(
-                        Symbol(
-                            "+",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -42,7 +45,9 @@ Located(
                                 },
                                 Var(
                                     Symbol(
-                                        "x",
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
                                 ),
                             ),
@@ -59,21 +64,27 @@ Located(
                                         end: 11,
                                     },
                                     Var(
-                                        QualifiedName(
-                                            Symbol(
-                                                "y",
+                                        QualifiedName {
+                                            symbol: Symbol(
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
-                                        ),
+                                            actually_qualified: false,
+                                        },
                                     ),
                                 ),
                                 [
                                     (
                                         Symbol(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "+",
+                                            QualifiedName {
+                                                symbol: Symbol(
+                                                    Id {
+                                                        value: 1,
+                                                    },
                                                 ),
-                                            ),
+                                                actually_qualified: false,
+                                            },
                                         ),
                                         Located(
                                             SourceSpan {

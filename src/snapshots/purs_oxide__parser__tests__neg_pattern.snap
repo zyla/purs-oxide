@@ -15,11 +15,14 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],

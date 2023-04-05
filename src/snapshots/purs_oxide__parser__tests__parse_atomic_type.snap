@@ -9,7 +9,9 @@ Located(
     },
     Var(
         Symbol(
-            "var",
+            Id {
+                value: 1,
+            },
         ),
     ),
 )

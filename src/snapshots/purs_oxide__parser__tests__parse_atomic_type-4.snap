@@ -8,10 +8,13 @@ Located(
         end: 3,
     },
     TypeConstructor(
-        QualifiedName(
-            Symbol(
-                "Int",
+        QualifiedName {
+            symbol: Symbol(
+                Id {
+                    value: 1,
+                },
             ),
-        ),
+            actually_qualified: false,
+        },
     ),
 )

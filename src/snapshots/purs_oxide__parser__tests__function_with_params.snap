@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -28,7 +31,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "f",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -38,7 +43,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "x",
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
                                         ),
                                     ),
@@ -70,7 +77,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "g",
+                                    Id {
+                                        value: 4,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -80,7 +89,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "x",
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
                                         ),
                                     ),
@@ -91,7 +102,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "y",
+                                                Id {
+                                                    value: 5,
+                                                },
                                             ),
                                         ),
                                     ),
@@ -123,7 +136,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "h",
+                                    Id {
+                                        value: 6,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -141,7 +156,9 @@ Located(
                                                         },
                                                         Var(
                                                             Symbol(
-                                                                "x",
+                                                                Id {
+                                                                    value: 3,
+                                                                },
                                                             ),
                                                         ),
                                                     ),
@@ -152,7 +169,9 @@ Located(
                                                         },
                                                         Var(
                                                             Symbol(
-                                                                "y",
+                                                                Id {
+                                                                    value: 5,
+                                                                },
                                                             ),
                                                         ),
                                                     ),
@@ -188,7 +207,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "j",
+                                    Id {
+                                        value: 7,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -201,7 +222,9 @@ Located(
                                                 [
                                                     (
                                                         Symbol(
-                                                            "x",
+                                                            Id {
+                                                                value: 3,
+                                                            },
                                                         ),
                                                         Located(
                                                             SourceSpan {
@@ -210,14 +233,18 @@ Located(
                                                             },
                                                             Var(
                                                                 Symbol(
-                                                                    "x",
+                                                                    Id {
+                                                                        value: 3,
+                                                                    },
                                                                 ),
                                                             ),
                                                         ),
                                                     ),
                                                     (
                                                         Symbol(
-                                                            "y",
+                                                            Id {
+                                                                value: 5,
+                                                            },
                                                         ),
                                                         Located(
                                                             SourceSpan {
@@ -263,7 +290,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "k",
+                                    Id {
+                                        value: 8,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -311,7 +340,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "l",
+                                    Id {
+                                        value: 9,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -353,7 +384,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "m",
+                                    Id {
+                                        value: 10,
+                                    },
                                 ),
                                 params: [
                                     Located(
@@ -363,7 +396,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "x",
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
                                         ),
                                     ),

@@ -12,7 +12,9 @@ Located(
             [
                 (
                     Symbol(
-                        "foo",
+                        Id {
+                            value: 1,
+                        },
                     ),
                     Located(
                         SourceSpan {

@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -28,7 +31,9 @@ Located(
                         KindSignature {
                             for_type: TypeSynonym,
                             name: Symbol(
-                                "Qux",
+                                Id {
+                                    value: 2,
+                                },
                             ),
                             kind: Located(
                                 SourceSpan {
@@ -42,11 +47,14 @@ Located(
                                             end: 34,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Type",
+                                            QualifiedName {
+                                                symbol: Symbol(
+                                                    Id {
+                                                        value: 3,
+                                                    },
                                                 ),
-                                            ),
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                     Located(
@@ -55,11 +63,14 @@ Located(
                                             end: 42,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Type",
+                                            QualifiedName {
+                                                symbol: Symbol(
+                                                    Id {
+                                                        value: 3,
+                                                    },
                                                 ),
-                                            ),
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                 ),

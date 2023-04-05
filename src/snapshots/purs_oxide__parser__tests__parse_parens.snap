@@ -8,10 +8,13 @@ Located(
         end: 5,
     },
     Var(
-        QualifiedName(
-            Symbol(
-                "foo",
+        QualifiedName {
+            symbol: Symbol(
+                Id {
+                    value: 1,
+                },
             ),
-        ),
+            actually_qualified: false,
+        },
     ),
 )

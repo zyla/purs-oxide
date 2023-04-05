@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,18 +32,24 @@ Located(
                             TypeClassDeclaration {
                                 constraints: [],
                                 name: Symbol(
-                                    "Foo",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                                 params: [
                                     (
                                         Symbol(
-                                            "a",
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
                                         None,
                                     ),
                                     (
                                         Symbol(
-                                            "b",
+                                            Id {
+                                                value: 4,
+                                            },
                                         ),
                                         None,
                                     ),
@@ -49,12 +58,16 @@ Located(
                                     Fundep {
                                         from: [
                                             Symbol(
-                                                "a",
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
                                         ],
                                         to: [
                                             Symbol(
-                                                "b",
+                                                Id {
+                                                    value: 4,
+                                                },
                                             ),
                                         ],
                                     },

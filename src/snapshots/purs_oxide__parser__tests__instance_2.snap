@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -41,11 +44,14 @@ Located(
                                                         end: 30,
                                                     },
                                                     TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Bar",
+                                                        QualifiedName {
+                                                            symbol: Symbol(
+                                                                Id {
+                                                                    value: 2,
+                                                                },
                                                             ),
-                                                        ),
+                                                            actually_qualified: false,
+                                                        },
                                                     ),
                                                 ),
                                                 Located(
@@ -55,7 +61,9 @@ Located(
                                                     },
                                                     Var(
                                                         Symbol(
-                                                            "a",
+                                                            Id {
+                                                                value: 3,
+                                                            },
                                                         ),
                                                     ),
                                                 ),
@@ -64,11 +72,14 @@ Located(
                                     ],
                                     instance_type: Plain,
                                     instance_name: None,
-                                    class: QualifiedName(
-                                        Symbol(
-                                            "Foo",
+                                    class: QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 4,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                     args: [
                                         Located(
                                             SourceSpan {
@@ -77,7 +88,9 @@ Located(
                                             },
                                             Var(
                                                 Symbol(
-                                                    "a",
+                                                    Id {
+                                                        value: 3,
+                                                    },
                                                 ),
                                             ),
                                         ),
@@ -93,7 +106,9 @@ Located(
                                                 ValueDeclaration(
                                                     ValueDeclaration {
                                                         ident: Symbol(
-                                                            "bar",
+                                                            Id {
+                                                                value: 5,
+                                                            },
                                                         ),
                                                         params: [],
                                                         expr: Unconditional(

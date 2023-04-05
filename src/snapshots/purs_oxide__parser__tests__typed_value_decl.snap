@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Foo",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -28,7 +31,9 @@ Located(
                         TypeSignature(
                             TypeDeclarationData {
                                 ident: Symbol(
-                                    "x",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                                 type: Located(
                                     SourceSpan {
@@ -36,11 +41,14 @@ Located(
                                         end: 25,
                                     },
                                     TypeConstructor(
-                                        QualifiedName(
-                                            Symbol(
-                                                "Int",
+                                        QualifiedName {
+                                            symbol: Symbol(
+                                                Id {
+                                                    value: 3,
+                                                },
                                             ),
-                                        ),
+                                            actually_qualified: false,
+                                        },
                                     ),
                                 ),
                             },
@@ -57,7 +65,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "x",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                                 params: [],
                                 expr: Unconditional(

@@ -19,7 +19,9 @@ Located(
                     TypeSignature(
                         TypeDeclarationData {
                             ident: Symbol(
-                                "x",
+                                Id {
+                                    value: 1,
+                                },
                             ),
                             type: Located(
                                 SourceSpan {
@@ -27,11 +29,14 @@ Located(
                                     end: 16,
                                 },
                                 TypeConstructor(
-                                    QualifiedName(
-                                        Symbol(
-                                            "Int",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 2,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         },
@@ -48,7 +53,9 @@ Located(
                     ValueDeclaration(
                         ValueDeclaration {
                             ident: Symbol(
-                                "x",
+                                Id {
+                                    value: 1,
+                                },
                             ),
                             params: [],
                             expr: Unconditional(
@@ -78,7 +85,9 @@ Located(
                     ValueDeclaration(
                         ValueDeclaration {
                             ident: Symbol(
-                                "y",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                             params: [],
                             expr: Unconditional(
@@ -112,11 +121,14 @@ Located(
                                 end: 51,
                             },
                             DataConstructorApp(
-                                QualifiedName(
-                                    Symbol(
-                                        "Tuple",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 4,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                                 [
                                     Located(
                                         SourceSpan {
@@ -125,7 +137,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "a",
+                                                Id {
+                                                    value: 5,
+                                                },
                                             ),
                                         ),
                                     ),
@@ -136,7 +150,9 @@ Located(
                                         },
                                         Var(
                                             Symbol(
-                                                "b",
+                                                Id {
+                                                    value: 6,
+                                                },
                                             ),
                                         ),
                                     ),
@@ -150,11 +166,14 @@ Located(
                                     end: 55,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "y",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ),
@@ -176,7 +195,9 @@ Located(
                         },
                         Var(
                             Symbol(
-                                "z",
+                                Id {
+                                    value: 7,
+                                },
                             ),
                         ),
                     ),
@@ -193,21 +214,27 @@ Located(
                                 end: 66,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "x",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 1,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
                             (
                                 Symbol(
-                                    QualifiedName(
-                                        Symbol(
-                                            "+",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 8,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                                 Located(
                                     SourceSpan {
@@ -215,11 +242,14 @@ Located(
                                         end: 70,
                                     },
                                     Var(
-                                        QualifiedName(
-                                            Symbol(
-                                                "z",
+                                        QualifiedName {
+                                            symbol: Symbol(
+                                                Id {
+                                                    value: 7,
+                                                },
                                             ),
-                                        ),
+                                            actually_qualified: false,
+                                        },
                                     ),
                                 ),
                             ),

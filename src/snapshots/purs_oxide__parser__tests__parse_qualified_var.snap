@@ -8,10 +8,13 @@ Located(
         end: 19,
     },
     Var(
-        QualifiedName(
-            Symbol(
-                "Data.Maybe.fromJust",
+        QualifiedName {
+            symbol: Symbol(
+                Id {
+                    value: 1,
+                },
             ),
-        ),
+            actually_qualified: true,
+        },
     ),
 )

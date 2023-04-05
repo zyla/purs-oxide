@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,14 +32,19 @@ Located(
                             associativity: Right,
                             precedence: 4,
                             name: Type(
-                                QualifiedName(
-                                    Symbol(
-                                        "NaturalTransformation",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                             operator: Symbol(
-                                "~>",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                         },
                     ),

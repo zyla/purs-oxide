@@ -20,11 +20,14 @@ Located(
                         end: 2,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "Eq",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 1,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 Located(
@@ -34,7 +37,9 @@ Located(
                     },
                     Var(
                         Symbol(
-                            "a",
+                            Id {
+                                value: 2,
+                            },
                         ),
                     ),
                 ),
@@ -58,11 +63,14 @@ Located(
                                 end: 12,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Show",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 3,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         Located(
@@ -72,7 +80,9 @@ Located(
                             },
                             Var(
                                 Symbol(
-                                    "a",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                             ),
                         ),
@@ -85,7 +95,9 @@ Located(
                     },
                     Var(
                         Symbol(
-                            "a",
+                            Id {
+                                value: 2,
+                            },
                         ),
                     ),
                 ),

@@ -21,7 +21,9 @@ Located(
                             ValueDeclaration(
                                 ValueDeclaration {
                                     ident: Symbol(
-                                        "x",
+                                        Id {
+                                            value: 1,
+                                        },
                                     ),
                                     params: [],
                                     expr: Unconditional(

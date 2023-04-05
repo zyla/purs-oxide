@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -27,7 +30,9 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol(
-                                "Foo",
+                                Id {
+                                    value: 2,
+                                },
                             ),
                             params: [],
                             body: Located(
@@ -36,11 +41,14 @@ Located(
                                     end: 32,
                                 },
                                 TypeConstructor(
-                                    QualifiedName(
-                                        Symbol(
-                                            "Int",
+                                    QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         },
@@ -55,12 +63,16 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol(
-                                "Bar",
+                                Id {
+                                    value: 4,
+                                },
                             ),
                             params: [
                                 (
                                     Symbol(
-                                        "a",
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
                                     None,
                                 ),
@@ -72,7 +84,9 @@ Located(
                                 },
                                 Var(
                                     Symbol(
-                                        "a",
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
                                 ),
                             ),
@@ -88,18 +102,24 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol(
-                                "Baz",
+                                Id {
+                                    value: 6,
+                                },
                             ),
                             params: [
                                 (
                                     Symbol(
-                                        "a",
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
                                     None,
                                 ),
                                 (
                                     Symbol(
-                                        "b",
+                                        Id {
+                                            value: 7,
+                                        },
                                     ),
                                     None,
                                 ),
@@ -111,7 +131,9 @@ Located(
                                 },
                                 Var(
                                     Symbol(
-                                        "a",
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
                                 ),
                             ),

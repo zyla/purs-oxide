@@ -15,11 +15,14 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 1,
+                            },
                         ),
-                    ),
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],
@@ -32,11 +35,14 @@ Located(
                             end: 17,
                         },
                         DataConstructorApp(
-                            QualifiedName(
-                                Symbol(
-                                    "C",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                             [
                                 Located(
                                     SourceSpan {
@@ -45,7 +51,9 @@ Located(
                                     },
                                     Var(
                                         Symbol(
-                                            "a",
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
                                     ),
                                 ),
@@ -56,7 +64,9 @@ Located(
                                     },
                                     Var(
                                         Symbol(
-                                            "b",
+                                            Id {
+                                                value: 4,
+                                            },
                                         ),
                                     ),
                                 ),
@@ -86,11 +96,14 @@ Located(
                             end: 38,
                         },
                         DataConstructorApp(
-                            QualifiedName(
-                                Symbol(
-                                    "D",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 5,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                             [
                                 Located(
                                     SourceSpan {
@@ -98,11 +111,14 @@ Located(
                                         end: 36,
                                     },
                                     DataConstructorApp(
-                                        QualifiedName(
-                                            Symbol(
-                                                "A",
+                                        QualifiedName {
+                                            symbol: Symbol(
+                                                Id {
+                                                    value: 6,
+                                                },
                                             ),
-                                        ),
+                                            actually_qualified: false,
+                                        },
                                         [
                                             Located(
                                                 SourceSpan {
@@ -111,7 +127,9 @@ Located(
                                                 },
                                                 Var(
                                                     Symbol(
-                                                        "c",
+                                                        Id {
+                                                            value: 7,
+                                                        },
                                                     ),
                                                 ),
                                             ),
@@ -151,11 +169,14 @@ Located(
                             end: 47,
                         },
                         DataConstructorApp(
-                            QualifiedName(
-                                Symbol(
-                                    "E",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 8,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                             [],
                         ),
                     ),

@@ -20,17 +20,22 @@ Located(
                         end: 1,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "r",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 1,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 [
                     (
                         Symbol(
-                            "x",
+                            Id {
+                                value: 2,
+                            },
                         ),
                         Located(
                             SourceSpan {

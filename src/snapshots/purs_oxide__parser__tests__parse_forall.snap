@@ -11,13 +11,17 @@ Located(
         vars: [
             (
                 Symbol(
-                    "x",
+                    Id {
+                        value: 1,
+                    },
                 ),
                 None,
             ),
             (
                 Symbol(
-                    "y",
+                    Id {
+                        value: 2,
+                    },
                 ),
                 Some(
                     Located(
@@ -26,11 +30,14 @@ Located(
                             end: 21,
                         },
                         TypeConstructor(
-                            QualifiedName(
-                                Symbol(
-                                    "Symbol",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 3,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     ),
                 ),
@@ -48,11 +55,14 @@ Located(
                         end: 29,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "Maybe",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 4,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 Located(
@@ -62,7 +72,9 @@ Located(
                     },
                     Var(
                         Symbol(
-                            "x",
+                            Id {
+                                value: 1,
+                            },
                         ),
                     ),
                 ),

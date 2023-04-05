@@ -20,11 +20,14 @@ Located(
                         end: 3,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 1,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 [
@@ -34,11 +37,14 @@ Located(
                             end: 7,
                         },
                         Var(
-                            QualifiedName(
-                                Symbol(
-                                    "bar",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     ),
                 ],
@@ -50,11 +56,14 @@ Located(
                 end: 14,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Int",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 3,
+                        },
                     ),
-                ),
+                    actually_qualified: false,
+                },
             ),
         ),
     ),

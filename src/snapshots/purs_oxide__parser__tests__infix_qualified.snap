@@ -14,21 +14,27 @@ Located(
                 end: 2,
             },
             Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 1,
+                        },
                     ),
-                ),
+                    actually_qualified: false,
+                },
             ),
         ),
         [
             (
                 Symbol(
-                    QualifiedName(
-                        Symbol(
-                            "List.:",
+                    QualifiedName {
+                        symbol: Symbol(
+                            Id {
+                                value: 2,
+                            },
                         ),
-                    ),
+                        actually_qualified: true,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -36,11 +42,14 @@ Located(
                         end: 12,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "xs",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 3,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),

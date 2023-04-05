@@ -14,11 +14,14 @@ Located(
                 end: 1,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Prim.Record",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 4,
+                        },
                     ),
-                ),
+                    actually_qualified: true,
+                },
             ),
         ),
         Located(
@@ -30,7 +33,9 @@ Located(
                 fields: [
                     (
                         Symbol(
-                            "foo",
+                            Id {
+                                value: 1,
+                            },
                         ),
                         Located(
                             SourceSpan {
@@ -38,11 +43,14 @@ Located(
                                 end: 12,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Int",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                     ),
@@ -55,7 +63,9 @@ Located(
                         },
                         Var(
                             Symbol(
-                                "e",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                         ),
                     ),

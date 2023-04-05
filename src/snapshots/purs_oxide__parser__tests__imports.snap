@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [
                 Located(
@@ -23,11 +26,14 @@ Located(
                         end: 34,
                     },
                     ImportInner {
-                        module: QualifiedName(
-                            Symbol(
-                                "Foo.Asd",
+                        module: QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 2,
+                                },
                             ),
-                        ),
+                            actually_qualified: true,
+                        },
                         kind: Implicit,
                         alias: None,
                     },
@@ -38,18 +44,24 @@ Located(
                         end: 55,
                     },
                     ImportInner {
-                        module: QualifiedName(
-                            Symbol(
-                                "Bar.Asd",
+                        module: QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 3,
+                                },
                             ),
-                        ),
+                            actually_qualified: true,
+                        },
                         kind: Implicit,
                         alias: Some(
-                            QualifiedName(
-                                Symbol(
-                                    "Baz",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 4,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     },
                 ),
@@ -59,11 +71,14 @@ Located(
                         end: 74,
                     },
                     ImportInner {
-                        module: QualifiedName(
-                            Symbol(
-                                "Qux.Asd",
+                        module: QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 5,
+                                },
                             ),
-                        ),
+                            actually_qualified: true,
+                        },
                         kind: Explicit(
                             [
                                 Located(
@@ -73,7 +88,9 @@ Located(
                                     },
                                     Value {
                                         name: Symbol(
-                                            "x",
+                                            Id {
+                                                value: 6,
+                                            },
                                         ),
                                     },
                                 ),
@@ -88,11 +105,14 @@ Located(
                         end: 103,
                     },
                     ImportInner {
-                        module: QualifiedName(
-                            Symbol(
-                                "Zzz.Asd",
+                        module: QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 7,
+                                },
                             ),
-                        ),
+                            actually_qualified: true,
+                        },
                         kind: Explicit(
                             [
                                 Located(
@@ -102,7 +122,9 @@ Located(
                                     },
                                     Value {
                                         name: Symbol(
-                                            "y",
+                                            Id {
+                                                value: 8,
+                                            },
                                         ),
                                     },
                                 ),
@@ -113,18 +135,23 @@ Located(
                                     },
                                     Value {
                                         name: Symbol(
-                                            "z",
+                                            Id {
+                                                value: 9,
+                                            },
                                         ),
                                     },
                                 ),
                             ],
                         ),
                         alias: Some(
-                            QualifiedName(
-                                Symbol(
-                                    "Yyy",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 10,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     },
                 ),
@@ -134,11 +161,14 @@ Located(
                         end: 129,
                     },
                     ImportInner {
-                        module: QualifiedName(
-                            Symbol(
-                                "Aaa.Asd",
+                        module: QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 11,
+                                },
                             ),
-                        ),
+                            actually_qualified: true,
+                        },
                         kind: Hiding(
                             [
                                 Located(
@@ -148,7 +178,9 @@ Located(
                                     },
                                     Value {
                                         name: Symbol(
-                                            "q",
+                                            Id {
+                                                value: 12,
+                                            },
                                         ),
                                     },
                                 ),
@@ -169,7 +201,9 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol(
-                                    "x",
+                                    Id {
+                                        value: 6,
+                                    },
                                 ),
                                 params: [],
                                 expr: Unconditional(

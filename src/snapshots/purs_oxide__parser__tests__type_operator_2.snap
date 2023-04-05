@@ -15,7 +15,9 @@ Located(
             },
             Var(
                 Symbol(
-                    "a",
+                    Id {
+                        value: 1,
+                    },
                 ),
             ),
         ),
@@ -38,17 +40,22 @@ Located(
                             },
                             Var(
                                 Symbol(
-                                    "b",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                             ),
                         ),
                         [
                             (
-                                QualifiedName(
-                                    Symbol(
-                                        "~>",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 3,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                                 Located(
                                     SourceSpan {
                                         start: 10,
@@ -56,7 +63,9 @@ Located(
                                     },
                                     Var(
                                         Symbol(
-                                            "c",
+                                            Id {
+                                                value: 4,
+                                            },
                                         ),
                                     ),
                                 ),
@@ -71,7 +80,9 @@ Located(
                     },
                     Var(
                         Symbol(
-                            "d",
+                            Id {
+                                value: 5,
+                            },
                         ),
                     ),
                 ),

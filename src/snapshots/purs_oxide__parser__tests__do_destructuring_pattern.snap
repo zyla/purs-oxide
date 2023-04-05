@@ -16,11 +16,14 @@ Located(
                         end: 14,
                     },
                     DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "Tuple",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 1,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                         [
                             Located(
                                 SourceSpan {
@@ -29,7 +32,9 @@ Located(
                                 },
                                 Var(
                                     Symbol(
-                                        "x",
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
                                 ),
                             ),
@@ -40,7 +45,9 @@ Located(
                                 },
                                 Var(
                                     Symbol(
-                                        "y",
+                                        Id {
+                                            value: 3,
+                                        },
                                     ),
                                 ),
                             ),
@@ -53,11 +60,14 @@ Located(
                         end: 21,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 4,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
@@ -74,11 +84,14 @@ Located(
                                 end: 28,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 5,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

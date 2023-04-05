@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,12 +32,16 @@ Located(
                             TypeClassDeclaration {
                                 constraints: [],
                                 name: Symbol(
-                                    "Foo",
+                                    Id {
+                                        value: 2,
+                                    },
                                 ),
                                 params: [
                                     (
                                         Symbol(
-                                            "a",
+                                            Id {
+                                                value: 3,
+                                            },
                                         ),
                                         Some(
                                             Located(
@@ -43,11 +50,14 @@ Located(
                                                     end: 40,
                                                 },
                                                 TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Symbol",
+                                                    QualifiedName {
+                                                        symbol: Symbol(
+                                                            Id {
+                                                                value: 4,
+                                                            },
                                                         ),
-                                                    ),
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                         ),

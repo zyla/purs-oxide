@@ -19,7 +19,9 @@ Located(
                     ValueDeclaration(
                         ValueDeclaration {
                             ident: Symbol(
-                                "x",
+                                Id {
+                                    value: 1,
+                                },
                             ),
                             params: [],
                             expr: Unconditional(
@@ -46,11 +48,14 @@ Located(
                 end: 14,
             },
             Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
+                QualifiedName {
+                    symbol: Symbol(
+                        Id {
+                            value: 1,
+                        },
                     ),
-                ),
+                    actually_qualified: false,
+                },
             ),
         ),
     },

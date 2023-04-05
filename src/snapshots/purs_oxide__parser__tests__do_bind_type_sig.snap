@@ -23,7 +23,9 @@ Located(
                             },
                             Var(
                                 Symbol(
-                                    "x",
+                                    Id {
+                                        value: 1,
+                                    },
                                 ),
                             ),
                         ),
@@ -33,11 +35,14 @@ Located(
                                 end: 13,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Int",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                     ),
@@ -48,11 +53,14 @@ Located(
                         end: 20,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
+                        QualifiedName {
+                            symbol: Symbol(
+                                Id {
+                                    value: 3,
+                                },
                             ),
-                        ),
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
@@ -69,11 +77,14 @@ Located(
                                 end: 27,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 4,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

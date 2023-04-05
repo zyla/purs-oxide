@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -31,11 +34,14 @@ Located(
                                     constraints: [],
                                     instance_type: Plain,
                                     instance_name: None,
-                                    class: QualifiedName(
-                                        Symbol(
-                                            "Foo",
+                                    class: QualifiedName {
+                                        symbol: Symbol(
+                                            Id {
+                                                value: 2,
+                                            },
                                         ),
-                                    ),
+                                        actually_qualified: false,
+                                    },
                                     args: [
                                         Located(
                                             SourceSpan {
@@ -43,11 +49,14 @@ Located(
                                                 end: 34,
                                             },
                                             TypeConstructor(
-                                                QualifiedName(
-                                                    Symbol(
-                                                        "Int",
+                                                QualifiedName {
+                                                    symbol: Symbol(
+                                                        Id {
+                                                            value: 3,
+                                                        },
                                                     ),
-                                                ),
+                                                    actually_qualified: false,
+                                                },
                                             ),
                                         ),
                                     ],
@@ -62,7 +71,9 @@ Located(
                                                 TypeSignature(
                                                     TypeDeclarationData {
                                                         ident: Symbol(
-                                                            "x",
+                                                            Id {
+                                                                value: 4,
+                                                            },
                                                         ),
                                                         type: Located(
                                                             SourceSpan {
@@ -70,11 +81,14 @@ Located(
                                                                 end: 53,
                                                             },
                                                             TypeConstructor(
-                                                                QualifiedName(
-                                                                    Symbol(
-                                                                        "Int",
+                                                                QualifiedName {
+                                                                    symbol: Symbol(
+                                                                        Id {
+                                                                            value: 3,
+                                                                        },
                                                                     ),
-                                                                ),
+                                                                    actually_qualified: false,
+                                                                },
                                                             ),
                                                         ),
                                                     },

@@ -10,11 +10,14 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
+            name: QualifiedName {
+                symbol: Symbol(
+                    Id {
+                        value: 1,
+                    },
                 ),
-            ),
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,14 +32,19 @@ Located(
                             associativity: None,
                             precedence: 1,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "Foo.f",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 2,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: true,
+                                },
                             ),
                             operator: Symbol(
-                                "!#",
+                                Id {
+                                    value: 3,
+                                },
                             ),
                         },
                     ),
@@ -52,14 +60,19 @@ Located(
                             associativity: None,
                             precedence: 2,
                             name: DataConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Bar.X",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 4,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: true,
+                                },
                             ),
                             operator: Symbol(
-                                "^%",
+                                Id {
+                                    value: 5,
+                                },
                             ),
                         },
                     ),
@@ -75,14 +88,19 @@ Located(
                             associativity: None,
                             precedence: 3,
                             name: Type(
-                                QualifiedName(
-                                    Symbol(
-                                        "Bar.X",
+                                QualifiedName {
+                                    symbol: Symbol(
+                                        Id {
+                                            value: 4,
+                                        },
                                     ),
-                                ),
+                                    actually_qualified: true,
+                                },
                             ),
                             operator: Symbol(
-                                "$^%",
+                                Id {
+                                    value: 6,
+                                },
                             ),
                         },
                     ),

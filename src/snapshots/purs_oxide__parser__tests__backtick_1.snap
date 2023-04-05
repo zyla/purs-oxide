@@ -28,11 +28,14 @@ Located(
                             end: 6,
                         },
                         Var(
-                            QualifiedName(
-                                Symbol(
-                                    "mod",
+                            QualifiedName {
+                                symbol: Symbol(
+                                    Id {
+                                        value: 1,
+                                    },
                                 ),
-                            ),
+                                actually_qualified: false,
+                            },
                         ),
                     ),
                 ),
