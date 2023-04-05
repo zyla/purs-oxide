@@ -1,5 +1,7 @@
 use anyhow::format_err;
-use std::{fmt::Display, fs::File, io::Read};
+use rayon::prelude::*;
+use salsa::ParallelDatabase;
+use std::{fs::File, io::Read};
 
 fn main() -> std::io::Result<()> {
     let mut db = purs_oxide::Database::new();
@@ -8,10 +10,19 @@ fn main() -> std::io::Result<()> {
             println!("FAIL {} error: {}", filename, err);
         }
     }
-    for module in db.module_ids() {
-        purs_oxide::parsed_module(&db, module);
-        println!("parsed {}", module.name(&db));
-    }
+    let db = db.snapshot();
+    db.module_ids().par_iter().for_each_with(
+        purs_oxide::DbSnapshot(db.snapshot()),
+        |db, module| {
+            let db: &dyn purs_oxide::Db = &*db.0;
+            let parsed_module = purs_oxide::parsed_module(db, *module);
+            println!(
+                "parsed {}, {} declarations",
+                module.name(db),
+                parsed_module.declarations.len()
+            );
+        },
+    );
     Ok(())
 }
 

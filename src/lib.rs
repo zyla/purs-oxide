@@ -1,6 +1,8 @@
 use dashmap::{mapref::entry::Entry, DashMap};
+use salsa::ParallelDatabase;
 use std::fmt::Display;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 #[macro_use]
 extern crate lalrpop_util;
@@ -67,7 +69,7 @@ pub trait Db: salsa::DbWithJar<Jar> {
 #[salsa::db(Jar)]
 pub struct Database {
     storage: salsa::Storage<Self>,
-    module_sources: DashMap<String, ModuleSource>,
+    module_sources: Arc<DashMap<String, ModuleSource>>,
 }
 
 pub struct ModuleNameNotSpecified;
@@ -77,7 +79,7 @@ impl Database {
         let storage = Default::default();
         Self {
             storage,
-            module_sources: DashMap::new(),
+            module_sources: Arc::new(DashMap::new()),
         }
     }
 
@@ -116,6 +118,23 @@ impl Db for Database {
 }
 
 impl salsa::Database for Database {}
+
+impl ParallelDatabase for Database {
+    fn snapshot(&self) -> salsa::Snapshot<Self> {
+        salsa::Snapshot::new(Self {
+            storage: self.storage.snapshot(),
+            module_sources: self.module_sources.clone(),
+        })
+    }
+}
+
+pub struct DbSnapshot(pub salsa::Snapshot<Database>);
+
+impl Clone for DbSnapshot {
+    fn clone(&self) -> Self {
+        Self(self.0.snapshot())
+    }
+}
 
 pub mod ast;
 pub mod lexer;
