@@ -1,0 +1,7 @@
+---
+source: src/parser.rs
+expression: "super::parse_module_name(indoc!(\"\n        module Foo.Bar where\n        import Bar\n        \"))"
+---
+Some(
+    "Foo.Bar",
+)

@@ -191,6 +191,22 @@ pub fn parse_module(input: &str) -> ParseResult<Module> {
     (errors, result)
 }
 
+// Recognize `module Some.Module` header,
+// without parsing the rest.
+//
+// Used for detecting which module a source file represents.
+pub fn parse_module_name(input: &str) -> Option<String> {
+    let mut lexer = lexer::lex(input);
+    if !matches!(lexer.next(), Some(Ok((_, Token::Module, _)))) {
+        return None;
+    }
+    match lexer.next() {
+        Some(Ok((_, Token::UpperIdentifier(s), _))) => Some(s),
+        Some(Ok((_, Token::QualifiedUpperIdentifier(s), _))) => Some(s),
+        _ => None,
+    }
+}
+
 pub fn parse_type(input: &str) -> ParseResult<Type> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
@@ -231,6 +247,26 @@ mod tests {
         assert_debug_snapshot!(parse_module(indoc!(
             "
         module Foo where
+        "
+        )));
+    }
+
+    #[test]
+    fn test_module_name_parser() {
+        assert_debug_snapshot!(super::parse_module_name(indoc!(
+            "
+        module Foo where
+        import Bar
+        "
+        )));
+    }
+
+    #[test]
+    fn test_module_name_parser_2() {
+        assert_debug_snapshot!(super::parse_module_name(indoc!(
+            "
+        module Foo.Bar where
+        import Bar
         "
         )));
     }
