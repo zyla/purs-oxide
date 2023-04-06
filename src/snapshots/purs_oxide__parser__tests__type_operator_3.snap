@@ -14,21 +14,19 @@ Located(
                 end: 1,
             },
             Var(
-                Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                Symbol {
+                    [salsa id]: 0,
+                    text: "a",
+                },
             ),
         ),
         [
             (
                 QualifiedName {
-                    symbol: Symbol(
-                        Id {
-                            value: 2,
-                        },
-                    ),
+                    symbol: Symbol {
+                        [salsa id]: 1,
+                        text: "-",
+                    },
                     actually_qualified: false,
                 },
                 Located(
@@ -37,11 +35,10 @@ Located(
                         end: 5,
                     },
                     Var(
-                        Symbol(
-                            Id {
-                                value: 3,
-                            },
-                        ),
+                        Symbol {
+                            [salsa id]: 2,
+                            text: "b",
+                        },
                     ),
                 ),
             ),

@@ -10,11 +10,10 @@ Located(
     Row {
         fields: [
             (
-                Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                Symbol {
+                    [salsa id]: 0,
+                    text: "foo",
+                },
                 Located(
                     SourceSpan {
                         start: 9,
@@ -22,22 +21,20 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "Int",
+                            },
                             actually_qualified: false,
                         },
                     ),
                 ),
             ),
             (
-                Symbol(
-                    Id {
-                        value: 3,
-                    },
-                ),
+                Symbol {
+                    [salsa id]: 2,
+                    text: "Bar",
+                },
                 Located(
                     SourceSpan {
                         start: 23,
@@ -45,22 +42,20 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 4,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 3,
+                                text: "String",
+                            },
                             actually_qualified: false,
                         },
                     ),
                 ),
             ),
             (
-                Symbol(
-                    Id {
-                        value: 5,
-                    },
-                ),
+                Symbol {
+                    [salsa id]: 4,
+                    text: "data",
+                },
                 Located(
                     SourceSpan {
                         start: 39,
@@ -68,11 +63,10 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "Int",
+                            },
                             actually_qualified: false,
                         },
                     ),

@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Control.Applicative",
+                },
                 actually_qualified: true,
             },
             exports: None,
@@ -27,11 +26,10 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "Control.Apply",
+                            },
                             actually_qualified: true,
                         },
                         kind: Implicit,

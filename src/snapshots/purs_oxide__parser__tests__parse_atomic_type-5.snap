@@ -9,11 +9,10 @@ Located(
     },
     TypeConstructor(
         QualifiedName {
-            symbol: Symbol(
-                Id {
-                    value: 1,
-                },
-            ),
+            symbol: Symbol {
+                [salsa id]: 0,
+                text: "Prelude.Int",
+            },
             actually_qualified: true,
         },
     ),

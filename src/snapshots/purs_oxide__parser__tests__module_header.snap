@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Foo",
+                },
                 actually_qualified: false,
             },
             exports: None,

@@ -23,11 +23,10 @@ Located(
             (
                 Symbol(
                     QualifiedName {
-                        symbol: Symbol(
-                            Id {
-                                value: 1,
-                            },
-                        ),
+                        symbol: Symbol {
+                            [salsa id]: 0,
+                            text: "<=",
+                        },
                         actually_qualified: false,
                     },
                 ),
@@ -46,11 +45,10 @@ Located(
             (
                 Symbol(
                     QualifiedName {
-                        symbol: Symbol(
-                            Id {
-                                value: 2,
-                            },
-                        ),
+                        symbol: Symbol {
+                            [salsa id]: 1,
+                            text: ">=",
+                        },
                         actually_qualified: false,
                     },
                 ),

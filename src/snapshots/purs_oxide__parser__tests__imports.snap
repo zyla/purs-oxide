@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
                 actually_qualified: false,
             },
             exports: None,
@@ -27,11 +26,10 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "Foo.Asd",
+                            },
                             actually_qualified: true,
                         },
                         kind: Implicit,
@@ -45,21 +43,19 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 3,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 2,
+                                text: "Bar.Asd",
+                            },
                             actually_qualified: true,
                         },
                         kind: Implicit,
                         alias: Some(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 4,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 3,
+                                    text: "Baz",
+                                },
                                 actually_qualified: false,
                             },
                         ),
@@ -72,11 +68,10 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 5,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 4,
+                                text: "Qux.Asd",
+                            },
                             actually_qualified: true,
                         },
                         kind: Explicit(
@@ -87,11 +82,10 @@ Located(
                                         end: 73,
                                     },
                                     Value {
-                                        name: Symbol(
-                                            Id {
-                                                value: 6,
-                                            },
-                                        ),
+                                        name: Symbol {
+                                            [salsa id]: 5,
+                                            text: "x",
+                                        },
                                     },
                                 ),
                             ],
@@ -106,11 +100,10 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 7,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 6,
+                                text: "Zzz.Asd",
+                            },
                             actually_qualified: true,
                         },
                         kind: Explicit(
@@ -121,11 +114,10 @@ Located(
                                         end: 92,
                                     },
                                     Value {
-                                        name: Symbol(
-                                            Id {
-                                                value: 8,
-                                            },
-                                        ),
+                                        name: Symbol {
+                                            [salsa id]: 7,
+                                            text: "y",
+                                        },
                                     },
                                 ),
                                 Located(
@@ -134,22 +126,20 @@ Located(
                                         end: 95,
                                     },
                                     Value {
-                                        name: Symbol(
-                                            Id {
-                                                value: 9,
-                                            },
-                                        ),
+                                        name: Symbol {
+                                            [salsa id]: 8,
+                                            text: "z",
+                                        },
                                     },
                                 ),
                             ],
                         ),
                         alias: Some(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 10,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 9,
+                                    text: "Yyy",
+                                },
                                 actually_qualified: false,
                             },
                         ),
@@ -162,11 +152,10 @@ Located(
                     },
                     ImportInner {
                         module: QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 11,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 10,
+                                text: "Aaa.Asd",
+                            },
                             actually_qualified: true,
                         },
                         kind: Hiding(
@@ -177,11 +166,10 @@ Located(
                                         end: 128,
                                     },
                                     Value {
-                                        name: Symbol(
-                                            Id {
-                                                value: 12,
-                                            },
-                                        ),
+                                        name: Symbol {
+                                            [salsa id]: 11,
+                                            text: "q",
+                                        },
                                     },
                                 ),
                             ],
@@ -200,11 +188,10 @@ Located(
                         [],
                         ValueDeclaration(
                             ValueDeclaration {
-                                ident: Symbol(
-                                    Id {
-                                        value: 6,
-                                    },
-                                ),
+                                ident: Symbol {
+                                    [salsa id]: 5,
+                                    text: "x",
+                                },
                                 params: [],
                                 expr: Unconditional(
                                     Located(

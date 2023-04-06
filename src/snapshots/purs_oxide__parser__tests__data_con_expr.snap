@@ -15,11 +15,10 @@ Located(
             },
             DataConstructor(
                 QualifiedName {
-                    symbol: Symbol(
-                        Id {
-                            value: 1,
-                        },
-                    ),
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "Just",
+                    },
                     actually_qualified: false,
                 },
             ),

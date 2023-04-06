@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
                 actually_qualified: false,
             },
             exports: None,
@@ -31,78 +30,68 @@ Located(
                         Class(
                             TypeClassDeclaration {
                                 constraints: [],
-                                name: Symbol(
-                                    Id {
-                                        value: 2,
-                                    },
-                                ),
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Foo",
+                                },
                                 params: [
                                     (
-                                        Symbol(
-                                            Id {
-                                                value: 3,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 2,
+                                            text: "a",
+                                        },
                                         None,
                                     ),
                                     (
-                                        Symbol(
-                                            Id {
-                                                value: 4,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 3,
+                                            text: "b",
+                                        },
                                         None,
                                     ),
                                     (
-                                        Symbol(
-                                            Id {
-                                                value: 5,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 4,
+                                            text: "c",
+                                        },
                                         None,
                                     ),
                                 ],
                                 fundeps: [
                                     Fundep {
                                         from: [
-                                            Symbol(
-                                                Id {
-                                                    value: 3,
-                                                },
-                                            ),
-                                            Symbol(
-                                                Id {
-                                                    value: 4,
-                                                },
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 2,
+                                                text: "a",
+                                            },
+                                            Symbol {
+                                                [salsa id]: 3,
+                                                text: "b",
+                                            },
                                         ],
                                         to: [
-                                            Symbol(
-                                                Id {
-                                                    value: 5,
-                                                },
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 4,
+                                                text: "c",
+                                            },
                                         ],
                                     },
                                     Fundep {
                                         from: [
-                                            Symbol(
-                                                Id {
-                                                    value: 3,
-                                                },
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 2,
+                                                text: "a",
+                                            },
                                         ],
                                         to: [
-                                            Symbol(
-                                                Id {
-                                                    value: 4,
-                                                },
-                                            ),
-                                            Symbol(
-                                                Id {
-                                                    value: 5,
-                                                },
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 3,
+                                                text: "b",
+                                            },
+                                            Symbol {
+                                                [salsa id]: 4,
+                                                text: "c",
+                                            },
                                         ],
                                     },
                                 ],

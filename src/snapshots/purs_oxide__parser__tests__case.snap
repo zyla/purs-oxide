@@ -16,11 +16,10 @@ Located(
                 },
                 Var(
                     QualifiedName {
-                        symbol: Symbol(
-                            Id {
-                                value: 1,
-                            },
-                        ),
+                        symbol: Symbol {
+                            [salsa id]: 0,
+                            text: "x",
+                        },
                         actually_qualified: false,
                     },
                 ),
@@ -36,11 +35,10 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 2,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 1,
+                                    text: "C",
+                                },
                                 actually_qualified: false,
                             },
                             [
@@ -50,11 +48,10 @@ Located(
                                         end: 15,
                                     },
                                     Var(
-                                        Symbol(
-                                            Id {
-                                                value: 3,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 2,
+                                            text: "a",
+                                        },
                                     ),
                                 ),
                                 Located(
@@ -63,11 +60,10 @@ Located(
                                         end: 17,
                                     },
                                     Var(
-                                        Symbol(
-                                            Id {
-                                                value: 4,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 3,
+                                            text: "b",
+                                        },
                                     ),
                                 ),
                             ],
@@ -97,11 +93,10 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 5,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 4,
+                                    text: "D",
+                                },
                                 actually_qualified: false,
                             },
                             [
@@ -112,11 +107,10 @@ Located(
                                     },
                                     DataConstructorApp(
                                         QualifiedName {
-                                            symbol: Symbol(
-                                                Id {
-                                                    value: 6,
-                                                },
-                                            ),
+                                            symbol: Symbol {
+                                                [salsa id]: 5,
+                                                text: "A",
+                                            },
                                             actually_qualified: false,
                                         },
                                         [
@@ -126,11 +120,10 @@ Located(
                                                     end: 35,
                                                 },
                                                 Var(
-                                                    Symbol(
-                                                        Id {
-                                                            value: 7,
-                                                        },
-                                                    ),
+                                                    Symbol {
+                                                        [salsa id]: 6,
+                                                        text: "c",
+                                                    },
                                                 ),
                                             ),
                                         ],
@@ -170,11 +163,10 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 8,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 7,
+                                    text: "E",
+                                },
                                 actually_qualified: false,
                             },
                             [],

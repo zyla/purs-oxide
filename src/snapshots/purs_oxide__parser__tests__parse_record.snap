@@ -15,11 +15,10 @@ Located(
             },
             TypeConstructor(
                 QualifiedName {
-                    symbol: Symbol(
-                        Id {
-                            value: 4,
-                        },
-                    ),
+                    symbol: Symbol {
+                        [salsa id]: 3,
+                        text: "Prim.Record",
+                    },
                     actually_qualified: true,
                 },
             ),
@@ -32,11 +31,10 @@ Located(
             Row {
                 fields: [
                     (
-                        Symbol(
-                            Id {
-                                value: 1,
-                            },
-                        ),
+                        Symbol {
+                            [salsa id]: 0,
+                            text: "foo",
+                        },
                         Located(
                             SourceSpan {
                                 start: 9,
@@ -44,11 +42,10 @@ Located(
                             },
                             TypeConstructor(
                                 QualifiedName {
-                                    symbol: Symbol(
-                                        Id {
-                                            value: 2,
-                                        },
-                                    ),
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "Int",
+                                    },
                                     actually_qualified: false,
                                 },
                             ),
@@ -62,11 +59,10 @@ Located(
                             end: 16,
                         },
                         Var(
-                            Symbol(
-                                Id {
-                                    value: 3,
-                                },
-                            ),
+                            Symbol {
+                                [salsa id]: 2,
+                                text: "e",
+                            },
                         ),
                     ),
                 ),

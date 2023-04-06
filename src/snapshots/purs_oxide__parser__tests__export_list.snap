@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Control.Applicative",
+                },
                 actually_qualified: true,
             },
             exports: Some(
@@ -26,11 +25,10 @@ Located(
                             end: 48,
                         },
                         TypeClass {
-                            name: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "Applicative",
+                            },
                         },
                     ),
                     Located(
@@ -39,11 +37,10 @@ Located(
                             end: 57,
                         },
                         Value {
-                            name: Symbol(
-                                Id {
-                                    value: 3,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 2,
+                                text: "pure",
+                            },
                         },
                     ),
                     Located(
@@ -53,11 +50,10 @@ Located(
                         },
                         Module {
                             name: QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 4,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 3,
+                                    text: "Data.Functor",
+                                },
                                 actually_qualified: true,
                             },
                         },
@@ -68,11 +64,10 @@ Located(
                             end: 92,
                         },
                         Type {
-                            name: Symbol(
-                                Id {
-                                    value: 5,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 4,
+                                text: "Either",
+                            },
                             constructors: None,
                         },
                     ),
@@ -82,11 +77,10 @@ Located(
                             end: 104,
                         },
                         Type {
-                            name: Symbol(
-                                Id {
-                                    value: 6,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 5,
+                                text: "Foo",
+                            },
                             constructors: Some(
                                 All,
                             ),
@@ -98,24 +92,21 @@ Located(
                             end: 129,
                         },
                         Type {
-                            name: Symbol(
-                                Id {
-                                    value: 7,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 6,
+                                text: "Maybe",
+                            },
                             constructors: Some(
                                 Some(
                                     [
-                                        Symbol(
-                                            Id {
-                                                value: 8,
-                                            },
-                                        ),
-                                        Symbol(
-                                            Id {
-                                                value: 9,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 7,
+                                            text: "Just",
+                                        },
+                                        Symbol {
+                                            [salsa id]: 8,
+                                            text: "Nothing",
+                                        },
                                     ],
                                 ),
                             ),
@@ -127,11 +118,10 @@ Located(
                             end: 138,
                         },
                         ValueOp {
-                            name: Symbol(
-                                Id {
-                                    value: 10,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 9,
+                                text: "+~",
+                            },
                         },
                     ),
                     Located(
@@ -140,11 +130,10 @@ Located(
                             end: 152,
                         },
                         TypeOp {
-                            name: Symbol(
-                                Id {
-                                    value: 11,
-                                },
-                            ),
+                            name: Symbol {
+                                [salsa id]: 10,
+                                text: "<>",
+                            },
                         },
                     ),
                 ],

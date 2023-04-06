@@ -15,11 +15,10 @@ Located(
             },
             TypeConstructor(
                 QualifiedName {
-                    symbol: Symbol(
-                        Id {
-                            value: 1,
-                        },
-                    ),
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "A",
+                    },
                     actually_qualified: false,
                 },
             ),
@@ -37,11 +36,10 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 2,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "B",
+                            },
                             actually_qualified: false,
                         },
                     ),
@@ -53,11 +51,10 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            symbol: Symbol(
-                                Id {
-                                    value: 3,
-                                },
-                            ),
+                            symbol: Symbol {
+                                [salsa id]: 2,
+                                text: "C",
+                            },
                             actually_qualified: false,
                         },
                     ),

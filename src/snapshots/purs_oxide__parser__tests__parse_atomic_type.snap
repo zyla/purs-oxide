@@ -8,10 +8,9 @@ Located(
         end: 3,
     },
     Var(
-        Symbol(
-            Id {
-                value: 1,
-            },
-        ),
+        Symbol {
+            [salsa id]: 0,
+            text: "var",
+        },
     ),
 )

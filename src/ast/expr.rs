@@ -4,10 +4,11 @@ use crate::string::PSChar;
 use crate::string::PSString;
 use crate::symbol::Symbol;
 use ordered_float::OrderedFloat;
+use salsa::DebugWithDb;
 
 pub type Expr = Located<ExprKind>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum ExprKind {
     Literal(Literal<Expr>),
 
@@ -63,13 +64,13 @@ pub enum ExprKind {
     Negate(Box<Expr>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum InfixOp {
     Symbol(QualifiedName),
     Backtick(Box<Expr>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DoItem {
     Let(Vec<Declaration>),
     Expr(Expr),
@@ -78,31 +79,31 @@ pub enum DoItem {
 
 type RecordUpdate = Vec<(Symbol, Expr)>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum RecordLiteralOrUpdate {
     Literal(Vec<(Symbol, Expr)>),
     Update(Vec<(Symbol, Expr)>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct CaseBranch {
     pub pats: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum PossiblyGuardedExpr {
     Unconditional(Expr),
     Guarded(Vec<GuardedExpr>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct GuardedExpr {
     pub guards: Vec<Guard>,
     pub expr: Expr,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum Guard {
     Expr(Expr),
     Bind(Pat, Expr),
@@ -110,7 +111,7 @@ pub enum Guard {
 
 pub type Pat = Located<PatKind>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum PatKind {
     Literal(Literal<Pat>),
 
@@ -128,7 +129,7 @@ pub enum PatKind {
     Typed(Box<Pat>, Box<Type>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum Literal<T> {
     Integer(i64),
     Float(OrderedFloat<f64>),

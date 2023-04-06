@@ -35,11 +35,10 @@ Located(
                                         end: 6,
                                     },
                                     Var(
-                                        Symbol(
-                                            Id {
-                                                value: 1,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 0,
+                                            text: "x",
+                                        },
                                     ),
                                 ),
                                 Located(
@@ -48,11 +47,10 @@ Located(
                                         end: 8,
                                     },
                                     Var(
-                                        Symbol(
-                                            Id {
-                                                value: 2,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 1,
+                                            text: "y",
+                                        },
                                     ),
                                 ),
                             ],
@@ -63,11 +61,10 @@ Located(
                                 },
                                 Var(
                                     QualifiedName {
-                                        symbol: Symbol(
-                                            Id {
-                                                value: 1,
-                                            },
-                                        ),
+                                        symbol: Symbol {
+                                            [salsa id]: 0,
+                                            text: "x",
+                                        },
                                         actually_qualified: false,
                                     },
                                 ),

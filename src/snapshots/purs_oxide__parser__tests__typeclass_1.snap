@@ -11,11 +11,10 @@ Located(
         [],
         ModuleInner {
             name: QualifiedName {
-                symbol: Symbol(
-                    Id {
-                        value: 1,
-                    },
-                ),
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
                 actually_qualified: false,
             },
             exports: None,
@@ -31,30 +30,27 @@ Located(
                         Class(
                             TypeClassDeclaration {
                                 constraints: [],
-                                name: Symbol(
-                                    Id {
-                                        value: 2,
-                                    },
-                                ),
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Foo",
+                                },
                                 params: [
                                     (
-                                        Symbol(
-                                            Id {
-                                                value: 3,
-                                            },
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 2,
+                                            text: "a",
+                                        },
                                         None,
                                     ),
                                 ],
                                 fundeps: [],
                                 methods: [
                                     TypeDeclarationData {
-                                        ident: Symbol(
-                                            Id {
-                                                value: 4,
-                                            },
-                                        ),
-                                        type: Located(
+                                        ident: Symbol {
+                                            [salsa id]: 3,
+                                            text: "foo",
+                                        },
+                                        r#type: Located(
                                             SourceSpan {
                                                 start: 45,
                                                 end: 54,
@@ -66,11 +62,10 @@ Located(
                                                         end: 46,
                                                     },
                                                     Var(
-                                                        Symbol(
-                                                            Id {
-                                                                value: 3,
-                                                            },
-                                                        ),
+                                                        Symbol {
+                                                            [salsa id]: 2,
+                                                            text: "a",
+                                                        },
                                                     ),
                                                 ),
                                                 Located(
@@ -80,11 +75,10 @@ Located(
                                                     },
                                                     TypeConstructor(
                                                         QualifiedName {
-                                                            symbol: Symbol(
-                                                                Id {
-                                                                    value: 5,
-                                                                },
-                                                            ),
+                                                            symbol: Symbol {
+                                                                [salsa id]: 4,
+                                                                text: "Bool",
+                                                            },
                                                             actually_qualified: false,
                                                         },
                                                     ),
@@ -93,22 +87,20 @@ Located(
                                         ),
                                     },
                                     TypeDeclarationData {
-                                        ident: Symbol(
-                                            Id {
-                                                value: 6,
-                                            },
-                                        ),
-                                        type: Located(
+                                        ident: Symbol {
+                                            [salsa id]: 5,
+                                            text: "bar",
+                                        },
+                                        r#type: Located(
                                             SourceSpan {
                                                 start: 64,
                                                 end: 65,
                                             },
                                             Var(
-                                                Symbol(
-                                                    Id {
-                                                        value: 3,
-                                                    },
-                                                ),
+                                                Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "a",
+                                                },
                                             ),
                                         ),
                                     },

@@ -16,11 +16,10 @@ Located(
                 },
                 Var(
                     QualifiedName {
-                        symbol: Symbol(
-                            Id {
-                                value: 1,
-                            },
-                        ),
+                        symbol: Symbol {
+                            [salsa id]: 0,
+                            text: "x",
+                        },
                         actually_qualified: false,
                     },
                 ),
@@ -36,11 +35,10 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 2,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 1,
+                                    text: "A",
+                                },
                                 actually_qualified: false,
                             },
                             [],

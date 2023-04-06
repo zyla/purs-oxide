@@ -43,11 +43,10 @@ Located(
                                 (
                                     Symbol(
                                         QualifiedName {
-                                            symbol: Symbol(
-                                                Id {
-                                                    value: 1,
-                                                },
-                                            ),
+                                            symbol: Symbol {
+                                                [salsa id]: 0,
+                                                text: "+",
+                                            },
                                             actually_qualified: false,
                                         },
                                     ),

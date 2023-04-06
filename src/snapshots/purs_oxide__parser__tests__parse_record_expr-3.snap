@@ -11,11 +11,10 @@ Located(
         Object(
             [
                 (
-                    Symbol(
-                        Id {
-                            value: 1,
-                        },
-                    ),
+                    Symbol {
+                        [salsa id]: 0,
+                        text: "foo",
+                    },
                     Located(
                         SourceSpan {
                             start: 3,
@@ -23,11 +22,10 @@ Located(
                         },
                         Var(
                             QualifiedName {
-                                symbol: Symbol(
-                                    Id {
-                                        value: 1,
-                                    },
-                                ),
+                                symbol: Symbol {
+                                    [salsa id]: 0,
+                                    text: "foo",
+                                },
                                 actually_qualified: false,
                             },
                         ),

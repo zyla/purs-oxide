@@ -1,10 +1,11 @@
 use super::{Commented, Located, Pat, PossiblyGuardedExpr, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
+use salsa::DebugWithDb;
 
 pub type Module = Located<Commented<ModuleInner>>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ModuleInner {
     pub name: ModuleName,
     pub exports: Option<Vec<DeclarationRef>>,
@@ -14,7 +15,7 @@ pub struct ModuleInner {
 
 pub type Import = Located<ImportInner>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ImportInner {
     pub module: ModuleName,
     pub kind: ImportDeclarationKind,
@@ -23,7 +24,7 @@ pub struct ImportInner {
 
 pub type DeclarationRef = Located<DeclarationRefKind>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum NameSource {
     UserNamed,
     CompilerNamed,
@@ -31,7 +32,7 @@ pub enum NameSource {
 
 pub type ModuleName = QualifiedName;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DeclarationRefKind {
     TypeClass {
         name: Symbol,
@@ -63,33 +64,33 @@ pub enum DeclarationRefKind {
     },
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DeclarationRefConstructors {
     All,
     Some(Vec<Symbol>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum ImportDeclarationKind {
     Implicit,
     Explicit(Vec<DeclarationRef>),
     Hiding(Vec<DeclarationRef>),
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct RoleDeclarationData {
     pub ident: Symbol,
     pub role: Vec<Role>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum Role {
     Nominal,
     Representational,
     Phantom,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct TypeDeclarationData {
     pub ident: Symbol,
     pub r#type: Type,
@@ -103,7 +104,7 @@ impl TypeDeclarationData {
 
 pub type Declaration = Located<Commented<DeclarationKind>>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DeclarationKind {
     Data {
         type_: DataDeclType,
@@ -157,14 +158,14 @@ pub enum DeclarationKind {
     },
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum Associativity {
     None,
     Left,
     Right,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum OperatorTarget {
     Type(QualifiedName),
     DataConstructor(QualifiedName),
@@ -175,7 +176,7 @@ pub type Kind = Type;
 
 pub type TypeParameter = (Symbol, Option<Kind>);
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct TypeClassDeclaration {
     pub constraints: Vec<Type>,
     pub name: Symbol,
@@ -184,7 +185,7 @@ pub struct TypeClassDeclaration {
     pub methods: Vec<TypeDeclarationData>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct InstanceDeclaration {
     pub constraints: Vec<Type>,
     pub instance_type: InstanceType,
@@ -194,13 +195,13 @@ pub struct InstanceDeclaration {
     pub body: Vec<Declaration>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Fundep {
     pub from: Vec<Symbol>,
     pub to: Vec<Symbol>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum InstanceType {
     Plain,
     Derive,
@@ -208,7 +209,7 @@ pub enum InstanceType {
 }
 
 // Note: `data` and `newtype` signatures are actually declarations without constructors
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum KindSignatureFor {
     TypeSynonym,
     Class,
@@ -216,7 +217,7 @@ pub enum KindSignatureFor {
 
 pub type DataConstructorDeclaration = Located<Commented<DataConstructorDeclarationData>>;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct DataConstructorDeclarationData {
     pub name: Symbol,
 
@@ -224,14 +225,14 @@ pub struct DataConstructorDeclarationData {
     pub fields: Vec<Type>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DataDeclType {
     Data,
     ForeignData,
     Newtype,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ValueDeclaration {
     pub ident: Symbol,
 

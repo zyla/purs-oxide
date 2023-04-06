@@ -7,9 +7,10 @@ use crate::symbol::Symbol;
 pub use declarations::*;
 pub use expr::*;
 pub use meta::*;
+use salsa::DebugWithDb;
 pub use types::*;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct QualifiedName {
     pub symbol: Symbol,
     pub actually_qualified: bool,

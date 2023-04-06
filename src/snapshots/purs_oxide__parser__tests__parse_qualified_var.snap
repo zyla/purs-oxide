@@ -9,11 +9,10 @@ Located(
     },
     Var(
         QualifiedName {
-            symbol: Symbol(
-                Id {
-                    value: 1,
-                },
-            ),
+            symbol: Symbol {
+                [salsa id]: 0,
+                text: "Data.Maybe.fromJust",
+            },
             actually_qualified: true,
         },
     ),

@@ -224,27 +224,34 @@ pub fn parse_expr<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, 
 #[cfg(test)]
 mod tests {
     use indoc::indoc;
-    use insta::{self, assert_debug_snapshot};
+    use insta::{self, assert_debug_snapshot, assert_snapshot};
 
-    fn expect_success<T>(output: super::ParseResult<T>) -> T {
+    fn expect_success<'db, T: salsa::DebugWithDb<<crate::Jar as ::salsa::jar::Jar<'db>>::DynDb>>(
+        db: &<crate::Jar as ::salsa::jar::Jar<'db>>::DynDb,
+        output: super::ParseResult<T>,
+    ) -> String {
         let (errors, result) = output;
         assert_eq!(errors, &[]);
-        result.unwrap()
+        let x = result.unwrap();
+        format!("{:#?}", x.into_debug_all(db))
     }
 
-    fn parse_module(input: &str) -> crate::ast::Module {
-        expect_success(super::parse_module(&crate::Database::new(), input))
+    fn parse_module(input: &str) -> String {
+        let db = crate::Database::new();
+        expect_success(&db, super::parse_module(&db, input))
     }
-    fn parse_type(input: &str) -> crate::ast::Type {
-        expect_success(super::parse_type(&crate::Database::new(), input))
+    fn parse_type(input: &str) -> String {
+        let db = crate::Database::new();
+        expect_success(&db, super::parse_type(&db, input))
     }
-    fn parse_expr(input: &str) -> crate::ast::Expr {
-        expect_success(super::parse_expr(&crate::Database::new(), input))
+    fn parse_expr(input: &str) -> String {
+        let db = crate::Database::new();
+        expect_success(&db, super::parse_expr(&db, input))
     }
 
     #[test]
     fn test_module_header() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Foo where
         "
@@ -273,7 +280,7 @@ mod tests {
 
     #[test]
     fn test_module_header_qualified() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Some.Module where
         "
@@ -282,7 +289,7 @@ mod tests {
 
     #[test]
     fn test_simple_value_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Foo where
         x = 1
@@ -292,7 +299,7 @@ mod tests {
 
     #[test]
     fn test_typed_value_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Foo where
         x :: Int
@@ -303,7 +310,7 @@ mod tests {
 
     #[test]
     fn test_export_list() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
           module Control.Applicative
             ( class Applicative
@@ -322,7 +329,7 @@ mod tests {
 
     #[test]
     fn test_imports() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
           module Test where
 
@@ -340,7 +347,7 @@ mod tests {
 
     #[test]
     fn test_indented_where() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
             module Control.Applicative
               where
@@ -351,7 +358,7 @@ mod tests {
 
     #[test]
     fn test_function_with_params() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             f x = 1
@@ -367,7 +374,7 @@ mod tests {
 
     #[test]
     fn test_type_synonym() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             type Foo = Int
@@ -379,7 +386,7 @@ mod tests {
 
     #[test]
     fn test_foreign_import() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             foreign import foo :: Int -> Int
@@ -389,7 +396,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_1() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo a where
@@ -401,7 +408,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_2() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Bar a <= Foo a where
@@ -412,7 +419,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_3() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class (Bar a, Baz b) <= Foo a where
@@ -423,7 +430,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_4() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo a where
@@ -433,7 +440,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_5() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo a
@@ -443,7 +450,7 @@ mod tests {
 
     #[test]
     fn test_typeclass_var_kind() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo (a :: Symbol)
@@ -453,7 +460,7 @@ mod tests {
 
     #[test]
     fn test_fundeps_1() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo a b | a -> b where
@@ -463,7 +470,7 @@ mod tests {
 
     #[test]
     fn test_fundeps_2() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Foo a b c | a b -> c, a -> b c where
@@ -473,7 +480,7 @@ mod tests {
 
     #[test]
     fn test_kind_signature_class() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             class Category :: forall k. (k -> k -> Type) -> Constraint
@@ -483,7 +490,7 @@ mod tests {
 
     #[test]
     fn test_kind_signature_data() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             data Foo :: Type
@@ -494,7 +501,7 @@ mod tests {
 
     #[test]
     fn test_kind_signature_type() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             type Qux :: Type -> Type
@@ -504,7 +511,7 @@ mod tests {
 
     #[test]
     fn test_instance_1() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int where
@@ -516,7 +523,7 @@ mod tests {
 
     #[test]
     fn test_instance_2() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Bar a => Foo a where
@@ -527,7 +534,7 @@ mod tests {
 
     #[test]
     fn test_instance_3() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance (Bar a, Baz b) => Foo Int where
@@ -538,7 +545,7 @@ mod tests {
 
     #[test]
     fn test_instance_4() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int where
@@ -548,7 +555,7 @@ mod tests {
 
     #[test]
     fn test_instance_5() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int
@@ -558,7 +565,7 @@ mod tests {
 
     #[test]
     fn test_instance_6() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance namedInstance :: Foo Int where
@@ -568,7 +575,7 @@ mod tests {
 
     #[test]
     fn test_instance_deriving() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             derive instance Foo Int
@@ -579,7 +586,7 @@ mod tests {
 
     #[test]
     fn test_instance_chain() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int where
@@ -592,7 +599,7 @@ mod tests {
 
     #[test]
     fn test_instance_chain_2() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int else
@@ -603,7 +610,7 @@ mod tests {
 
     #[test]
     fn test_instance_method_sig() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Foo Int where
@@ -615,7 +622,7 @@ mod tests {
     #[test]
     #[ignore = "Not implemented yet"]
     fn test_instance_method_infix() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             instance Semigroup Int where
@@ -626,7 +633,7 @@ mod tests {
 
     #[test]
     fn test_data_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             r#"
             module Test where
             data Maybe a = Nothing | Just a
@@ -639,197 +646,197 @@ mod tests {
 
     #[test]
     fn test_parse_atomic_type() {
-        assert_debug_snapshot!(parse_type("var"));
-        assert_debug_snapshot!(parse_type("\"string\""));
-        assert_debug_snapshot!(parse_type("42"));
-        assert_debug_snapshot!(parse_type("Int"));
-        assert_debug_snapshot!(parse_type("Prelude.Int"));
-        assert_debug_snapshot!(parse_type("(-42)"));
+        assert_snapshot!(parse_type("var"));
+        assert_snapshot!(parse_type("\"string\""));
+        assert_snapshot!(parse_type("42"));
+        assert_snapshot!(parse_type("Int"));
+        assert_snapshot!(parse_type("Prelude.Int"));
+        assert_snapshot!(parse_type("(-42)"));
     }
 
     #[test]
     fn test_parse_complex_type() {
-        assert_debug_snapshot!(parse_type("Maybe Int"));
-        assert_debug_snapshot!(parse_type("Either String Int"));
-        assert_debug_snapshot!(parse_type("Array (Maybe Int)"));
+        assert_snapshot!(parse_type("Maybe Int"));
+        assert_snapshot!(parse_type("Either String Int"));
+        assert_snapshot!(parse_type("Array (Maybe Int)"));
     }
 
     #[test]
     fn test_parse_forall() {
-        assert_debug_snapshot!(parse_type("forall x (y :: Symbol). Maybe x"));
+        assert_snapshot!(parse_type("forall x (y :: Symbol). Maybe x"));
     }
 
     #[test]
     fn test_parse_constraint() {
-        assert_debug_snapshot!(parse_type("Eq a => a"));
+        assert_snapshot!(parse_type("Eq a => a"));
     }
 
     #[test]
     fn test_parse_constraints() {
-        assert_debug_snapshot!(parse_type("Eq a => Show a => a"));
+        assert_snapshot!(parse_type("Eq a => Show a => a"));
     }
 
     #[test]
     fn test_parse_row_1() {
-        assert_debug_snapshot!(parse_type("( foo :: Int, \"Bar\" :: String, data :: Int )"));
+        assert_snapshot!(parse_type("( foo :: Int, \"Bar\" :: String, data :: Int )"));
     }
 
     #[test]
     fn test_parse_row_2() {
-        assert_debug_snapshot!(parse_type("( foo :: Int | e )"));
+        assert_snapshot!(parse_type("( foo :: Int | e )"));
     }
 
     #[test]
     fn test_parse_row_3() {
-        assert_debug_snapshot!(parse_type("( | e )"));
+        assert_snapshot!(parse_type("( | e )"));
     }
 
     #[test]
     fn test_parse_row_4() {
-        assert_debug_snapshot!(parse_type("()"));
+        assert_snapshot!(parse_type("()"));
     }
 
     #[test]
     fn test_parse_record() {
-        assert_debug_snapshot!(parse_type("{ foo :: Int | e }"));
+        assert_snapshot!(parse_type("{ foo :: Int | e }"));
     }
 
     #[test]
     fn test_parse_function_type() {
-        assert_debug_snapshot!(parse_type("A -> B -> C"));
+        assert_snapshot!(parse_type("A -> B -> C"));
     }
 
     #[test]
     fn test_function_as_type_operator() {
-        assert_debug_snapshot!(parse_type("(->)"));
+        assert_snapshot!(parse_type("(->)"));
     }
 
     #[test]
     fn test_type_operator() {
-        assert_debug_snapshot!(parse_type("a + b"));
+        assert_snapshot!(parse_type("a + b"));
     }
 
     #[test]
     fn test_type_operator_2() {
-        assert_debug_snapshot!(parse_type("a -> b ~> c -> d"));
+        assert_snapshot!(parse_type("a -> b ~> c -> d"));
     }
 
     #[test]
     fn test_type_operator_3() {
-        assert_debug_snapshot!(parse_type("a - b"));
+        assert_snapshot!(parse_type("a - b"));
     }
 
     #[test]
     fn test_type_operator_4() {
-        assert_debug_snapshot!(parse_type("a + b + c"));
+        assert_snapshot!(parse_type("a + b + c"));
     }
 
     #[test]
     fn test_parse_literals() {
-        assert_debug_snapshot!(parse_expr("123"));
-        assert_debug_snapshot!(parse_expr(r#" "hello" "#));
-        assert_debug_snapshot!(parse_expr(r#" true "#));
-        assert_debug_snapshot!(parse_expr(r#" 'a' "#));
+        assert_snapshot!(parse_expr("123"));
+        assert_snapshot!(parse_expr(r#" "hello" "#));
+        assert_snapshot!(parse_expr(r#" true "#));
+        assert_snapshot!(parse_expr(r#" 'a' "#));
     }
 
     #[test]
     fn test_float_literal() {
-        assert_debug_snapshot!(parse_expr("12.34"));
+        assert_snapshot!(parse_expr("12.34"));
     }
 
     #[test]
     fn test_float_literal_with_underscores() {
-        assert_debug_snapshot!(parse_expr("15_000.0"));
+        assert_snapshot!(parse_expr("15_000.0"));
     }
 
     #[test]
     fn test_parse_array() {
-        assert_debug_snapshot!(parse_expr(r#" [] "#));
-        assert_debug_snapshot!(parse_expr(r#" [1] "#));
-        assert_debug_snapshot!(parse_expr(r#" [true, false] "#));
+        assert_snapshot!(parse_expr(r#" [] "#));
+        assert_snapshot!(parse_expr(r#" [1] "#));
+        assert_snapshot!(parse_expr(r#" [true, false] "#));
     }
 
     #[test]
     fn test_parse_record_expr() {
-        assert_debug_snapshot!(parse_expr(r#" {} "#));
-        assert_debug_snapshot!(parse_expr(r#" { foo: 1 } "#));
-        assert_debug_snapshot!(parse_expr(r#" { foo } "#));
-        assert_debug_snapshot!(parse_expr(r#" { foo, bar: 2 } "#));
+        assert_snapshot!(parse_expr(r#" {} "#));
+        assert_snapshot!(parse_expr(r#" { foo: 1 } "#));
+        assert_snapshot!(parse_expr(r#" { foo } "#));
+        assert_snapshot!(parse_expr(r#" { foo, bar: 2 } "#));
     }
 
     #[test]
     fn test_parse_infix_expr() {
-        assert_debug_snapshot!(parse_expr(r#" 1 %+ 2 <$> 3 "#));
+        assert_snapshot!(parse_expr(r#" 1 %+ 2 <$> 3 "#));
     }
 
     #[test]
     fn test_infix_qualified() {
-        assert_debug_snapshot!(parse_expr(r#" x List.: xs "#));
+        assert_snapshot!(parse_expr(r#" x List.: xs "#));
     }
 
     #[test]
     fn test_parse_accessor_1() {
-        assert_debug_snapshot!(parse_expr(r#"foo.bar"#));
+        assert_snapshot!(parse_expr(r#"foo.bar"#));
     }
 
     #[test]
     fn test_parse_accessor_2() {
-        assert_debug_snapshot!(parse_expr(r#" foo."Bar" "#));
+        assert_snapshot!(parse_expr(r#" foo."Bar" "#));
     }
 
     #[test]
     fn test_parse_accessor_3() {
-        assert_debug_snapshot!(parse_expr(r#" foo.if "#));
+        assert_snapshot!(parse_expr(r#" foo.if "#));
     }
 
     #[test]
     fn test_parse_accessor_chain() {
-        assert_debug_snapshot!(parse_expr(r#" foo.bar.baz "#));
+        assert_snapshot!(parse_expr(r#" foo.bar.baz "#));
     }
 
     #[test]
     fn test_parse_qualified_var() {
-        assert_debug_snapshot!(parse_expr(r#"Data.Maybe.fromJust"#));
+        assert_snapshot!(parse_expr(r#"Data.Maybe.fromJust"#));
     }
 
     #[test]
     fn test_parse_parens() {
-        assert_debug_snapshot!(parse_expr(r#"(foo)"#));
+        assert_snapshot!(parse_expr(r#"(foo)"#));
     }
 
     #[test]
     fn test_parse_app_1() {
-        assert_debug_snapshot!(parse_expr(r#"f x y"#));
+        assert_snapshot!(parse_expr(r#"f x y"#));
     }
 
     #[test]
     fn test_parse_app_2() {
-        assert_debug_snapshot!(parse_expr(r#"f a.b (g x)"#));
+        assert_snapshot!(parse_expr(r#"f a.b (g x)"#));
     }
 
     #[test]
     fn test_parse_lam_1() {
-        assert_debug_snapshot!(parse_expr(r#"\x -> y"#));
+        assert_snapshot!(parse_expr(r#"\x -> y"#));
     }
 
     #[test]
     fn test_parse_lam_2() {
-        assert_debug_snapshot!(parse_expr(r#"\_ y -> y"#));
+        assert_snapshot!(parse_expr(r#"\_ y -> y"#));
     }
 
     #[test]
     fn test_fat_arrows_as_operators() {
-        assert_debug_snapshot!(parse_expr(r#"1 <= 2 >= 3"#));
+        assert_snapshot!(parse_expr(r#"1 <= 2 >= 3"#));
     }
 
     #[test]
     fn test_special_operators() {
-        assert_debug_snapshot!(parse_expr(r#"x : y"#));
+        assert_snapshot!(parse_expr(r#"x : y"#));
     }
 
     #[test]
     fn test_case() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           case x of
             C a b ->
@@ -843,7 +850,7 @@ mod tests {
 
     #[test]
     fn test_case_guards_1() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           case x of
             A | true -> 1
@@ -854,7 +861,7 @@ mod tests {
 
     #[test]
     fn test_case_guards_2() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           case x of
             A | true, Just x <- foo + bar -> 1
@@ -864,7 +871,7 @@ mod tests {
 
     #[test]
     fn test_case_multi() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           case x, y of
             C, D -> 1
@@ -874,22 +881,22 @@ mod tests {
 
     #[test]
     fn test_typed_expr() {
-        assert_debug_snapshot!(parse_expr("foo bar :: Int"));
+        assert_snapshot!(parse_expr("foo bar :: Int"));
     }
 
     #[test]
     fn test_if() {
-        assert_debug_snapshot!(parse_expr("if b then 1 else 2"));
+        assert_snapshot!(parse_expr("if b then 1 else 2"));
     }
 
     #[test]
     fn test_let_1() {
-        assert_debug_snapshot!(parse_expr("let x = 1 in x"));
+        assert_snapshot!(parse_expr("let x = 1 in x"));
     }
 
     #[test]
     fn test_let_2() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
             let
                 x :: Int
@@ -904,7 +911,7 @@ mod tests {
 
     #[test]
     fn test_let_guards() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
             let x | true = 1
             in x
@@ -914,7 +921,7 @@ mod tests {
 
     #[test]
     fn test_let_guards_2() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
             let Just x | true = 1
             in x
@@ -924,47 +931,47 @@ mod tests {
 
     #[test]
     fn test_wildcard() {
-        assert_debug_snapshot!(parse_expr("_.foo"));
+        assert_snapshot!(parse_expr("_.foo"));
     }
 
     #[test]
     fn test_data_con_expr() {
-        assert_debug_snapshot!(parse_expr("Just 1"));
+        assert_snapshot!(parse_expr("Just 1"));
     }
 
     #[test]
     fn test_block_argument() {
-        assert_debug_snapshot!(parse_expr("f \\x -> y"));
+        assert_snapshot!(parse_expr("f \\x -> y"));
     }
 
     #[test]
     fn test_block_argument_2() {
-        assert_debug_snapshot!(parse_expr("f 1 \\x -> y"));
+        assert_snapshot!(parse_expr("f 1 \\x -> y"));
     }
 
     #[test]
     fn test_block_argument_3() {
-        assert_debug_snapshot!(parse_expr("f $ g \\x -> y"));
+        assert_snapshot!(parse_expr("f $ g \\x -> y"));
     }
 
     #[test]
     fn test_lambda_infix() {
-        assert_debug_snapshot!(parse_expr("1 + \\x -> y + 2"));
+        assert_snapshot!(parse_expr("1 + \\x -> y + 2"));
     }
 
     #[test]
     fn test_lambda_typed() {
-        assert_debug_snapshot!(parse_expr("\\x -> 1 :: Int"));
+        assert_snapshot!(parse_expr("\\x -> 1 :: Int"));
     }
 
     #[test]
     fn test_named_pattern() {
-        assert_debug_snapshot!(parse_expr("\\x@Nothing -> y"));
+        assert_snapshot!(parse_expr("\\x@Nothing -> y"));
     }
 
     #[test]
     fn test_fn_arg_con_arity0() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Some.Module where
         f Nothing = 1
@@ -974,22 +981,22 @@ mod tests {
 
     #[test]
     fn test_record_update_1() {
-        assert_debug_snapshot!(parse_expr("r { x = 1 }"));
+        assert_snapshot!(parse_expr("r { x = 1 }"));
     }
 
     #[test]
     fn test_record_update_2() {
-        assert_debug_snapshot!(parse_expr("f r { x = 1, y = 2, \"random label\" = 3 }"));
+        assert_snapshot!(parse_expr("f r { x = 1, y = 2, \"random label\" = 3 }"));
     }
 
     #[test]
     fn test_record_update_3() {
-        assert_debug_snapshot!(parse_expr("f r { x = 1 } { y: 2 } q"));
+        assert_snapshot!(parse_expr("f r { x = 1 } { y: 2 } q"));
     }
 
     #[test]
     fn test_do_simple() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           do
             x <- f
@@ -1000,7 +1007,7 @@ mod tests {
 
     #[test]
     fn test_do_let() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           do
             let x = 1
@@ -1011,7 +1018,7 @@ mod tests {
 
     #[test]
     fn test_do_destructuring_pattern() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           do
             Tuple x y <- foo
@@ -1022,7 +1029,7 @@ mod tests {
 
     #[test]
     fn test_do_bind_type_sig() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           do
             x :: Int <- foo
@@ -1033,7 +1040,7 @@ mod tests {
 
     #[test]
     fn test_ado_simple() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           ado
             x <- f
@@ -1044,7 +1051,7 @@ mod tests {
 
     #[test]
     fn test_ado_let() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           ado
             let x = 1
@@ -1055,7 +1062,7 @@ mod tests {
 
     #[test]
     fn test_ado_full() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
           ado
             let x = 1
@@ -1068,7 +1075,7 @@ mod tests {
 
     #[test]
     fn test_let_where() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
         let x = y
               where y = 5
@@ -1079,7 +1086,7 @@ mod tests {
 
     #[test]
     fn test_case_where() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
         case x of
             _ -> y
@@ -1090,7 +1097,7 @@ mod tests {
 
     #[test]
     fn test_case_in_infix() {
-        assert_debug_snapshot!(parse_expr(indoc!(
+        assert_snapshot!(parse_expr(indoc!(
             "
             case x of
                 _ -> y
@@ -1103,17 +1110,17 @@ mod tests {
 
     #[test]
     fn test_standalone_operator() {
-        assert_debug_snapshot!(parse_expr("(+)"));
+        assert_snapshot!(parse_expr("(+)"));
     }
 
     #[test]
     fn test_backtick_1() {
-        assert_debug_snapshot!(parse_expr("1 `mod` 2"));
+        assert_snapshot!(parse_expr("1 `mod` 2"));
     }
 
     #[test]
     fn test_backtick_2() {
-        assert_debug_snapshot!(parse_expr("1 `lift2 (+)` 2"));
+        assert_snapshot!(parse_expr("1 `lift2 (+)` 2"));
     }
 
     // I think we can't reasonably support this with the current parser,
@@ -1135,39 +1142,39 @@ mod tests {
     #[test]
     #[ignore = "Super hard to implement, see comment"]
     fn test_backtick_3() {
-        assert_debug_snapshot!(parse_expr("1 `\\x y -> x` 2"));
+        assert_snapshot!(parse_expr("1 `\\x y -> x` 2"));
     }
 
     #[test]
     fn test_backtick_4() {
-        assert_debug_snapshot!(parse_expr("1 `(\\x y -> x)` 2"));
+        assert_snapshot!(parse_expr("1 `(\\x y -> x)` 2"));
     }
 
     // No idea why, but the original grammar explicitly permits infix operators
     // directly inside a backtick.
     #[test]
     fn test_backtick_5() {
-        assert_debug_snapshot!(parse_expr("1 `2 + 2` 2"));
+        assert_snapshot!(parse_expr("1 `2 + 2` 2"));
     }
 
     #[test]
     fn test_negate_1() {
-        assert_debug_snapshot!(parse_expr("-5"));
+        assert_snapshot!(parse_expr("-5"));
     }
 
     #[test]
     fn test_negate_2() {
-        assert_debug_snapshot!(parse_expr("-f x"));
+        assert_snapshot!(parse_expr("-f x"));
     }
 
     #[test]
     fn test_minus_op() {
-        assert_debug_snapshot!(parse_expr("x - y"));
+        assert_snapshot!(parse_expr("x - y"));
     }
 
     #[test]
     fn test_operator_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Test where
         infix 1 f as !#
@@ -1180,7 +1187,7 @@ mod tests {
 
     #[test]
     fn test_type_operator_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Test where
         infixr 4 type NaturalTransformation as ~>
@@ -1190,7 +1197,7 @@ mod tests {
 
     #[test]
     fn test_operator_decl_qualified() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Test where
         infix 1 Foo.f as !#
@@ -1202,7 +1209,7 @@ mod tests {
 
     #[test]
     fn test_role_decl() {
-        assert_debug_snapshot!(parse_module(indoc!(
+        assert_snapshot!(parse_module(indoc!(
             "
         module Test where
         type role Foo phantom representational nominal
@@ -1212,13 +1219,13 @@ mod tests {
 
     #[test]
     fn test_neg_pattern() {
-        assert_debug_snapshot!(parse_expr("case x of -1 -> 1"));
+        assert_snapshot!(parse_expr("case x of -1 -> 1"));
     }
 
     #[test]
     fn test_range_operator() {
         // Should not be confused with float literal and a dot
-        assert_debug_snapshot!(parse_expr("1..5"));
+        assert_snapshot!(parse_expr("1..5"));
     }
 
     //
