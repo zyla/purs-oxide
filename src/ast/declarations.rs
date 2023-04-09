@@ -1,6 +1,7 @@
-use super::{Commented, Located, Pat, PossiblyGuardedExpr, Type};
+use super::{Commented, Located, Pat, PossiblyGuardedExpr, SourceSpan, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
+use crate::Db;
 use salsa::DebugWithDb;
 
 pub type Module = Located<Commented<ModuleInner>>;
@@ -11,6 +12,16 @@ pub struct ModuleInner {
     pub exports: Option<Vec<DeclarationRef>>,
     pub imports: Vec<Import>,
     pub declarations: Vec<Declaration>,
+}
+
+pub fn corrupted(db: &dyn Db, span: SourceSpan) -> Module {
+    let corrupted = ModuleInner {
+        name: QualifiedName::new(db, Symbol::new(db, "CorruptedModule".into())),
+        exports: Option::None,
+        imports: vec![],
+        declarations: vec![],
+    };
+    Located(span, Commented(vec![], corrupted))
 }
 
 pub type Import = Located<ImportInner>;

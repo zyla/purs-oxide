@@ -1,8 +1,11 @@
 use dashmap::{mapref::entry::Entry, DashMap};
+use derive_new::new;
 use salsa::ParallelDatabase;
 use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
+
+use crate::ast::{declarations, SourceSpan};
 
 #[macro_use]
 extern crate lalrpop_util;
@@ -13,6 +16,7 @@ pub struct Jar(
     crate::ModuleId,
     crate::parsed_module,
     crate::symbol::Symbol,
+    crate::Diagnostics,
 );
 
 #[salsa::input]
@@ -20,6 +24,77 @@ pub struct ModuleSource {
     id: ModuleId,
     #[return_ref]
     contents: Option<(PathBuf, String)>,
+}
+
+#[salsa::accumulator]
+pub struct Diagnostics(Diagnostic);
+
+#[derive(Clone, Debug, new)]
+pub struct Diagnostic {
+    pub start: usize,
+    pub end: usize,
+    pub message: String,
+    pub file: String,
+}
+
+impl Diagnostic {
+    fn from<T: std::fmt::Debug, E: Display>(
+        val: &lalrpop_util::ParseError<usize, T, E>,
+        file: String,
+    ) -> Self {
+        use lalrpop_util::ParseError::*;
+
+        match val {
+            InvalidToken { location } => {
+                Diagnostic::new(*location, *location, "invalid token".into(), file)
+            }
+
+            UnrecognizedEOF { location, .. } => {
+                Diagnostic::new(*location, *location, "unexpected eof".into(), file)
+            }
+
+            UnrecognizedToken {
+                token: (start, token, end),
+                ..
+            } => Diagnostic::new(
+                *start,
+                *end,
+                format!("unrecognized token {:?}", token),
+                file,
+            ),
+            ExtraToken {
+                token: (start, token, end),
+            } => Diagnostic::new(*start, *end, format!("extra token {:?}", token), file),
+            User { error } => Diagnostic::new(0, 0, format!("{}", error), file),
+        }
+    }
+}
+
+impl<T, E> From<lalrpop_util::ParseError<usize, T, E>> for SourceSpan {
+    fn from(val: lalrpop_util::ParseError<usize, T, E>) -> Self {
+        use lalrpop_util::ParseError::*;
+
+        match val {
+            InvalidToken { location } => SourceSpan {
+                start: location,
+                end: location,
+            },
+
+            UnrecognizedEOF { location, .. } => SourceSpan {
+                start: location,
+                end: location,
+            },
+
+            UnrecognizedToken {
+                token: (start, .., end),
+                ..
+            } => SourceSpan { start, end },
+            ExtraToken {
+                token: (start, .., end),
+            } => SourceSpan { start, end },
+            User { .. } => SourceSpan { start: 0, end: 0 },
+        }
+    }
 }
 
 #[salsa::interned]
@@ -42,13 +117,12 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> crate::ast::Module {
     }
     match result {
         Err(err) => {
-            println!(
-                "FAIL {} error: {}",
-                filename.to_string_lossy(),
-                fmt_error(&err)
+            Diagnostics::push(
+                db,
+                Diagnostic::from(&err, filename.to_string_lossy().to_string()),
             );
-            println!("{}", err);
-            panic!("Errors!");
+
+            declarations::corrupted(db, err.into())
         }
         Ok(module) => module,
     }

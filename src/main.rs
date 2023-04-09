@@ -1,4 +1,5 @@
 use anyhow::format_err;
+use purs_oxide::{Diagnostic, Diagnostics};
 use rayon::prelude::*;
 use salsa::ParallelDatabase;
 use std::{fs::File, io::Read};
@@ -16,10 +17,17 @@ fn main() -> std::io::Result<()> {
         |db, module| {
             let db: &dyn purs_oxide::Db = &*db.0;
             let parsed_module = purs_oxide::parsed_module(db, *module);
+            let accumulated: Vec<Diagnostic> =
+                purs_oxide::parsed_module::accumulated::<Diagnostics>(db, *module);
+
             println!(
-                "parsed {}, {} declarations",
+                "parsed {}, {} declarations, diagnostics: {}",
                 module.name(db),
-                parsed_module.declarations.len()
+                parsed_module.declarations.len(),
+                accumulated
+                    .into_iter()
+                    .map(|d| format!("\n - {:?}", d))
+                    .collect::<String>()
             );
         },
     );
