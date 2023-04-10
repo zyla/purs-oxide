@@ -14,11 +14,21 @@ This little thing someday hopes to become a PureScript compiler. For now it's ju
 
 The parser understands some real code (can parse the Restaumatic codebase and its dependencies).
 
-Currently we're working on integrating [salsa](https://github.com/salsa-rs/salsa) for incremental compilation. This is happening on the `salsa` branch in this repository.
+Currently we're working on the renamer.
 
 If you're interested, there's a [development channel](https://app.gitter.im/#/room/!dvRAwXOtlcqHYqTaYW:gitter.im) on Matrix/Gitter.
 
 ## Architecture
+
+### Incremental compilation
+
+We're using [salsa](https://github.com/salsa-rs/salsa) for incremental compilation. 
+
+Parsing is not incremental, whole file is parsed at a time. Later passes will be mostly done at definition granularity.
+
+Our base inputs are source files, but keyed by module name, not file name. This is because file names essentially don't matter for PureScript[^1], so later passes refer to inputs by module name.
+
+[^1]: Except for FFI, which we currently don't handle.
 
 ### Lexer
 
@@ -49,5 +59,3 @@ There's no trace yet of desugaring, renaming, typechecking or code generation.
 ## Testing
 
 We use [insta](https://docs.rs/insta/1.29.0/insta/) for snapshot testing.
-
-The snapshots are currently inline, but the parser outputs are getting large, and maintaining this is getting untenable.
