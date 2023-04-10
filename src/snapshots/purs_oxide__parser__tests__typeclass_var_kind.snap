@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -28,14 +30,16 @@ Located(
                         Class(
                             TypeClassDeclaration {
                                 constraints: [],
-                                name: Symbol(
-                                    "Foo",
-                                ),
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Foo",
+                                },
                                 params: [
                                     (
-                                        Symbol(
-                                            "a",
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 2,
+                                            text: "a",
+                                        },
                                         Some(
                                             Located(
                                                 SourceSpan {
@@ -43,11 +47,13 @@ Located(
                                                     end: 40,
                                                 },
                                                 TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Symbol",
-                                                        ),
-                                                    ),
+                                                    QualifiedName {
+                                                        symbol: Symbol {
+                                                            [salsa id]: 3,
+                                                            text: "Symbol",
+                                                        },
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                         ),

@@ -14,11 +14,13 @@ Located(
                 end: 5,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Maybe",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "Maybe",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
         Located(
@@ -27,11 +29,13 @@ Located(
                 end: 9,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Int",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 1,
+                        text: "Int",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
     ),

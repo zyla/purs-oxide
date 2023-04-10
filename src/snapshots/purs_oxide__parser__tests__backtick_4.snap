@@ -35,9 +35,10 @@ Located(
                                         end: 6,
                                     },
                                     Var(
-                                        Symbol(
-                                            "x",
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 0,
+                                            text: "x",
+                                        },
                                     ),
                                 ),
                                 Located(
@@ -46,9 +47,10 @@ Located(
                                         end: 8,
                                     },
                                     Var(
-                                        Symbol(
-                                            "y",
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 1,
+                                            text: "y",
+                                        },
                                     ),
                                 ),
                             ],
@@ -58,11 +60,13 @@ Located(
                                     end: 13,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "x",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 0,
+                                            text: "x",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ),

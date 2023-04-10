@@ -20,18 +20,21 @@ Located(
                         end: 1,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "r",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 0,
+                                text: "r",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 [
                     (
-                        Symbol(
-                            "x",
-                        ),
+                        Symbol {
+                            [salsa id]: 1,
+                            text: "x",
+                        },
                         Located(
                             SourceSpan {
                                 start: 8,

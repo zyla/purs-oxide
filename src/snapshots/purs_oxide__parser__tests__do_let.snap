@@ -20,9 +20,10 @@ Located(
                             [],
                             ValueDeclaration(
                                 ValueDeclaration {
-                                    ident: Symbol(
-                                        "x",
-                                    ),
+                                    ident: Symbol {
+                                        [salsa id]: 0,
+                                        text: "x",
+                                    },
                                     params: [],
                                     expr: Unconditional(
                                         Located(
@@ -56,11 +57,13 @@ Located(
                                 end: 21,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "pure",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

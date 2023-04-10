@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -26,9 +28,10 @@ Located(
                     Commented(
                         [],
                         ForeignValue {
-                            name: Symbol(
-                                "foo",
-                            ),
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "foo",
+                            },
                             type_: Located(
                                 SourceSpan {
                                     start: 40,
@@ -41,11 +44,13 @@ Located(
                                             end: 43,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Int",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "Int",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                     Located(
@@ -54,11 +59,13 @@ Located(
                                             end: 50,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Int",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "Int",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                 ),

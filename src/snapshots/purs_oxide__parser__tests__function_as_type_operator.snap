@@ -8,10 +8,12 @@ Located(
         end: 4,
     },
     Operator(
-        QualifiedName(
-            Symbol(
-                "->",
-            ),
-        ),
+        QualifiedName {
+            symbol: Symbol {
+                [salsa id]: 0,
+                text: "->",
+            },
+            actually_qualified: false,
+        },
     ),
 )

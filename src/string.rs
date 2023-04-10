@@ -1,4 +1,4 @@
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Hash)]
 pub struct PSString(pub Vec<PSChar>);
 
 /// Strings in PureScript can contain arbitrary Unicode code points, not just USVs.

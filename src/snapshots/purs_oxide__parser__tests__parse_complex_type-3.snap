@@ -14,11 +14,13 @@ Located(
                 end: 5,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Array",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "Array",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
         Located(
@@ -39,11 +41,13 @@ Located(
                                 end: 12,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Maybe",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "Maybe",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         Located(
@@ -52,11 +56,13 @@ Located(
                                 end: 16,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Int",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 2,
+                                        text: "Int",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                     ),

@@ -1,4 +1,6 @@
-#[derive(Debug)]
+use salsa::DebugWithDb;
+
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct SourceSpan {
     pub start: usize,
     pub end: usize,
@@ -10,7 +12,7 @@ impl SourceSpan {
     }
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Located<T>(pub SourceSpan, pub T);
 
 impl<T> Located<T> {
@@ -19,8 +21,22 @@ impl<T> Located<T> {
     }
 }
 
-#[derive(Debug)]
+impl<T> std::ops::Deref for Located<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.1
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Comment(pub String);
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Commented<T>(pub Vec<Comment>, pub T);
+
+impl<T> std::ops::Deref for Commented<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.1
+    }
+}

@@ -15,11 +15,13 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
-                        ),
-                    ),
+                    QualifiedName {
+                        symbol: Symbol {
+                            [salsa id]: 0,
+                            text: "x",
+                        },
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],
@@ -32,11 +34,13 @@ Located(
                             end: 13,
                         },
                         DataConstructorApp(
-                            QualifiedName(
-                                Symbol(
-                                    "A",
-                                ),
-                            ),
+                            QualifiedName {
+                                symbol: Symbol {
+                                    [salsa id]: 1,
+                                    text: "A",
+                                },
+                                actually_qualified: false,
+                            },
                             [],
                         ),
                     ),

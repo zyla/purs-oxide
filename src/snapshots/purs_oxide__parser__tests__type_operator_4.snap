@@ -14,45 +14,52 @@ Located(
                 end: 1,
             },
             Var(
-                Symbol(
-                    "a",
-                ),
+                Symbol {
+                    [salsa id]: 0,
+                    text: "a",
+                },
             ),
         ),
         [
             (
-                QualifiedName(
-                    Symbol(
-                        "+",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 1,
+                        text: "+",
+                    },
+                    actually_qualified: false,
+                },
                 Located(
                     SourceSpan {
                         start: 4,
                         end: 5,
                     },
                     Var(
-                        Symbol(
-                            "b",
-                        ),
+                        Symbol {
+                            [salsa id]: 2,
+                            text: "b",
+                        },
                     ),
                 ),
             ),
             (
-                QualifiedName(
-                    Symbol(
-                        "+",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 1,
+                        text: "+",
+                    },
+                    actually_qualified: false,
+                },
                 Located(
                     SourceSpan {
                         start: 8,
                         end: 9,
                     },
                     Var(
-                        Symbol(
-                            "c",
-                        ),
+                        Symbol {
+                            [salsa id]: 3,
+                            text: "c",
+                        },
                     ),
                 ),
             ),

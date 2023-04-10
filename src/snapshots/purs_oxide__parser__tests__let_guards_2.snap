@@ -23,11 +23,13 @@ Located(
                                 end: 10,
                             },
                             DataConstructorApp(
-                                QualifiedName(
-                                    Symbol(
-                                        "Just",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 0,
+                                        text: "Just",
+                                    },
+                                    actually_qualified: false,
+                                },
                                 [
                                     Located(
                                         SourceSpan {
@@ -35,9 +37,10 @@ Located(
                                             end: 10,
                                         },
                                         Var(
-                                            Symbol(
-                                                "x",
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 1,
+                                                text: "x",
+                                            },
                                         ),
                                     ),
                                 ],
@@ -85,11 +88,13 @@ Located(
                 end: 26,
             },
             Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 1,
+                        text: "x",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
     },

@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,15 +31,18 @@ Located(
                             associativity: None,
                             precedence: 1,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "f",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "f",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
-                            operator: Symbol(
-                                "!#",
-                            ),
+                            operator: Symbol {
+                                [salsa id]: 2,
+                                text: "!#",
+                            },
                         },
                     ),
                 ),
@@ -52,15 +57,18 @@ Located(
                             associativity: Left,
                             precedence: 2,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "g",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 3,
+                                        text: "g",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
-                            operator: Symbol(
-                                "$%#",
-                            ),
+                            operator: Symbol {
+                                [salsa id]: 4,
+                                text: "$%#",
+                            },
                         },
                     ),
                 ),
@@ -75,15 +83,18 @@ Located(
                             associativity: Right,
                             precedence: 3,
                             name: Value(
-                                QualifiedName(
-                                    Symbol(
-                                        "h",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 5,
+                                        text: "h",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
-                            operator: Symbol(
-                                "<@#%",
-                            ),
+                            operator: Symbol {
+                                [salsa id]: 6,
+                                text: "<@#%",
+                            },
                         },
                     ),
                 ),
@@ -98,15 +109,18 @@ Located(
                             associativity: None,
                             precedence: 1,
                             name: DataConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Foo",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 7,
+                                        text: "Foo",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
-                            operator: Symbol(
-                                "^%",
-                            ),
+                            operator: Symbol {
+                                [salsa id]: 8,
+                                text: "^%",
+                            },
                         },
                     ),
                 ),

@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -29,15 +31,18 @@ Located(
                             associativity: Right,
                             precedence: 4,
                             name: Type(
-                                QualifiedName(
-                                    Symbol(
-                                        "NaturalTransformation",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "NaturalTransformation",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
-                            operator: Symbol(
-                                "~>",
-                            ),
+                            operator: Symbol {
+                                [salsa id]: 2,
+                                text: "~>",
+                            },
                         },
                     ),
                 ),

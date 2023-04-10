@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -27,9 +29,10 @@ Located(
                         [],
                         KindSignature {
                             for_type: TypeSynonym,
-                            name: Symbol(
-                                "Qux",
-                            ),
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "Qux",
+                            },
                             kind: Located(
                                 SourceSpan {
                                     start: 30,
@@ -42,11 +45,13 @@ Located(
                                             end: 34,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Type",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "Type",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                     Located(
@@ -55,11 +60,13 @@ Located(
                                             end: 42,
                                         },
                                         TypeConstructor(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Type",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "Type",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                 ),

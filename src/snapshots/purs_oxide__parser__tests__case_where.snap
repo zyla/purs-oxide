@@ -15,11 +15,13 @@ Located(
                     end: 6,
                 },
                 Var(
-                    QualifiedName(
-                        Symbol(
-                            "x",
-                        ),
-                    ),
+                    QualifiedName {
+                        symbol: Symbol {
+                            [salsa id]: 0,
+                            text: "x",
+                        },
+                        actually_qualified: false,
+                    },
                 ),
             ),
         ],
@@ -51,9 +53,10 @@ Located(
                                         [],
                                         ValueDeclaration(
                                             ValueDeclaration {
-                                                ident: Symbol(
-                                                    "y",
-                                                ),
+                                                ident: Symbol {
+                                                    [salsa id]: 1,
+                                                    text: "y",
+                                                },
                                                 params: [],
                                                 expr: Unconditional(
                                                     Located(
@@ -79,11 +82,13 @@ Located(
                                     end: 20,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "y",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 1,
+                                            text: "y",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         },

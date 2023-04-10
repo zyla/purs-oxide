@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Some.Module",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Some.Module",
+                },
+                actually_qualified: true,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -27,9 +29,10 @@ Located(
                         [],
                         ValueDeclaration(
                             ValueDeclaration {
-                                ident: Symbol(
-                                    "f",
-                                ),
+                                ident: Symbol {
+                                    [salsa id]: 1,
+                                    text: "f",
+                                },
                                 params: [
                                     Located(
                                         SourceSpan {
@@ -37,11 +40,13 @@ Located(
                                             end: 34,
                                         },
                                         DataConstructorApp(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "Nothing",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "Nothing",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                             [],
                                         ),
                                     ),

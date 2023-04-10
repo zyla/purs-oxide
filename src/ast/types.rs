@@ -1,9 +1,10 @@
 use super::{Located, QualifiedName, Symbol};
 use crate::string::PSString;
+use salsa::DebugWithDb;
 
 pub type Type = Located<TypeKind>;
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum TypeKind {
     Unknown(u64),
     Var(Symbol),
@@ -49,14 +50,14 @@ pub enum TypeKind {
     Infix(Box<Type>, Vec<(QualifiedName, Type)>),
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum WildcardKind {
     Hole(Symbol),
     Unnamed,
     Ignored,
 }
 
-#[derive(Debug)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct SkolemScope(pub u64);
 
 pub type Constraint = Box<Type>;

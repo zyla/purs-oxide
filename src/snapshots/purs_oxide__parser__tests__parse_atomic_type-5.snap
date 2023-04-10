@@ -8,10 +8,12 @@ Located(
         end: 11,
     },
     TypeConstructor(
-        QualifiedName(
-            Symbol(
-                "Prelude.Int",
-            ),
-        ),
+        QualifiedName {
+            symbol: Symbol {
+                [salsa id]: 0,
+                text: "Prelude.Int",
+            },
+            actually_qualified: true,
+        },
     ),
 )

@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -41,11 +43,13 @@ Located(
                                                         end: 30,
                                                     },
                                                     TypeConstructor(
-                                                        QualifiedName(
-                                                            Symbol(
-                                                                "Bar",
-                                                            ),
-                                                        ),
+                                                        QualifiedName {
+                                                            symbol: Symbol {
+                                                                [salsa id]: 1,
+                                                                text: "Bar",
+                                                            },
+                                                            actually_qualified: false,
+                                                        },
                                                     ),
                                                 ),
                                                 Located(
@@ -54,9 +58,10 @@ Located(
                                                         end: 32,
                                                     },
                                                     Var(
-                                                        Symbol(
-                                                            "a",
-                                                        ),
+                                                        Symbol {
+                                                            [salsa id]: 2,
+                                                            text: "a",
+                                                        },
                                                     ),
                                                 ),
                                             ),
@@ -64,11 +69,13 @@ Located(
                                     ],
                                     instance_type: Plain,
                                     instance_name: None,
-                                    class: QualifiedName(
-                                        Symbol(
-                                            "Foo",
-                                        ),
-                                    ),
+                                    class: QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 3,
+                                            text: "Foo",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                     args: [
                                         Located(
                                             SourceSpan {
@@ -76,9 +83,10 @@ Located(
                                                 end: 41,
                                             },
                                             Var(
-                                                Symbol(
-                                                    "a",
-                                                ),
+                                                Symbol {
+                                                    [salsa id]: 2,
+                                                    text: "a",
+                                                },
                                             ),
                                         ),
                                     ],
@@ -92,9 +100,10 @@ Located(
                                                 [],
                                                 ValueDeclaration(
                                                     ValueDeclaration {
-                                                        ident: Symbol(
-                                                            "bar",
-                                                        ),
+                                                        ident: Symbol {
+                                                            [salsa id]: 4,
+                                                            text: "bar",
+                                                        },
                                                         params: [],
                                                         expr: Unconditional(
                                                             Located(

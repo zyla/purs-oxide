@@ -14,11 +14,13 @@ Located(
                 end: 1,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "A",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "A",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
         Located(
@@ -33,11 +35,13 @@ Located(
                         end: 6,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "B",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "B",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 Located(
@@ -46,11 +50,13 @@ Located(
                         end: 11,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "C",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 2,
+                                text: "C",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),

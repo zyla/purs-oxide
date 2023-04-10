@@ -14,11 +14,13 @@ Located(
                 end: 1,
             },
             TypeConstructor(
-                QualifiedName(
-                    Symbol(
-                        "Prim.Record",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 3,
+                        text: "Prim.Record",
+                    },
+                    actually_qualified: true,
+                },
             ),
         ),
         Located(
@@ -29,20 +31,23 @@ Located(
             Row {
                 fields: [
                     (
-                        Symbol(
-                            "foo",
-                        ),
+                        Symbol {
+                            [salsa id]: 0,
+                            text: "foo",
+                        },
                         Located(
                             SourceSpan {
                                 start: 9,
                                 end: 12,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Int",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "Int",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                     ),
@@ -54,9 +59,10 @@ Located(
                             end: 16,
                         },
                         Var(
-                            Symbol(
-                                "e",
-                            ),
+                            Symbol {
+                                [salsa id]: 2,
+                                text: "e",
+                            },
                         ),
                     ),
                 ),

@@ -1,46 +1,43 @@
-use lalrpop_util::ParseError;
-use std::{fmt::Display, fs::File, io::Read};
+use anyhow::format_err;
+use purs_oxide::{Diagnostic, Diagnostics};
+use rayon::prelude::*;
+use salsa::ParallelDatabase;
+use std::{fs::File, io::Read};
 
 fn main() -> std::io::Result<()> {
+    let mut db = purs_oxide::Database::new();
     for filename in std::env::args().skip(1) {
-        if let Err(err) = process_file(&filename) {
+        if let Err(err) = process_file(&mut db, &filename) {
             println!("FAIL {} error: {}", filename, err);
         }
     }
+    let db = db.snapshot();
+    db.module_ids().par_iter().for_each_with(
+        purs_oxide::DbSnapshot(db.snapshot()),
+        |db, module| {
+            let db: &dyn purs_oxide::Db = &*db.0;
+            let parsed_module = purs_oxide::parsed_module(db, *module);
+            let accumulated: Vec<Diagnostic> =
+                purs_oxide::parsed_module::accumulated::<Diagnostics>(db, *module);
+
+            println!(
+                "parsed {}, {} declarations, diagnostics: {}",
+                module.name(db),
+                parsed_module.declarations.len(),
+                accumulated
+                    .into_iter()
+                    .map(|d| format!("\n - {:?}", d))
+                    .collect::<String>()
+            );
+        },
+    );
     Ok(())
 }
 
-fn process_file(filename: &str) -> std::io::Result<()> {
-    let mut input = String::new();
-    File::open(&filename)?.read_to_string(&mut input)?;
-    let (errs, result) = purs_oxide::parser::parse_module(&input);
-    if !errs.is_empty() {
-        for err in errs.iter().take(1) {
-            println!("FAIL {} error: {}", filename, fmt_error(&err.error));
-        }
-        return Ok(());
-    }
-    match result {
-        Err(err) => {
-            println!("FAIL {} error: {}", filename, fmt_error(&err));
-            println!("{}", err);
-            return Ok(());
-        }
-        Ok(_) => {}
-    }
-    println!("OK {}", filename);
+fn process_file(db: &mut purs_oxide::Database, filename: &str) -> anyhow::Result<()> {
+    let mut contents = String::new();
+    File::open(&filename)?.read_to_string(&mut contents)?;
+    db.add_source_file(filename.into(), contents)
+        .map_err(|_| format_err!("Invalid module name"))?;
     Ok(())
-}
-
-fn fmt_error<T: std::fmt::Debug, E: Display>(e: &ParseError<usize, T, E>) -> String {
-    use ParseError::*;
-    match e {
-        InvalidToken { .. } => "invalid token".into(),
-        UnrecognizedEOF { .. } => "unexpected eof".into(),
-        UnrecognizedToken {
-            token: (_, t, _), ..
-        } => format!("unrecognized token {:?}", t),
-        ExtraToken { token: (_, t, _) } => format!("extra token {:?}", t),
-        User { error } => format!("{}", error),
-    }
 }

@@ -8,10 +8,12 @@ Located(
         end: 19,
     },
     Var(
-        QualifiedName(
-            Symbol(
-                "Data.Maybe.fromJust",
-            ),
-        ),
+        QualifiedName {
+            symbol: Symbol {
+                [salsa id]: 0,
+                text: "Data.Maybe.fromJust",
+            },
+            actually_qualified: true,
+        },
     ),
 )

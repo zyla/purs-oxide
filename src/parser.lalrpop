@@ -7,7 +7,7 @@ use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 use std::str::FromStr;
 
-grammar<'err>(errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
+grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
 
 pub Module: Module = Located<Commented<ModuleInner>>;
 
@@ -47,27 +47,27 @@ ImportDeclarationKind: ImportDeclarationKind = {
 };
 
 LowerIdent: Symbol = {
-  lower_ident => Symbol::new(<>),
-  "as" => Symbol::new("as".into()),
-  "hiding" => Symbol::new("hiding".into()),
-  "role" => Symbol::new("role".into()),
-  "nominal" => Symbol::new("nominal".into()),
-  "representational" => Symbol::new("representational".into()),
-  "phantom" => Symbol::new("phantom".into()),
+  lower_ident => Symbol::new(db, <>),
+  "as" => Symbol::new(db, "as".into()),
+  "hiding" => Symbol::new(db, "hiding".into()),
+  "role" => Symbol::new(db, "role".into()),
+  "nominal" => Symbol::new(db, "nominal".into()),
+  "representational" => Symbol::new(db, "representational".into()),
+  "phantom" => Symbol::new(db, "phantom".into()),
 };
 
 LowerQualifiedIdent: QualifiedName = {
-  LowerIdent => QualifiedName(<>),
-  lower_qualified_ident => QualifiedName(Symbol::new(<>)),
+  LowerIdent => QualifiedName::new(db, <>),
+  lower_qualified_ident => QualifiedName::new(db, Symbol::new(db, <>)),
 };
 
 UpperIdent: Symbol = {
-  upper_ident => Symbol::new(<>)
+  upper_ident => Symbol::new(db, <>)
 };
 
 UpperQualifiedIdent: QualifiedName = {
-  UpperIdent => QualifiedName(<>),
-  upper_qualified_ident => QualifiedName(Symbol::new(<>)),
+  UpperIdent => QualifiedName::new(db, <>),
+  upper_qualified_ident => QualifiedName::new(db, Symbol::new(db, <>)),
 };
 
 
@@ -97,7 +97,7 @@ DeclarationRefKind: DeclarationRefKind = {
 
 TypeOperator: Symbol = {
   Operator,
-  "->" => Symbol::new("->".into()),
+  "->" => Symbol::new(db, "->".into()),
 };
 
 DeclarationRefConstructors: DeclarationRefConstructors = {
@@ -317,22 +317,22 @@ Expr1<Variant>: ExprKind = {
 };
 
 QualifiedOp<Op>: QualifiedName = {
-  Op => QualifiedName(<>),
-  qualified_operator => QualifiedName(Symbol::new(<>)),
+  Op => QualifiedName::new(db, <>),
+  qualified_operator => QualifiedName::new(db, Symbol::new(db, <>)),
 };
 
 TypeInfixOperator: Symbol = {
-  operator => Symbol::new(<>),
-  "-" => Symbol::new("-".into()),
+  operator => Symbol::new(db, <>),
+  "-" => Symbol::new(db, "-".into()),
 }
 
 Operator: Symbol = {
-  operator => Symbol::new(<>),
-  "<=" => Symbol::new("<=".into()),
-  "=>" => Symbol::new("=>".into()),
-  "-" => Symbol::new("-".into()),
-  ":" => Symbol::new(":".into()),
-  ".." => Symbol::new("..".into()),
+  operator => Symbol::new(db, <>),
+  "<=" => Symbol::new(db, "<=".into()),
+  "=>" => Symbol::new(db, "=>".into()),
+  "-" => Symbol::new(db, "-".into()),
+  ":" => Symbol::new(db, ":".into()),
+  ".." => Symbol::new(db, "..".into()),
 };
 
 InfixOp<Variant>: InfixOp = {
@@ -412,7 +412,7 @@ Literal<T, RecordShortcut>: Literal<T> = {
         .map_err(|_| ParseError::User {
             // TODO: make it not a lexer error
             error: lexer::Error("invalid floating-point number".into())
-        })?)),
+        })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
   "true" => Literal::Boolean(true),
@@ -429,10 +429,10 @@ RecordField<T, RecordShortcut>: (Symbol, T) = {
 RecordShortcutExpr: (Symbol, Expr) = {
   // Note: string literal labels not allowed here, because they may not be a valid variable name
   <start:@L> <label:lower_ident> <end:@R> => {
-    let label = Symbol::new(label);
+    let label = Symbol::new(db, label);
     (
       label.clone(),
-      Located(SourceSpan::new(start, end), ExprKind::Var(QualifiedName(label)))
+      Located(SourceSpan::new(start, end), ExprKind::Var(QualifiedName::new(db, label)))
     )
   }
 };
@@ -533,7 +533,7 @@ AtomicType: TypeKind = {
     TypeKind::TypeApp(
       Box::new(
         Located(SourceSpan::new(record_start, record_end), 
-          TypeKind::TypeConstructor(QualifiedName(Symbol::new("Prim.Record".to_string()))))),
+          TypeKind::TypeConstructor(QualifiedName::new(db, Symbol::new(db, "Prim.Record".to_string()))))),
       Box::new(
         Located(SourceSpan::new(row_start, row_end), 
           TypeKind::Row{fields,rest}))
@@ -552,36 +552,36 @@ RowRest: Box<Type> = {
 /// A record field label
 Label: Symbol = {
   LowerIdent,
-  string =>? Ok(Symbol::new(<>.try_into().map_err(|NonUsvChar| ParseError::User {
+  string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
     // TODO: make it not a lexer error
     error: lexer::Error("non-USV character in string label".into())
   })?)),
 
-  "ado" => Symbol::new("ado".into()),
-  "case" => Symbol::new("case".into()),
-  "class" => Symbol::new("class".into()),
-  "data" => Symbol::new("data".into()),
-  "derive" => Symbol::new("derive".into()),
-  "do" => Symbol::new("do".into()),
-  "else" => Symbol::new("else".into()),
-  "false" => Symbol::new("false".into()),
-  "forall" => Symbol::new("forall".into()),
-  "foreign" => Symbol::new("foreign".into()),
-  "import" => Symbol::new("import".into()),
-  "if" => Symbol::new("if".into()),
-  "in" => Symbol::new("in".into()),
-  "infix" => Symbol::new("infix".into()),
-  "infixl" => Symbol::new("infixl".into()),
-  "infixr" => Symbol::new("infixr".into()),
-  "instance" => Symbol::new("instance".into()),
-  "let" => Symbol::new("let".into()),
-  "module" => Symbol::new("module".into()),
-  "newtype" => Symbol::new("newtype".into()),
-  "of" => Symbol::new("of".into()),
-  "then" => Symbol::new("then".into()),
-  "true" => Symbol::new("true".into()),
-  "type" => Symbol::new("type".into()),
-  "where" => Symbol::new("where".into()),
+  "ado" => Symbol::new(db, "ado".into()),
+  "case" => Symbol::new(db, "case".into()),
+  "class" => Symbol::new(db, "class".into()),
+  "data" => Symbol::new(db, "data".into()),
+  "derive" => Symbol::new(db, "derive".into()),
+  "do" => Symbol::new(db, "do".into()),
+  "else" => Symbol::new(db, "else".into()),
+  "false" => Symbol::new(db, "false".into()),
+  "forall" => Symbol::new(db, "forall".into()),
+  "foreign" => Symbol::new(db, "foreign".into()),
+  "import" => Symbol::new(db, "import".into()),
+  "if" => Symbol::new(db, "if".into()),
+  "in" => Symbol::new(db, "in".into()),
+  "infix" => Symbol::new(db, "infix".into()),
+  "infixl" => Symbol::new(db, "infixl".into()),
+  "infixr" => Symbol::new(db, "infixr".into()),
+  "instance" => Symbol::new(db, "instance".into()),
+  "let" => Symbol::new(db, "let".into()),
+  "module" => Symbol::new(db, "module".into()),
+  "newtype" => Symbol::new(db, "newtype".into()),
+  "of" => Symbol::new(db, "of".into()),
+  "then" => Symbol::new(db, "then".into()),
+  "true" => Symbol::new(db, "true".into()),
+  "type" => Symbol::new(db, "type".into()),
+  "where" => Symbol::new(db, "where".into()),
 };
 
 ForallVar: (Symbol, Option<Box<Type>>) = {

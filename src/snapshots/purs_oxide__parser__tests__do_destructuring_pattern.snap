@@ -16,11 +16,13 @@ Located(
                         end: 14,
                     },
                     DataConstructorApp(
-                        QualifiedName(
-                            Symbol(
-                                "Tuple",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 0,
+                                text: "Tuple",
+                            },
+                            actually_qualified: false,
+                        },
                         [
                             Located(
                                 SourceSpan {
@@ -28,9 +30,10 @@ Located(
                                     end: 12,
                                 },
                                 Var(
-                                    Symbol(
-                                        "x",
-                                    ),
+                                    Symbol {
+                                        [salsa id]: 1,
+                                        text: "x",
+                                    },
                                 ),
                             ),
                             Located(
@@ -39,9 +42,10 @@ Located(
                                     end: 14,
                                 },
                                 Var(
-                                    Symbol(
-                                        "y",
-                                    ),
+                                    Symbol {
+                                        [salsa id]: 2,
+                                        text: "y",
+                                    },
                                 ),
                             ),
                         ],
@@ -53,11 +57,13 @@ Located(
                         end: 21,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 3,
+                                text: "foo",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
@@ -74,11 +80,13 @@ Located(
                                 end: 28,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 4,
+                                        text: "pure",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

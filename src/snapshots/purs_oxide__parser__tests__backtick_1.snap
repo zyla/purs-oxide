@@ -28,11 +28,13 @@ Located(
                             end: 6,
                         },
                         Var(
-                            QualifiedName(
-                                Symbol(
-                                    "mod",
-                                ),
-                            ),
+                            QualifiedName {
+                                symbol: Symbol {
+                                    [salsa id]: 0,
+                                    text: "mod",
+                                },
+                                actually_qualified: false,
+                            },
                         ),
                     ),
                 ),

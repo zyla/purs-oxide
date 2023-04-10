@@ -22,9 +22,10 @@ Located(
                                 end: 6,
                             },
                             Var(
-                                Symbol(
-                                    "x",
-                                ),
+                                Symbol {
+                                    [salsa id]: 0,
+                                    text: "x",
+                                },
                             ),
                         ),
                         Located(
@@ -33,11 +34,13 @@ Located(
                                 end: 13,
                             },
                             TypeConstructor(
-                                QualifiedName(
-                                    Symbol(
-                                        "Int",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 1,
+                                        text: "Int",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                     ),
@@ -48,11 +51,13 @@ Located(
                         end: 20,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 2,
+                                text: "foo",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
@@ -69,11 +74,13 @@ Located(
                                 end: 27,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 3,
+                                        text: "pure",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

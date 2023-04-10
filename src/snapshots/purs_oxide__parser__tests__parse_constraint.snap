@@ -20,11 +20,13 @@ Located(
                         end: 2,
                     },
                     TypeConstructor(
-                        QualifiedName(
-                            Symbol(
-                                "Eq",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 0,
+                                text: "Eq",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
                 Located(
@@ -33,9 +35,10 @@ Located(
                         end: 4,
                     },
                     Var(
-                        Symbol(
-                            "a",
-                        ),
+                        Symbol {
+                            [salsa id]: 1,
+                            text: "a",
+                        },
                     ),
                 ),
             ),
@@ -46,9 +49,10 @@ Located(
                 end: 9,
             },
             Var(
-                Symbol(
-                    "a",
-                ),
+                Symbol {
+                    [salsa id]: 1,
+                    text: "a",
+                },
             ),
         ),
     },

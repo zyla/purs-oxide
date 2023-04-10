@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -27,9 +29,10 @@ Located(
                         [],
                         KindSignature {
                             for_type: Class,
-                            name: Symbol(
-                                "Category",
-                            ),
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "Category",
+                            },
                             kind: Located(
                                 SourceSpan {
                                     start: 36,
@@ -38,9 +41,10 @@ Located(
                                 ForAll {
                                     vars: [
                                         (
-                                            Symbol(
-                                                "k",
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 2,
+                                                text: "k",
+                                            },
                                             None,
                                         ),
                                     ],
@@ -68,9 +72,10 @@ Located(
                                                                     end: 48,
                                                                 },
                                                                 Var(
-                                                                    Symbol(
-                                                                        "k",
-                                                                    ),
+                                                                    Symbol {
+                                                                        [salsa id]: 2,
+                                                                        text: "k",
+                                                                    },
                                                                 ),
                                                             ),
                                                             Located(
@@ -85,9 +90,10 @@ Located(
                                                                             end: 53,
                                                                         },
                                                                         Var(
-                                                                            Symbol(
-                                                                                "k",
-                                                                            ),
+                                                                            Symbol {
+                                                                                [salsa id]: 2,
+                                                                                text: "k",
+                                                                            },
                                                                         ),
                                                                     ),
                                                                     Located(
@@ -96,11 +102,13 @@ Located(
                                                                             end: 61,
                                                                         },
                                                                         TypeConstructor(
-                                                                            QualifiedName(
-                                                                                Symbol(
-                                                                                    "Type",
-                                                                                ),
-                                                                            ),
+                                                                            QualifiedName {
+                                                                                symbol: Symbol {
+                                                                                    [salsa id]: 3,
+                                                                                    text: "Type",
+                                                                                },
+                                                                                actually_qualified: false,
+                                                                            },
                                                                         ),
                                                                     ),
                                                                 ),
@@ -115,11 +123,13 @@ Located(
                                                     end: 76,
                                                 },
                                                 TypeConstructor(
-                                                    QualifiedName(
-                                                        Symbol(
-                                                            "Constraint",
-                                                        ),
-                                                    ),
+                                                    QualifiedName {
+                                                        symbol: Symbol {
+                                                            [salsa id]: 4,
+                                                            text: "Constraint",
+                                                        },
+                                                        actually_qualified: false,
+                                                    },
                                                 ),
                                             ),
                                         ),

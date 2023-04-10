@@ -20,20 +20,24 @@ Located(
                         end: 4,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "foo",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 0,
+                                text: "foo",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
-                Symbol(
-                    "bar",
-                ),
+                Symbol {
+                    [salsa id]: 1,
+                    text: "bar",
+                },
             ),
         ),
-        Symbol(
-            "baz",
-        ),
+        Symbol {
+            [salsa id]: 2,
+            text: "baz",
+        },
     ),
 )

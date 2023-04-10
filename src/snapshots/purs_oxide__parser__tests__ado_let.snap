@@ -20,9 +20,10 @@ Located(
                             [],
                             ValueDeclaration(
                                 ValueDeclaration {
-                                    ident: Symbol(
-                                        "x",
-                                    ),
+                                    ident: Symbol {
+                                        [salsa id]: 0,
+                                        text: "x",
+                                    },
                                     params: [],
                                     expr: Unconditional(
                                         Located(

@@ -14,21 +14,25 @@ Located(
                 end: 1,
             },
             Var(
-                QualifiedName(
-                    Symbol(
-                        "x",
-                    ),
-                ),
+                QualifiedName {
+                    symbol: Symbol {
+                        [salsa id]: 0,
+                        text: "x",
+                    },
+                    actually_qualified: false,
+                },
             ),
         ),
         [
             (
                 Symbol(
-                    QualifiedName(
-                        Symbol(
-                            ":",
-                        ),
-                    ),
+                    QualifiedName {
+                        symbol: Symbol {
+                            [salsa id]: 1,
+                            text: ":",
+                        },
+                        actually_qualified: false,
+                    },
                 ),
                 Located(
                     SourceSpan {
@@ -36,11 +40,13 @@ Located(
                         end: 5,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "y",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 2,
+                                text: "y",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),

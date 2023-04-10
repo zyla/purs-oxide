@@ -9,11 +9,13 @@ Located(
     },
     Operator(
         Symbol(
-            QualifiedName(
-                Symbol(
-                    "+",
-                ),
-            ),
+            QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "+",
+                },
+                actually_qualified: false,
+            },
         ),
     ),
 )

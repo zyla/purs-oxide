@@ -10,11 +10,13 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName(
-                Symbol(
-                    "Test",
-                ),
-            ),
+            name: QualifiedName {
+                symbol: Symbol {
+                    [salsa id]: 0,
+                    text: "Test",
+                },
+                actually_qualified: false,
+            },
             exports: None,
             imports: [],
             declarations: [
@@ -31,15 +33,18 @@ Located(
                                     constraints: [],
                                     instance_type: Plain,
                                     instance_name: Some(
-                                        Symbol(
-                                            "namedInstance",
-                                        ),
+                                        Symbol {
+                                            [salsa id]: 1,
+                                            text: "namedInstance",
+                                        },
                                     ),
-                                    class: QualifiedName(
-                                        Symbol(
-                                            "Foo",
-                                        ),
-                                    ),
+                                    class: QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 2,
+                                            text: "Foo",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                     args: [
                                         Located(
                                             SourceSpan {
@@ -47,11 +52,13 @@ Located(
                                                 end: 51,
                                             },
                                             TypeConstructor(
-                                                QualifiedName(
-                                                    Symbol(
-                                                        "Int",
-                                                    ),
-                                                ),
+                                                QualifiedName {
+                                                    symbol: Symbol {
+                                                        [salsa id]: 3,
+                                                        text: "Int",
+                                                    },
+                                                    actually_qualified: false,
+                                                },
                                             ),
                                         ),
                                     ],

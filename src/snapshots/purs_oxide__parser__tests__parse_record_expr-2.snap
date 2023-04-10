@@ -11,9 +11,10 @@ Located(
         Object(
             [
                 (
-                    Symbol(
-                        "foo",
-                    ),
+                    Symbol {
+                        [salsa id]: 0,
+                        text: "foo",
+                    },
                     Located(
                         SourceSpan {
                             start: 8,

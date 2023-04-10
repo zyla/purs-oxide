@@ -20,9 +20,10 @@ Located(
                             [],
                             ValueDeclaration(
                                 ValueDeclaration {
-                                    ident: Symbol(
-                                        "x",
-                                    ),
+                                    ident: Symbol {
+                                        [salsa id]: 0,
+                                        text: "x",
+                                    },
                                     params: [],
                                     expr: Unconditional(
                                         Located(
@@ -50,9 +51,10 @@ Located(
                         end: 19,
                     },
                     Var(
-                        Symbol(
-                            "y",
-                        ),
+                        Symbol {
+                            [salsa id]: 1,
+                            text: "y",
+                        },
                     ),
                 ),
                 Located(
@@ -67,11 +69,13 @@ Located(
                                 end: 24,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "f",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 2,
+                                        text: "f",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
@@ -81,11 +85,13 @@ Located(
                                     end: 26,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "z",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 3,
+                                            text: "z",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ],
@@ -105,11 +111,13 @@ Located(
                                 end: 30,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "g",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 4,
+                                        text: "g",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
@@ -119,11 +127,13 @@ Located(
                                     end: 32,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "a",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 5,
+                                            text: "a",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ],

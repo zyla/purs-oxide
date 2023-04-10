@@ -16,9 +16,10 @@ Located(
                         end: 6,
                     },
                     Var(
-                        Symbol(
-                            "x",
-                        ),
+                        Symbol {
+                            [salsa id]: 0,
+                            text: "x",
+                        },
                     ),
                 ),
                 Located(
@@ -27,11 +28,13 @@ Located(
                         end: 11,
                     },
                     Var(
-                        QualifiedName(
-                            Symbol(
-                                "f",
-                            ),
-                        ),
+                        QualifiedName {
+                            symbol: Symbol {
+                                [salsa id]: 1,
+                                text: "f",
+                            },
+                            actually_qualified: false,
+                        },
                     ),
                 ),
             ),
@@ -48,11 +51,13 @@ Located(
                                 end: 18,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "pure",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 2,
+                                        text: "pure",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [

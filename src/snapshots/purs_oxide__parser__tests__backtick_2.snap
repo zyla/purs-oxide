@@ -34,11 +34,13 @@ Located(
                                     end: 8,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "lift2",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 0,
+                                            text: "lift2",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                             [
@@ -49,11 +51,13 @@ Located(
                                     },
                                     Operator(
                                         Symbol(
-                                            QualifiedName(
-                                                Symbol(
-                                                    "+",
-                                                ),
-                                            ),
+                                            QualifiedName {
+                                                symbol: Symbol {
+                                                    [salsa id]: 1,
+                                                    text: "+",
+                                                },
+                                                actually_qualified: false,
+                                            },
                                         ),
                                     ),
                                 ),

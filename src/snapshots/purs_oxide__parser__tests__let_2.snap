@@ -18,20 +18,23 @@ Located(
                     [],
                     TypeSignature(
                         TypeDeclarationData {
-                            ident: Symbol(
-                                "x",
-                            ),
-                            type: Located(
+                            ident: Symbol {
+                                [salsa id]: 0,
+                                text: "x",
+                            },
+                            r#type: Located(
                                 SourceSpan {
                                     start: 13,
                                     end: 16,
                                 },
                                 TypeConstructor(
-                                    QualifiedName(
-                                        Symbol(
-                                            "Int",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 1,
+                                            text: "Int",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         },
@@ -47,9 +50,10 @@ Located(
                     [],
                     ValueDeclaration(
                         ValueDeclaration {
-                            ident: Symbol(
-                                "x",
-                            ),
+                            ident: Symbol {
+                                [salsa id]: 0,
+                                text: "x",
+                            },
                             params: [],
                             expr: Unconditional(
                                 Located(
@@ -77,9 +81,10 @@ Located(
                     [],
                     ValueDeclaration(
                         ValueDeclaration {
-                            ident: Symbol(
-                                "y",
-                            ),
+                            ident: Symbol {
+                                [salsa id]: 2,
+                                text: "y",
+                            },
                             params: [],
                             expr: Unconditional(
                                 Located(
@@ -112,11 +117,13 @@ Located(
                                 end: 51,
                             },
                             DataConstructorApp(
-                                QualifiedName(
-                                    Symbol(
-                                        "Tuple",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 3,
+                                        text: "Tuple",
+                                    },
+                                    actually_qualified: false,
+                                },
                                 [
                                     Located(
                                         SourceSpan {
@@ -124,9 +131,10 @@ Located(
                                             end: 49,
                                         },
                                         Var(
-                                            Symbol(
-                                                "a",
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 4,
+                                                text: "a",
+                                            },
                                         ),
                                     ),
                                     Located(
@@ -135,9 +143,10 @@ Located(
                                             end: 51,
                                         },
                                         Var(
-                                            Symbol(
-                                                "b",
-                                            ),
+                                            Symbol {
+                                                [salsa id]: 5,
+                                                text: "b",
+                                            },
                                         ),
                                     ),
                                 ],
@@ -150,11 +159,13 @@ Located(
                                     end: 55,
                                 },
                                 Var(
-                                    QualifiedName(
-                                        Symbol(
-                                            "y",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 2,
+                                            text: "y",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                             ),
                         ),
@@ -175,9 +186,10 @@ Located(
                             end: 61,
                         },
                         Var(
-                            Symbol(
-                                "z",
-                            ),
+                            Symbol {
+                                [salsa id]: 6,
+                                text: "z",
+                            },
                         ),
                     ),
                 ],
@@ -193,21 +205,25 @@ Located(
                                 end: 66,
                             },
                             Var(
-                                QualifiedName(
-                                    Symbol(
-                                        "x",
-                                    ),
-                                ),
+                                QualifiedName {
+                                    symbol: Symbol {
+                                        [salsa id]: 0,
+                                        text: "x",
+                                    },
+                                    actually_qualified: false,
+                                },
                             ),
                         ),
                         [
                             (
                                 Symbol(
-                                    QualifiedName(
-                                        Symbol(
-                                            "+",
-                                        ),
-                                    ),
+                                    QualifiedName {
+                                        symbol: Symbol {
+                                            [salsa id]: 7,
+                                            text: "+",
+                                        },
+                                        actually_qualified: false,
+                                    },
                                 ),
                                 Located(
                                     SourceSpan {
@@ -215,11 +231,13 @@ Located(
                                         end: 70,
                                     },
                                     Var(
-                                        QualifiedName(
-                                            Symbol(
-                                                "z",
-                                            ),
-                                        ),
+                                        QualifiedName {
+                                            symbol: Symbol {
+                                                [salsa id]: 6,
+                                                text: "z",
+                                            },
+                                            actually_qualified: false,
+                                        },
                                     ),
                                 ),
                             ),

@@ -16,9 +16,10 @@ Located(
                     end: 5,
                 },
                 Var(
-                    Symbol(
-                        "e",
-                    ),
+                    Symbol {
+                        [salsa id]: 0,
+                        text: "e",
+                    },
                 ),
             ),
         ),
