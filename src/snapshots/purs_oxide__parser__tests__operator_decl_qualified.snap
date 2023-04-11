@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [],
@@ -32,15 +29,21 @@ Located(
                             precedence: 1,
                             name: Value(
                                 QualifiedName {
-                                    symbol: Symbol {
-                                        [salsa id]: 1,
-                                        text: "Foo.f",
+                                    [salsa id]: 0,
+                                    module: Some(
+                                        ModuleId {
+                                            [salsa id]: 1,
+                                            name: "Foo",
+                                        },
+                                    ),
+                                    name: Symbol {
+                                        [salsa id]: 0,
+                                        text: "f",
                                     },
-                                    actually_qualified: true,
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 2,
+                                [salsa id]: 1,
                                 text: "!#",
                             },
                         },
@@ -58,15 +61,21 @@ Located(
                             precedence: 2,
                             name: DataConstructor(
                                 QualifiedName {
-                                    symbol: Symbol {
-                                        [salsa id]: 3,
-                                        text: "Bar.X",
+                                    [salsa id]: 1,
+                                    module: Some(
+                                        ModuleId {
+                                            [salsa id]: 2,
+                                            name: "Bar",
+                                        },
+                                    ),
+                                    name: Symbol {
+                                        [salsa id]: 2,
+                                        text: "X",
                                     },
-                                    actually_qualified: true,
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 4,
+                                [salsa id]: 3,
                                 text: "^%",
                             },
                         },
@@ -84,15 +93,21 @@ Located(
                             precedence: 3,
                             name: Type(
                                 QualifiedName {
-                                    symbol: Symbol {
-                                        [salsa id]: 3,
-                                        text: "Bar.X",
+                                    [salsa id]: 1,
+                                    module: Some(
+                                        ModuleId {
+                                            [salsa id]: 2,
+                                            name: "Bar",
+                                        },
+                                    ),
+                                    name: Symbol {
+                                        [salsa id]: 2,
+                                        text: "X",
                                     },
-                                    actually_qualified: true,
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 5,
+                                [salsa id]: 4,
                                 text: "$^%",
                             },
                         },

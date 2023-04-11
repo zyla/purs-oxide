@@ -15,11 +15,17 @@ Located(
             },
             TypeConstructor(
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 1,
+                    module: Some(
+                        ModuleId {
+                            [salsa id]: 0,
+                            name: "Prim",
+                        },
+                    ),
+                    name: Symbol {
                         [salsa id]: 3,
-                        text: "Prim.Record",
+                        text: "Record",
                     },
-                    actually_qualified: true,
                 },
             ),
         ),
@@ -42,11 +48,12 @@ Located(
                             },
                             TypeConstructor(
                                 QualifiedName {
-                                    symbol: Symbol {
+                                    [salsa id]: 0,
+                                    module: None,
+                                    name: Symbol {
                                         [salsa id]: 1,
                                         text: "Int",
                                     },
-                                    actually_qualified: false,
                                 },
                             ),
                         ),

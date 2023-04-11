@@ -35,11 +35,12 @@ Located(
                             },
                             TypeConstructor(
                                 QualifiedName {
-                                    symbol: Symbol {
+                                    [salsa id]: 1,
+                                    module: None,
+                                    name: Symbol {
                                         [salsa id]: 1,
                                         text: "Int",
                                     },
-                                    actually_qualified: false,
                                 },
                             ),
                         ),
@@ -52,11 +53,12 @@ Located(
                     },
                     Var(
                         QualifiedName {
-                            symbol: Symbol {
+                            [salsa id]: 2,
+                            module: None,
+                            name: Symbol {
                                 [salsa id]: 2,
                                 text: "foo",
                             },
-                            actually_qualified: false,
                         },
                     ),
                 ),
@@ -75,11 +77,12 @@ Located(
                             },
                             Var(
                                 QualifiedName {
-                                    symbol: Symbol {
+                                    [salsa id]: 3,
+                                    module: None,
+                                    name: Symbol {
                                         [salsa id]: 3,
                                         text: "pure",
                                     },
-                                    actually_qualified: false,
                                 },
                             ),
                         ),

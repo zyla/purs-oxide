@@ -24,11 +24,12 @@ Located(
                             },
                             DataConstructorApp(
                                 QualifiedName {
-                                    symbol: Symbol {
+                                    [salsa id]: 0,
+                                    module: None,
+                                    name: Symbol {
                                         [salsa id]: 0,
                                         text: "Just",
                                     },
-                                    actually_qualified: false,
                                 },
                                 [
                                     Located(
@@ -89,11 +90,12 @@ Located(
             },
             Var(
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 1,
+                    module: None,
+                    name: Symbol {
                         [salsa id]: 1,
                         text: "x",
                     },
-                    actually_qualified: false,
                 },
             ),
         ),

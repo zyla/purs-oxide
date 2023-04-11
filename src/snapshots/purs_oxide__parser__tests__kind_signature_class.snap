@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [],
@@ -30,7 +27,7 @@ Located(
                         KindSignature {
                             for_type: Class,
                             name: Symbol {
-                                [salsa id]: 1,
+                                [salsa id]: 0,
                                 text: "Category",
                             },
                             kind: Located(
@@ -42,7 +39,7 @@ Located(
                                     vars: [
                                         (
                                             Symbol {
-                                                [salsa id]: 2,
+                                                [salsa id]: 1,
                                                 text: "k",
                                             },
                                             None,
@@ -73,7 +70,7 @@ Located(
                                                                 },
                                                                 Var(
                                                                     Symbol {
-                                                                        [salsa id]: 2,
+                                                                        [salsa id]: 1,
                                                                         text: "k",
                                                                     },
                                                                 ),
@@ -91,7 +88,7 @@ Located(
                                                                         },
                                                                         Var(
                                                                             Symbol {
-                                                                                [salsa id]: 2,
+                                                                                [salsa id]: 1,
                                                                                 text: "k",
                                                                             },
                                                                         ),
@@ -103,11 +100,12 @@ Located(
                                                                         },
                                                                         TypeConstructor(
                                                                             QualifiedName {
-                                                                                symbol: Symbol {
-                                                                                    [salsa id]: 3,
+                                                                                [salsa id]: 0,
+                                                                                module: None,
+                                                                                name: Symbol {
+                                                                                    [salsa id]: 2,
                                                                                     text: "Type",
                                                                                 },
-                                                                                actually_qualified: false,
                                                                             },
                                                                         ),
                                                                     ),
@@ -124,11 +122,12 @@ Located(
                                                 },
                                                 TypeConstructor(
                                                     QualifiedName {
-                                                        symbol: Symbol {
-                                                            [salsa id]: 4,
+                                                        [salsa id]: 1,
+                                                        module: None,
+                                                        name: Symbol {
+                                                            [salsa id]: 3,
                                                             text: "Constraint",
                                                         },
-                                                        actually_qualified: false,
                                                     },
                                                 ),
                                             ),

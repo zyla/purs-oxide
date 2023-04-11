@@ -32,17 +32,20 @@ pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<
     }
 }
 
-pub(self) fn constraint_to_class_head(c: Type) -> Option<(Symbol, Vec<TypeParameter>)> {
+pub(self) fn constraint_to_class_head(
+    db: &dyn crate::Db,
+    c: Type,
+) -> Option<(Symbol, Vec<TypeParameter>)> {
     let mut t = c;
     let mut params = vec![];
     loop {
         match t.into_inner() {
             TypeKind::TypeConstructor(con) => {
-                if con.is_actually_qualified() {
+                if con.is_actually_qualified(db) {
                     return None;
                 }
                 params.reverse();
-                return Some((con.symbol, params));
+                return Some((con.name(db), params));
             }
             TypeKind::TypeApp(f, x) => match *x {
                 Located(_, TypeKind::Var(v)) => {
@@ -85,25 +88,25 @@ pub(self) fn apply_record_updates(f: Expr, args: Vec<Expr>) -> ExprKind {
     ExprKind::App(Box::new(f), result)
 }
 
-pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
+pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> {
     let Located(span, kind) = expr;
     Ok(Located(
         span,
         match kind {
-            ExprKind::Literal(lit) => PatKind::Literal(lit_expr_to_pat(lit)?),
+            ExprKind::Literal(lit) => PatKind::Literal(lit_expr_to_pat(db, lit)?),
             ExprKind::Infix(x, xs) => PatKind::Infix(
-                Box::new(expr_to_pat(*x)?),
+                Box::new(expr_to_pat(db, *x)?),
                 xs.into_iter()
-                    .map(|(op, x)| Ok::<_, String>((infix_op_to_pat(op)?, expr_to_pat(x)?)))
+                    .map(|(op, x)| Ok::<_, String>((infix_op_to_pat(op)?, expr_to_pat(db, x)?)))
                     .collect::<Result<_, _>>()?,
             ),
             ExprKind::Accessor(_, _) => return Err("Illegal record accessor in pattern".into()),
             ExprKind::RecordUpdate(_, _) => return Err("Illegal record update in pattern".into()),
             ExprKind::Var(name) => {
-                if name.is_actually_qualified() {
+                if name.is_actually_qualified(db) {
                     return Err("Illegal qualified name in pattern".into());
                 } else {
-                    PatKind::Var(name.symbol)
+                    PatKind::Var(name.name(db))
                 }
             }
             ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(name, vec![]),
@@ -111,7 +114,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
                 ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(
                     name,
                     args.into_iter()
-                        .map(|x| expr_to_pat(x))
+                        .map(|x| expr_to_pat(db, x))
                         .collect::<Result<_, _>>()?,
                 ),
                 f => {
@@ -124,7 +127,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             ExprKind::Lam(_, _) => return Err("Illegal lambda in pattern".into()),
             ExprKind::Case { .. } => return Err("Illegal case in pattern".into()),
             ExprKind::If { .. } => return Err("Illegal if in pattern".into()),
-            ExprKind::Typed(x, ty) => PatKind::Typed(Box::new(expr_to_pat(*x)?), ty),
+            ExprKind::Typed(x, ty) => PatKind::Typed(Box::new(expr_to_pat(db, *x)?), ty),
             ExprKind::Let { .. } => return Err("Illegal let in pattern".into()),
             ExprKind::Wildcard => PatKind::Wildcard,
             ExprKind::RecordUpdateSuffix(_) => {
@@ -132,7 +135,7 @@ pub(self) fn expr_to_pat(expr: Expr) -> Result<Pat, String> {
             }
             ExprKind::Do(_) => return Err("Illegal do in pattern".into()),
             ExprKind::Ado(_, _) => return Err("Illegal ado in pattern".into()),
-            ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(*x)?)),
+            ExprKind::NamedPat(name, x) => PatKind::Named(name, Box::new(expr_to_pat(db, *x)?)),
             ExprKind::Operator(_) => return Err("Illegal operator in pattern".into()),
             ExprKind::Negate(x) => match x.into_inner() {
                 ExprKind::Literal(Literal::Integer(x)) => PatKind::Literal(Literal::Integer(-x)),
@@ -149,7 +152,10 @@ pub(self) fn infix_op_to_pat(op: InfixOp) -> Result<QualifiedName, String> {
     }
 }
 
-pub(self) fn lit_expr_to_pat(lit: Literal<Expr>) -> Result<Literal<Pat>, String> {
+pub(self) fn lit_expr_to_pat(
+    db: &dyn crate::Db,
+    lit: Literal<Expr>,
+) -> Result<Literal<Pat>, String> {
     Ok(match lit {
         Literal::Integer(x) => Literal::Integer(x),
         Literal::Float(x) => Literal::Float(x),
@@ -158,12 +164,12 @@ pub(self) fn lit_expr_to_pat(lit: Literal<Expr>) -> Result<Literal<Pat>, String>
         Literal::Boolean(x) => Literal::Boolean(x),
         Literal::Array(xs) => Literal::Array(
             xs.into_iter()
-                .map(|x| expr_to_pat(x))
+                .map(|x| expr_to_pat(db, x))
                 .collect::<Result<_, _>>()?,
         ),
         Literal::Object(xs) => Literal::Object(
             xs.into_iter()
-                .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(x)?)))
+                .map(|(k, x)| Ok::<_, String>((k, expr_to_pat(db, x)?)))
                 .collect::<Result<_, _>>()?,
         ),
     })
@@ -202,7 +208,9 @@ pub fn parse_module_name(input: &str) -> Option<String> {
     }
     match lexer.next() {
         Some(Ok((_, Token::UpperIdentifier(s), _))) => Some(s),
-        Some(Ok((_, Token::QualifiedUpperIdentifier(s), _))) => Some(s),
+        Some(Ok((_, Token::QualifiedUpperIdentifier((prefix, suffix)), _))) => {
+            Some(format!("{}.{}", prefix, suffix))
+        }
         _ => None,
     }
 }

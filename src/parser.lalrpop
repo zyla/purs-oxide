@@ -3,6 +3,7 @@ use crate::lexer;
 use crate::ast::*;
 use crate::symbol::*;
 use crate::string::*;
+use crate::ModuleId;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 use std::str::FromStr;
@@ -12,7 +13,7 @@ grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Tok
 pub Module: Module = Located<Commented<ModuleInner>>;
 
 ModuleInner: ModuleInner = {
-  "module" <name:UpperQualifiedIdent>
+  "module" <name:ModuleName>
   <exports:("(" <SepBy<DeclarationRef, ",">> ")")?>
   "where" <guts:ModuleGuts>
       => ModuleInner { name, exports, imports: guts.0, declarations: guts.1 }
@@ -34,9 +35,9 @@ ModuleGuts: (Vec<Import>, Vec<Declaration>) = {
 Import: Import = Located<ImportInner>;
 
 ImportInner: ImportInner = {
-  "import" <module:UpperQualifiedIdent>
+  "import" <module:ModuleName>
     <kind:ImportDeclarationKind>
-    <alias:("as" <UpperQualifiedIdent>)?> =>
+    <alias:("as" <ModuleName>)?> =>
     ImportInner{module,kind,alias}
 };
 
@@ -57,8 +58,8 @@ LowerIdent: Symbol = {
 };
 
 LowerQualifiedIdent: QualifiedName = {
-  LowerIdent => QualifiedName::new(db, <>),
-  lower_qualified_ident => QualifiedName::new(db, Symbol::new(db, <>)),
+  LowerIdent => QualifiedName::new_unqualified(db, <>),
+  lower_qualified_ident => QualifiedName::new_qualified(db, ModuleId::new(db, <>.0), Symbol::new(db, <>.1)),
 };
 
 UpperIdent: Symbol = {
@@ -66,8 +67,8 @@ UpperIdent: Symbol = {
 };
 
 UpperQualifiedIdent: QualifiedName = {
-  UpperIdent => QualifiedName::new(db, <>),
-  upper_qualified_ident => QualifiedName::new(db, Symbol::new(db, <>)),
+  UpperIdent => QualifiedName::new_unqualified(db, <>),
+  upper_qualified_ident => QualifiedName::new_qualified(db, ModuleId::new(db, <>.0), Symbol::new(db, <>.1)),
 };
 
 
@@ -92,7 +93,12 @@ DeclarationRefKind: DeclarationRefKind = {
     DeclarationRefKind::Type{name,constructors},
   <name:LowerIdent> => DeclarationRefKind::Value{name},
   "(" <name:Operator> ")" => DeclarationRefKind::ValueOp{name},
-  "module" <name:UpperQualifiedIdent> => DeclarationRefKind::Module{name},
+  "module" <name:ModuleName> => DeclarationRefKind::Module{name},
+};
+
+ModuleName: ModuleId = {
+  upper_ident => ModuleId::new(db, <>),
+  upper_qualified_ident => ModuleId::new(db, format!("{}.{}", <>.0, <>.1)),
 };
 
 TypeOperator: Symbol = {
@@ -200,7 +206,7 @@ ClassDeclaration: DeclarationKind = {
     <head:Located<Constraint>>
     <fundeps:( "|" <SepBy<Fundep, ",">> )?>
     <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
-      let (name, params) = super::constraint_to_class_head(head)
+      let (name, params) = super::constraint_to_class_head(db, head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error
           error: lexer::Error("Invalid class head".into())
@@ -317,8 +323,8 @@ Expr1<Variant>: ExprKind = {
 };
 
 QualifiedOp<Op>: QualifiedName = {
-  Op => QualifiedName::new(db, <>),
-  qualified_operator => QualifiedName::new(db, Symbol::new(db, <>)),
+  Op => QualifiedName::new_unqualified(db, <>),
+  qualified_operator => QualifiedName::new_qualified(db, ModuleId::new(db, <>.0), Symbol::new(db, <>.1)),
 };
 
 TypeInfixOperator: Symbol = {
@@ -398,7 +404,7 @@ DoItem: DoItem = {
 
 AsPat<E>: Pat = {
   <E> =>? {
-    super::expr_to_pat(<>)
+    super::expr_to_pat(db, <>)
       .map_err(|err| ParseError::User {
         // TODO: make it not a lexer error
         error: lexer::Error(err)
@@ -432,7 +438,7 @@ RecordShortcutExpr: (Symbol, Expr) = {
     let label = Symbol::new(db, label);
     (
       label.clone(),
-      Located(SourceSpan::new(start, end), ExprKind::Var(QualifiedName::new(db, label)))
+      Located(SourceSpan::new(start, end), ExprKind::Var(QualifiedName::new_unqualified(db, label)))
     )
   }
 };
@@ -533,7 +539,7 @@ AtomicType: TypeKind = {
     TypeKind::TypeApp(
       Box::new(
         Located(SourceSpan::new(record_start, record_end), 
-          TypeKind::TypeConstructor(QualifiedName::new(db, Symbol::new(db, "Prim.Record".to_string()))))),
+          TypeKind::TypeConstructor(QualifiedName::new_qualified(db, ModuleId::new(db, "Prim".into()), Symbol::new(db, "Record".into()))))),
       Box::new(
         Located(SourceSpan::new(row_start, row_end), 
           TypeKind::Row{fields,rest}))
@@ -611,9 +617,9 @@ extern {
     string => Token::StringLiteral(<PSString>),
     char => Token::CharLiteral(<PSChar>),
     lower_ident => Token::LowerIdentifier(<String>),
-    lower_qualified_ident => Token::QualifiedLowerIdentifier(<String>),
+    lower_qualified_ident => Token::QualifiedLowerIdentifier(<(String, String)>),
     upper_ident => Token::UpperIdentifier(<String>),
-    upper_qualified_ident => Token::QualifiedUpperIdentifier(<String>),
+    upper_qualified_ident => Token::QualifiedUpperIdentifier(<(String, String)>),
 
     // Layout
     LayoutStart => Token::LayoutStart,
@@ -646,7 +652,7 @@ extern {
     ".." => Token::DotDot,
 
     operator => Token::Operator(<String>),
-    qualified_operator => Token::QualifiedOperator(<String>),
+    qualified_operator => Token::QualifiedOperator(<(String, String)>),
 
     // Keywords
     "if" => Token::If,

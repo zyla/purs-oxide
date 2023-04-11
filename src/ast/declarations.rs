@@ -2,13 +2,14 @@ use super::{Commented, Located, Pat, PossiblyGuardedExpr, SourceSpan, Type};
 use crate::ast::QualifiedName;
 use crate::symbol::Symbol;
 use crate::Db;
+use crate::ModuleId;
 use salsa::DebugWithDb;
 
 pub type Module = Located<Commented<ModuleInner>>;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ModuleInner {
-    pub name: ModuleName,
+    pub name: ModuleId,
     pub exports: Option<Vec<DeclarationRef>>,
     pub imports: Vec<Import>,
     pub declarations: Vec<Declaration>,
@@ -16,7 +17,7 @@ pub struct ModuleInner {
 
 pub fn corrupted(db: &dyn Db, span: SourceSpan) -> Module {
     let corrupted = ModuleInner {
-        name: QualifiedName::new(db, Symbol::new(db, "CorruptedModule".into())),
+        name: ModuleId::new(db, "CorruptedModule".into()),
         exports: Option::None,
         imports: vec![],
         declarations: vec![],
@@ -28,9 +29,9 @@ pub type Import = Located<ImportInner>;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ImportInner {
-    pub module: ModuleName,
+    pub module: ModuleId,
     pub kind: ImportDeclarationKind,
-    pub alias: Option<ModuleName>,
+    pub alias: Option<ModuleId>,
 }
 
 pub type DeclarationRef = Located<DeclarationRefKind>;
@@ -40,8 +41,6 @@ pub enum NameSource {
     UserNamed,
     CompilerNamed,
 }
-
-pub type ModuleName = QualifiedName;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DeclarationRefKind {
@@ -66,12 +65,7 @@ pub enum DeclarationRefKind {
         name_source: NameSource,
     },
     Module {
-        name: ModuleName,
-    },
-    ReExport {
-        imported_from: ModuleName,
-        defined_in: ModuleName,
-        declaration_ref: Box<DeclarationRef>,
+        name: ModuleId,
     },
 }
 

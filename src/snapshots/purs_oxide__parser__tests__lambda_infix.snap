@@ -23,11 +23,12 @@ Located(
             (
                 Symbol(
                     QualifiedName {
-                        symbol: Symbol {
+                        [salsa id]: 0,
+                        module: None,
+                        name: Symbol {
                             [salsa id]: 0,
                             text: "+",
                         },
-                        actually_qualified: false,
                     },
                 ),
                 Located(
@@ -63,11 +64,12 @@ Located(
                                     },
                                     Var(
                                         QualifiedName {
-                                            symbol: Symbol {
+                                            [salsa id]: 2,
+                                            module: None,
+                                            name: Symbol {
                                                 [salsa id]: 2,
                                                 text: "y",
                                             },
-                                            actually_qualified: false,
                                         },
                                     ),
                                 ),
@@ -75,11 +77,12 @@ Located(
                                     (
                                         Symbol(
                                             QualifiedName {
-                                                symbol: Symbol {
+                                                [salsa id]: 0,
+                                                module: None,
+                                                name: Symbol {
                                                     [salsa id]: 0,
                                                     text: "+",
                                                 },
-                                                actually_qualified: false,
                                             },
                                         ),
                                         Located(

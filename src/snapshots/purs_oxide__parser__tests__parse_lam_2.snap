@@ -36,11 +36,12 @@ Located(
             },
             Var(
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 0,
+                    module: None,
+                    name: Symbol {
                         [salsa id]: 0,
                         text: "y",
                     },
-                    actually_qualified: false,
                 },
             ),
         ),

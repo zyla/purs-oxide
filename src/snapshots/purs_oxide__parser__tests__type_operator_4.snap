@@ -23,11 +23,12 @@ Located(
         [
             (
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 0,
+                    module: None,
+                    name: Symbol {
                         [salsa id]: 1,
                         text: "+",
                     },
-                    actually_qualified: false,
                 },
                 Located(
                     SourceSpan {
@@ -44,11 +45,12 @@ Located(
             ),
             (
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 0,
+                    module: None,
+                    name: Symbol {
                         [salsa id]: 1,
                         text: "+",
                     },
-                    actually_qualified: false,
                 },
                 Located(
                     SourceSpan {

@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [
@@ -25,12 +22,9 @@ Located(
                         end: 34,
                     },
                     ImportInner {
-                        module: QualifiedName {
-                            symbol: Symbol {
-                                [salsa id]: 1,
-                                text: "Foo.Asd",
-                            },
-                            actually_qualified: true,
+                        module: ModuleId {
+                            [salsa id]: 1,
+                            name: "Foo.Asd",
                         },
                         kind: Implicit,
                         alias: None,
@@ -42,21 +36,15 @@ Located(
                         end: 55,
                     },
                     ImportInner {
-                        module: QualifiedName {
-                            symbol: Symbol {
-                                [salsa id]: 2,
-                                text: "Bar.Asd",
-                            },
-                            actually_qualified: true,
+                        module: ModuleId {
+                            [salsa id]: 2,
+                            name: "Bar.Asd",
                         },
                         kind: Implicit,
                         alias: Some(
-                            QualifiedName {
-                                symbol: Symbol {
-                                    [salsa id]: 3,
-                                    text: "Baz",
-                                },
-                                actually_qualified: false,
+                            ModuleId {
+                                [salsa id]: 3,
+                                name: "Baz",
                             },
                         ),
                     },
@@ -67,12 +55,9 @@ Located(
                         end: 74,
                     },
                     ImportInner {
-                        module: QualifiedName {
-                            symbol: Symbol {
-                                [salsa id]: 4,
-                                text: "Qux.Asd",
-                            },
-                            actually_qualified: true,
+                        module: ModuleId {
+                            [salsa id]: 4,
+                            name: "Qux.Asd",
                         },
                         kind: Explicit(
                             [
@@ -83,7 +68,7 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 5,
+                                            [salsa id]: 0,
                                             text: "x",
                                         },
                                     },
@@ -99,12 +84,9 @@ Located(
                         end: 103,
                     },
                     ImportInner {
-                        module: QualifiedName {
-                            symbol: Symbol {
-                                [salsa id]: 6,
-                                text: "Zzz.Asd",
-                            },
-                            actually_qualified: true,
+                        module: ModuleId {
+                            [salsa id]: 5,
+                            name: "Zzz.Asd",
                         },
                         kind: Explicit(
                             [
@@ -115,7 +97,7 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 7,
+                                            [salsa id]: 1,
                                             text: "y",
                                         },
                                     },
@@ -127,7 +109,7 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 8,
+                                            [salsa id]: 2,
                                             text: "z",
                                         },
                                     },
@@ -135,12 +117,9 @@ Located(
                             ],
                         ),
                         alias: Some(
-                            QualifiedName {
-                                symbol: Symbol {
-                                    [salsa id]: 9,
-                                    text: "Yyy",
-                                },
-                                actually_qualified: false,
+                            ModuleId {
+                                [salsa id]: 6,
+                                name: "Yyy",
                             },
                         ),
                     },
@@ -151,12 +130,9 @@ Located(
                         end: 129,
                     },
                     ImportInner {
-                        module: QualifiedName {
-                            symbol: Symbol {
-                                [salsa id]: 10,
-                                text: "Aaa.Asd",
-                            },
-                            actually_qualified: true,
+                        module: ModuleId {
+                            [salsa id]: 7,
+                            name: "Aaa.Asd",
                         },
                         kind: Hiding(
                             [
@@ -167,7 +143,7 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 11,
+                                            [salsa id]: 3,
                                             text: "q",
                                         },
                                     },
@@ -189,7 +165,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 5,
+                                    [salsa id]: 0,
                                     text: "x",
                                 },
                                 params: [],

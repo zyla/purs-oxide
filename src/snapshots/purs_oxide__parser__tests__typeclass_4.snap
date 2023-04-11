@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [],
@@ -31,13 +28,13 @@ Located(
                             TypeClassDeclaration {
                                 constraints: [],
                                 name: Symbol {
-                                    [salsa id]: 1,
+                                    [salsa id]: 0,
                                     text: "Foo",
                                 },
                                 params: [
                                     (
                                         Symbol {
-                                            [salsa id]: 2,
+                                            [salsa id]: 1,
                                             text: "a",
                                         },
                                         None,

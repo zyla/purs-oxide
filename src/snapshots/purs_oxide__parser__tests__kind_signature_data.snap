@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [],
@@ -30,7 +27,7 @@ Located(
                         Data {
                             type_: Data,
                             name: Symbol {
-                                [salsa id]: 1,
+                                [salsa id]: 0,
                                 text: "Foo",
                             },
                             params: [],
@@ -42,11 +39,12 @@ Located(
                                     },
                                     TypeConstructor(
                                         QualifiedName {
-                                            symbol: Symbol {
-                                                [salsa id]: 2,
+                                            [salsa id]: 0,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 1,
                                                 text: "Type",
                                             },
-                                            actually_qualified: false,
                                         },
                                     ),
                                 ),
@@ -65,7 +63,7 @@ Located(
                         Data {
                             type_: Newtype,
                             name: Symbol {
-                                [salsa id]: 3,
+                                [salsa id]: 2,
                                 text: "Bar",
                             },
                             params: [],
@@ -83,11 +81,12 @@ Located(
                                             },
                                             TypeConstructor(
                                                 QualifiedName {
-                                                    symbol: Symbol {
-                                                        [salsa id]: 2,
+                                                    [salsa id]: 0,
+                                                    module: None,
+                                                    name: Symbol {
+                                                        [salsa id]: 1,
                                                         text: "Type",
                                                     },
-                                                    actually_qualified: false,
                                                 },
                                             ),
                                         ),
@@ -98,11 +97,12 @@ Located(
                                             },
                                             TypeConstructor(
                                                 QualifiedName {
-                                                    symbol: Symbol {
-                                                        [salsa id]: 2,
+                                                    [salsa id]: 0,
+                                                    module: None,
+                                                    name: Symbol {
+                                                        [salsa id]: 1,
                                                         text: "Type",
                                                     },
-                                                    actually_qualified: false,
                                                 },
                                             ),
                                         ),

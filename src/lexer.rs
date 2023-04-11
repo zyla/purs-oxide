@@ -488,13 +488,15 @@ impl<'a> Lexer<'a> {
                         current_segment_is_upper = !self.eof() && self.peek().is_uppercase();
                         continue;
                     } else if prev == '.' && is_operator_char(self.peek()) {
+                        let dot = self.pos;
                         // Qualified operator
                         while !self.eof() && is_operator_char(self.peek()) {
                             self.next_char();
                         }
-                        return self.make_token(Token::QualifiedOperator(
-                            self.input[self.token_start..self.pos].into(),
-                        ));
+                        return self.make_token(Token::QualifiedOperator((
+                            self.input[self.token_start..dot - 1].into(),
+                            self.input[dot..self.pos].into(),
+                        )));
                     } else {
                         break;
                     }
@@ -761,15 +763,19 @@ fn ident_to_token(ident: &str, is_upper: bool) -> Token {
         _ => {
             let str = ident.to_string();
             if is_upper {
-                if str.contains('.') {
-                    Token::QualifiedUpperIdentifier(str)
-                } else {
-                    Token::UpperIdentifier(str)
+                match str.rsplit_once('.') {
+                    Some((module, name)) => {
+                        Token::QualifiedUpperIdentifier((module.into(), name.into()))
+                    }
+                    None => Token::UpperIdentifier(str),
                 }
-            } else if str.contains('.') {
-                Token::QualifiedLowerIdentifier(str)
             } else {
-                Token::LowerIdentifier(str)
+                match str.rsplit_once('.') {
+                    Some((module, name)) => {
+                        Token::QualifiedLowerIdentifier((module.into(), name.into()))
+                    }
+                    None => Token::LowerIdentifier(str),
+                }
             }
         }
     }
@@ -1649,7 +1655,10 @@ mod tests {
         Ok(
             [
                 QualifiedUpperIdentifier(
-                    "Foo.Bar",
+                    (
+                        "Foo",
+                        "Bar",
+                    ),
                 ),
             ],
         )
@@ -1664,7 +1673,10 @@ mod tests {
         Ok(
             [
                 QualifiedLowerIdentifier(
-                    "Foo.Bar.t",
+                    (
+                        "Foo.Bar",
+                        "t",
+                    ),
                 ),
             ],
         )
@@ -1679,7 +1691,10 @@ mod tests {
         Ok(
             [
                 QualifiedLowerIdentifier(
-                    "Foo.Bar.t",
+                    (
+                        "Foo.Bar",
+                        "t",
+                    ),
                 ),
                 Dot,
                 LowerIdentifier(
@@ -1698,7 +1713,10 @@ mod tests {
         Ok(
             [
                 QualifiedLowerIdentifier(
-                    "Foo.Bar.t",
+                    (
+                        "Foo.Bar",
+                        "t",
+                    ),
                 ),
                 Dot,
                 StringLiteral(
@@ -1742,7 +1760,10 @@ mod tests {
         Ok(
             [
                 QualifiedLowerIdentifier(
-                    "Data.Maybe.fromJust",
+                    (
+                        "Data.Maybe",
+                        "fromJust",
+                    ),
                 ),
             ],
         )

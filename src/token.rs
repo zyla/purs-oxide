@@ -9,9 +9,9 @@ pub enum Token {
     StringLiteral(PSString),
     CharLiteral(PSChar),
     LowerIdentifier(String),
-    QualifiedLowerIdentifier(String),
+    QualifiedLowerIdentifier((String, String)),
     UpperIdentifier(String),
-    QualifiedUpperIdentifier(String),
+    QualifiedUpperIdentifier((String, String)),
 
     // Layout
     LayoutStart,
@@ -44,7 +44,7 @@ pub enum Token {
     DotDot,       // ..
 
     Operator(String),
-    QualifiedOperator(String),
+    QualifiedOperator((String, String)),
 
     // Keywords
     If,

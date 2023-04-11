@@ -15,11 +15,12 @@ Located(
             },
             Var(
                 QualifiedName {
-                    symbol: Symbol {
+                    [salsa id]: 0,
+                    module: None,
+                    name: Symbol {
                         [salsa id]: 0,
                         text: "x",
                     },
-                    actually_qualified: false,
                 },
             ),
         ),
@@ -27,11 +28,17 @@ Located(
             (
                 Symbol(
                     QualifiedName {
-                        symbol: Symbol {
+                        [salsa id]: 1,
+                        module: Some(
+                            ModuleId {
+                                [salsa id]: 0,
+                                name: "List",
+                            },
+                        ),
+                        name: Symbol {
                             [salsa id]: 1,
-                            text: "List.:",
+                            text: ":",
                         },
-                        actually_qualified: true,
                     },
                 ),
                 Located(
@@ -41,11 +48,12 @@ Located(
                     },
                     Var(
                         QualifiedName {
-                            symbol: Symbol {
+                            [salsa id]: 2,
+                            module: None,
+                            name: Symbol {
                                 [salsa id]: 2,
                                 text: "xs",
                             },
-                            actually_qualified: false,
                         },
                     ),
                 ),

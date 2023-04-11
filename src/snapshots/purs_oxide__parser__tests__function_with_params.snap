@@ -10,12 +10,9 @@ Located(
     Commented(
         [],
         ModuleInner {
-            name: QualifiedName {
-                symbol: Symbol {
-                    [salsa id]: 0,
-                    text: "Test",
-                },
-                actually_qualified: false,
+            name: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
             exports: None,
             imports: [],
@@ -30,7 +27,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 1,
+                                    [salsa id]: 0,
                                     text: "f",
                                 },
                                 params: [
@@ -41,7 +38,7 @@ Located(
                                         },
                                         Var(
                                             Symbol {
-                                                [salsa id]: 2,
+                                                [salsa id]: 1,
                                                 text: "x",
                                             },
                                         ),
@@ -74,7 +71,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 3,
+                                    [salsa id]: 2,
                                     text: "g",
                                 },
                                 params: [
@@ -85,7 +82,7 @@ Located(
                                         },
                                         Var(
                                             Symbol {
-                                                [salsa id]: 2,
+                                                [salsa id]: 1,
                                                 text: "x",
                                             },
                                         ),
@@ -97,7 +94,7 @@ Located(
                                         },
                                         Var(
                                             Symbol {
-                                                [salsa id]: 4,
+                                                [salsa id]: 3,
                                                 text: "y",
                                             },
                                         ),
@@ -130,7 +127,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 5,
+                                    [salsa id]: 4,
                                     text: "h",
                                 },
                                 params: [
@@ -149,7 +146,7 @@ Located(
                                                         },
                                                         Var(
                                                             Symbol {
-                                                                [salsa id]: 2,
+                                                                [salsa id]: 1,
                                                                 text: "x",
                                                             },
                                                         ),
@@ -161,7 +158,7 @@ Located(
                                                         },
                                                         Var(
                                                             Symbol {
-                                                                [salsa id]: 4,
+                                                                [salsa id]: 3,
                                                                 text: "y",
                                                             },
                                                         ),
@@ -198,7 +195,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 6,
+                                    [salsa id]: 5,
                                     text: "j",
                                 },
                                 params: [
@@ -212,7 +209,7 @@ Located(
                                                 [
                                                     (
                                                         Symbol {
-                                                            [salsa id]: 2,
+                                                            [salsa id]: 1,
                                                             text: "x",
                                                         },
                                                         Located(
@@ -222,7 +219,7 @@ Located(
                                                             },
                                                             Var(
                                                                 Symbol {
-                                                                    [salsa id]: 2,
+                                                                    [salsa id]: 1,
                                                                     text: "x",
                                                                 },
                                                             ),
@@ -230,7 +227,7 @@ Located(
                                                     ),
                                                     (
                                                         Symbol {
-                                                            [salsa id]: 4,
+                                                            [salsa id]: 3,
                                                             text: "y",
                                                         },
                                                         Located(
@@ -277,7 +274,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 7,
+                                    [salsa id]: 6,
                                     text: "k",
                                 },
                                 params: [
@@ -326,7 +323,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 8,
+                                    [salsa id]: 7,
                                     text: "l",
                                 },
                                 params: [
@@ -369,7 +366,7 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 9,
+                                    [salsa id]: 8,
                                     text: "m",
                                 },
                                 params: [
@@ -380,7 +377,7 @@ Located(
                                         },
                                         Var(
                                             Symbol {
-                                                [salsa id]: 2,
+                                                [salsa id]: 1,
                                                 text: "x",
                                             },
                                         ),

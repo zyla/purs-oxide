@@ -17,6 +17,7 @@ pub struct Jar(
     crate::parsed_module,
     crate::symbol::Symbol,
     crate::Diagnostics,
+    crate::ast::QualifiedName,
 );
 
 #[salsa::input]
