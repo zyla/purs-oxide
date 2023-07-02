@@ -8,7 +8,7 @@ use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 use std::str::FromStr;
 
-grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
+grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Token, Located<lexer::Error>>>);
 
 pub Module: Module = Located<Commented<ModuleInner>>;
 
@@ -129,6 +129,11 @@ DeclarationKind: DeclarationKind = {
   InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
   OperatorDeclaration,
+
+  <start:@L> <x:!> <end:@R> =>  {
+    errors.push(ErrorRecovery { error: ParseError::User { error: Located(SourceSpan::new(start, end), lexer::Error(format!("Expected a declaration, not this thing. {:?}", x).into())) }, dropped_tokens: x.dropped_tokens});
+    DeclarationKind::Error
+  }
 }
 
 Role: Role = {
@@ -209,8 +214,8 @@ ClassDeclaration: DeclarationKind = {
       let (name, params) = super::constraint_to_class_head(db, head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error
-          error: lexer::Error("Invalid class head".into())
-        })?;
+          error:  Located(SourceSpan::new(0, 0), lexer::Error("Invalid class head".into()))
+      })?;
       Ok(DeclarationKind::Class(TypeClassDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
         name,
@@ -237,7 +242,7 @@ InstanceDeclaration: InstanceDeclaration = {
       let (class, args) = super::constraint_to_instance_head(head)
         .ok_or_else(|| ParseError::User {
           // TODO: make it not a lexer error
-          error: lexer::Error("Invalid instance head".into())
+          error:  Located(SourceSpan::new(0, 0), lexer::Error("Invalid instance head".into()))
         })?;
       Ok(InstanceDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
@@ -403,22 +408,22 @@ DoItem: DoItem = {
 };
 
 AsPat<E>: Pat = {
-  <E> =>? {
-    super::expr_to_pat(db, <>)
+  <start:@L> <exp:E> <end:@R> =>? {
+    super::expr_to_pat(db, exp)
       .map_err(|err| ParseError::User {
         // TODO: make it not a lexer error
-        error: lexer::Error(err)
+        error:  Located(SourceSpan::new(start, end), lexer::Error(err))
       })
   }
 };
 
 Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<> as i64),
-  float =>? Ok(Literal::Float(f64::from_str(&<>)
-        .map_err(|_| ParseError::User {
+ // float =>? Ok(Literal::Float(f64::from_str(&<>)
+ //       .map_err(|_| ParseError::User {
             // TODO: make it not a lexer error
-            error: lexer::Error("invalid floating-point number".into())
-        })?.into())),
+//            error: lexer::Error("invalid floating-point number".into())
+  //      })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
   "true" => Literal::Boolean(true),
@@ -558,10 +563,10 @@ RowRest: Box<Type> = {
 /// A record field label
 Label: Symbol = {
   LowerIdent,
-  string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
+ // string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
     // TODO: make it not a lexer error
-    error: lexer::Error("non-USV character in string label".into())
-  })?)),
+ //   error: lexer::Error("non-USV character in string label".into())
+ // })?)),
 
   "ado" => Symbol::new(db, "ado".into()),
   "case" => Symbol::new(db, "case".into()),
@@ -609,7 +614,7 @@ Box<T>: Box<T> = {
 
 extern {
   type Location = usize;
-  type Error = lexer::Error;
+  type Error =  Located<lexer::Error>;
 
   enum Token {
     int => Token::IntegerLiteral(<u64>),

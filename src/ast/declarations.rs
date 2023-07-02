@@ -111,6 +111,7 @@ pub type Declaration = Located<Commented<DeclarationKind>>;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum DeclarationKind {
+    Error,
     Data {
         type_: DataDeclType,
         name: Symbol,

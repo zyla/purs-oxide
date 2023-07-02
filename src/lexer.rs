@@ -1,3 +1,4 @@
+use crate::ast::{Located, SourceSpan};
 use crate::string::{PSChar, PSString};
 use log::trace;
 use std::iter::Peekable;
@@ -6,7 +7,7 @@ use unicode_general_category::{get_general_category, GeneralCategory::*};
 
 pub use crate::token::{Token, TokenInfo};
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Error(pub String);
 
 impl Display for Error {
@@ -17,7 +18,7 @@ impl Display for Error {
 
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
-pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Error>> + '_ {
+pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Located<Error>>> + '_ {
     make_lexer(input).map(|r| r.map(|t| (t.start, t.token, t.end)))
 }
 
@@ -67,7 +68,7 @@ struct LayoutEntry {
     after_patterns: bool,
 }
 
-pub type LexResult = Result<TokenInfo, self::Error>;
+pub type LexResult = Result<TokenInfo, Located<self::Error>>;
 
 impl<'a> Iterator for Lexer<'a> {
     type Item = LexResult;
@@ -410,6 +411,21 @@ impl<'a> Lexer<'a> {
         trace!("layout_pop() -> {:?}", entry);
         entry
     }
+
+    fn locate_error<T>(&mut self, err: Error, len: u32) -> Result<T, Located<self::Error>> {
+        // println!("locate offset={} len={}", self.offset, len);
+        use std::cmp::min;
+
+        Err(Located(
+            SourceSpan::new(
+                self.pos - min(len as usize, self.pos),
+                self.pos - min(1, self.pos)
+            ),
+            err,
+        ))
+    }
+    
+
 }
 
 fn is_matching_paren_pair(t1: &Token, t2: &Token) -> bool {
@@ -548,10 +564,7 @@ impl<'a> Lexer<'a> {
             '\'' => {
                 let c = self.parse_possibly_escaped_char()?;
                 if self.peek() != '\'' {
-                    return Err(Error(format!(
-                        "Invalid end of character literal: {}",
-                        self.peek()
-                    )));
+                    return self.locate_error(Error(format!("Invalid end of character literal: {}", self.peek())), 1);
                 }
                 self.next_char();
                 self.make_token(Token::CharLiteral(c))
@@ -572,7 +585,7 @@ impl<'a> Lexer<'a> {
                 self.make_token(operator_to_token(&self.input[self.token_start..self.pos]))
             }
 
-            _ => Err(Error(format!("Unknown character: {}", c))),
+            _ => self.locate_error(Error(format!("Unknown character: {}", c)), 1),
         }
     }
     fn eof(&self) -> bool {
@@ -615,7 +628,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    fn parse_string_literal(&mut self) -> Result<PSString, Error> {
+    fn parse_string_literal(&mut self) -> Result<PSString, Located<Error>> {
         #[derive(PartialEq, Eq)]
         enum State {
             Beginning,
@@ -629,7 +642,7 @@ impl<'a> Lexer<'a> {
         let mut num_quotes: u8 = 1;
         loop {
             if self.eof() {
-                return Err(Error("Unterminated string literal".to_string()));
+                return self.locate_error(Error("Unterminated string literal".to_string()), 1);
             }
             if self.peek() == '"' {
                 self.next_char();
@@ -666,7 +679,7 @@ impl<'a> Lexer<'a> {
                 }
                 num_quotes = 0;
                 if self.eof() {
-                    return Err(Error("Unterminated string literal".to_string()));
+                    return self.locate_error(Error("Unterminated string literal".to_string()), 0);
                 }
                 content.push(self.peek() as PSChar);
                 self.next_char();
@@ -677,15 +690,15 @@ impl<'a> Lexer<'a> {
         Ok(PSString(content))
     }
 
-    fn parse_possibly_escaped_char(&mut self) -> Result<PSChar, Error> {
+    fn parse_possibly_escaped_char(&mut self) -> Result<PSChar, Located<Error>> {
         if self.eof() {
-            return Err(Error("Unterminated string literal".to_string()));
+            return self.locate_error(Error("Unterminated string literal".to_string()), 1);
         }
         let c = match self.peek() {
             '\\' => {
                 self.next_char();
                 if self.eof() {
-                    return Err(Error("Unterminated string literal".to_string()));
+                    return self.locate_error(Error("Unterminated string literal".to_string()), 1);
                 }
                 match self.peek() {
                     'n' => '\n' as PSChar,
@@ -697,7 +710,7 @@ impl<'a> Lexer<'a> {
                         let mut value = 0;
                         while num_digits < 6 {
                             if self.eof() {
-                                return Err(Error("Unterminated string literal".to_string()));
+                                return self.locate_error(Error("Unterminated string literal".to_string()), 1);
                             }
                             let c = self.peek();
                             if !c.is_ascii_hexdigit() {
@@ -708,10 +721,10 @@ impl<'a> Lexer<'a> {
                             self.next_char();
                         }
                         if num_digits == 0 {
-                            return Err(Error("Invalid character escape".to_string()));
+                            return self.locate_error(Error("Invalid character escape".to_string()), 1);
                         }
                         if value > 0x10ffff {
-                            return Err(Error(format!("character out of range: {:02x}", value)));
+                            return self.locate_error(Error(format!("character out of range: {:02x}", value)), 1);
                         }
                         return Ok(value);
                     }

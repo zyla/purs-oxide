@@ -141,6 +141,7 @@ pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> 
                 ExprKind::Literal(Literal::Integer(x)) => PatKind::Literal(Literal::Integer(-x)),
                 _ => return Err("Illegal negation in pattern".into()),
             },
+            ExprKind::Error => return Err("Just Error".into()),
         },
     ))
 }
@@ -186,12 +187,12 @@ pub(self) fn normalize_app(f: Expr, x: Expr) -> ExprKind {
 }
 
 type ParseResult<'a, T> = (
-    Vec<ErrorRecovery<usize, Token, &'a str>>,
-    Result<T, ParseError<usize, Token, lexer::Error>>,
+    Vec<ErrorRecovery<usize, Token, Located<lexer::Error>>>,
+    Result<T, ParseError<usize, Token, Located<lexer::Error>>>,
 );
 
 pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
-    let mut errors = vec![];
+    let mut errors: Vec<ErrorRecovery<usize, Token, Located<lexer::Error>>>  = vec![];
     let lexer = lexer::lex(input);
     let result = parser::ModuleParser::new().parse(db, &mut errors, lexer);
     (errors, result)

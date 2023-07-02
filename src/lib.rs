@@ -1,4 +1,4 @@
-use dashmap::{mapref::entry::Entry, DashMap};
+pub(crate) use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
 use std::fmt::Display;
@@ -120,7 +120,10 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> crate::ast::Module {
         Err(err) => {
             Diagnostics::push(
                 db,
-                Diagnostic::from(&err, filename.to_string_lossy().to_string()),
+                Diagnostic::from(
+                    &err.clone().map_error(|err| err.1),
+                    filename.to_string_lossy().to_string(),
+                ),
             );
 
             declarations::corrupted(db, err.into())

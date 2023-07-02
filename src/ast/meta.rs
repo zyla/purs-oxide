@@ -1,3 +1,6 @@
+
+use std::fmt::Display;
+
 use salsa::DebugWithDb;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
@@ -20,6 +23,13 @@ impl<T> Located<T> {
         self.1
     }
 }
+
+impl<T : Display> Display for Located<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {}:{}", self.1, self.0.start, self.0.end)
+    }
+}
+
 
 impl<T> std::ops::Deref for Located<T> {
     type Target = T;

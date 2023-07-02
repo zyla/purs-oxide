@@ -62,6 +62,8 @@ pub enum ExprKind {
     Ado(Vec<DoItem>, Box<Expr>),
 
     Negate(Box<Expr>),
+
+    Error,
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
