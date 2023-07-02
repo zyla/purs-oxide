@@ -419,11 +419,11 @@ AsPat<E>: Pat = {
 
 Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<> as i64),
- // float =>? Ok(Literal::Float(f64::from_str(&<>)
- //       .map_err(|_| ParseError::User {
+  float =>? Ok(Literal::Float(f64::from_str(&<>)
+        .map_err(|_| ParseError::User {
             // TODO: make it not a lexer error
-//            error: lexer::Error("invalid floating-point number".into())
-  //      })?.into())),
+            error: Located(SourceSpan::new(0,0), lexer::Error("invalid floating-point number".into()))
+        })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
   "true" => Literal::Boolean(true),
@@ -563,10 +563,10 @@ RowRest: Box<Type> = {
 /// A record field label
 Label: Symbol = {
   LowerIdent,
- // string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
+  string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
     // TODO: make it not a lexer error
- //   error: lexer::Error("non-USV character in string label".into())
- // })?)),
+    error: Located(SourceSpan::new(0,0), lexer::Error("non-USV character in string label".into()))
+  })?)),
 
   "ado" => Symbol::new(db, "ado".into()),
   "case" => Symbol::new(db, "case".into()),

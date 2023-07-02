@@ -63,7 +63,6 @@ pub enum ExprKind {
 
     Negate(Box<Expr>),
 
-    Error,
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
