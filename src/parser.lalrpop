@@ -1,5 +1,6 @@
 use crate::token::Token;
 use crate::lexer;
+use crate::lexer::Error2;
 use crate::ast::*;
 use crate::symbol::*;
 use crate::string::*;
@@ -129,6 +130,8 @@ DeclarationKind: DeclarationKind = {
   InstanceChain => DeclarationKind::InstanceChain(<>),
   DataDeclaration,
   OperatorDeclaration,
+  
+  
 }
 
 Role: Role = {
@@ -208,8 +211,7 @@ ClassDeclaration: DeclarationKind = {
     <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
       let (name, params) = super::constraint_to_class_head(db, head)
         .ok_or_else(|| ParseError::User {
-          // TODO: make it not a lexer error
-          error: lexer::Error("Invalid class head".into())
+          error: Error2::InvalidClassHead
         })?;
       Ok(DeclarationKind::Class(TypeClassDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
@@ -236,8 +238,7 @@ InstanceDeclaration: InstanceDeclaration = {
     <body:("where" <MaybeLayoutBlock<LetDeclaration>>)?> =>? {
       let (class, args) = super::constraint_to_instance_head(head)
         .ok_or_else(|| ParseError::User {
-          // TODO: make it not a lexer error
-          error: lexer::Error("Invalid instance head".into())
+          error: Error2::InvalidInstanceHead
         })?;
       Ok(InstanceDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
@@ -406,8 +407,9 @@ AsPat<E>: Pat = {
   <E> =>? {
     super::expr_to_pat(db, <>)
       .map_err(|err| ParseError::User {
-        // TODO: make it not a lexer error
-        error: lexer::Error(err)
+          // TODO: make it not a lexer error
+          // TODO: Extract error
+          error: Error2::Unknown
       })
   }
 };
@@ -416,8 +418,7 @@ Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<> as i64),
   float =>? Ok(Literal::Float(f64::from_str(&<>)
         .map_err(|_| ParseError::User {
-            // TODO: make it not a lexer error
-            error: lexer::Error("invalid floating-point number".into())
+            error: Error2::InvalidFloatingPointNumber
         })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
@@ -559,8 +560,7 @@ RowRest: Box<Type> = {
 Label: Symbol = {
   LowerIdent,
   string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
-    // TODO: make it not a lexer error
-    error: lexer::Error("non-USV character in string label".into())
+      error: Error2::NonUsvChar
   })?)),
 
   "ado" => Symbol::new(db, "ado".into()),
@@ -609,7 +609,7 @@ Box<T>: Box<T> = {
 
 extern {
   type Location = usize;
-  type Error = lexer::Error;
+  type Error = Error2;
 
   enum Token {
     int => Token::IntegerLiteral(<u64>),

@@ -39,8 +39,8 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    fn from<T: std::fmt::Debug, E: Display>(
-        val: &lalrpop_util::ParseError<usize, T, E>,
+    fn from<T: std::fmt::Debug>(
+        val: &lalrpop_util::ParseError<usize, T, lexer::Error2>,
         file: String,
     ) -> Self {
         use lalrpop_util::ParseError::*;
@@ -66,7 +66,12 @@ impl Diagnostic {
             ExtraToken {
                 token: (start, token, end),
             } => Diagnostic::new(*start, *end, format!("extra token {:?}", token), file),
-            User { error } => Diagnostic::new(0, 0, format!("{}", error), file),
+            User { error } => match error {
+                lexer::Error2::LexerError(lexer::Error(msg, pos)) => {
+                    Diagnostic::new(pos.start, pos.end, format!("{}", msg), file)
+                }
+                error => Diagnostic::new(0, 0, format!("{}", error), file),
+            },
         }
     }
 }
