@@ -6,12 +6,55 @@ use unicode_general_category::{get_general_category, GeneralCategory::*};
 
 pub use crate::token::{Token, TokenInfo};
 
-#[derive(PartialEq, Eq, Debug)]
-pub struct Error(pub String);
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct LexerError(pub String);
 
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for LexerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+pub struct Loc {
+    pub start: usize,
+    pub end: usize,
+}
+
+impl Loc {
+    pub fn new(start: usize, end: usize) -> Self {
+        Self { start, end }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone)]
+pub struct Error {
+    pub loc: Loc,
+    pub kind: ErrorKind,
+}
+
+impl Error {
+    pub fn new(start: usize, end: usize, kind: ErrorKind) -> Self {
+        Self {
+            loc: Loc::new(start, end),
+            kind,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ErrorKind {
+    InvalidClassHead,
+    InvalidInstanceHead,
+    InvalidFloatingPointNumber,
+    NonUsvChar,
+    Unknown(String),
+    Error(LexerError),
+}
+
+impl Display for ErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -410,6 +453,16 @@ impl<'a> Lexer<'a> {
         trace!("layout_pop() -> {:?}", entry);
         entry
     }
+
+    fn loc_error(&self, error: String) -> Error {
+        Error {
+            loc: Loc {
+                start: self.token_start,
+                end: self.pos,
+            },
+            kind: ErrorKind::Error(LexerError(error)),
+        }
+    }
 }
 
 fn is_matching_paren_pair(t1: &Token, t2: &Token) -> bool {
@@ -548,10 +601,8 @@ impl<'a> Lexer<'a> {
             '\'' => {
                 let c = self.parse_possibly_escaped_char()?;
                 if self.peek() != '\'' {
-                    return Err(Error(format!(
-                        "Invalid end of character literal: {}",
-                        self.peek()
-                    )));
+                    return Err(self
+                        .loc_error(format!("Invalid end of character literal: {}", self.peek())));
                 }
                 self.next_char();
                 self.make_token(Token::CharLiteral(c))
@@ -572,7 +623,7 @@ impl<'a> Lexer<'a> {
                 self.make_token(operator_to_token(&self.input[self.token_start..self.pos]))
             }
 
-            _ => Err(Error(format!("Unknown character: {}", c))),
+            _ => Err(self.loc_error(format!("Unknown character: {}", c))),
         }
     }
     fn eof(&self) -> bool {
@@ -629,7 +680,7 @@ impl<'a> Lexer<'a> {
         let mut num_quotes: u8 = 1;
         loop {
             if self.eof() {
-                return Err(Error("Unterminated string literal".to_string()));
+                return Err(self.loc_error("Unterminated string literal".to_string()));
             }
             if self.peek() == '"' {
                 self.next_char();
@@ -666,7 +717,7 @@ impl<'a> Lexer<'a> {
                 }
                 num_quotes = 0;
                 if self.eof() {
-                    return Err(Error("Unterminated string literal".to_string()));
+                    return Err(self.loc_error("Unterminated string literal".to_string()));
                 }
                 content.push(self.peek() as PSChar);
                 self.next_char();
@@ -679,13 +730,13 @@ impl<'a> Lexer<'a> {
 
     fn parse_possibly_escaped_char(&mut self) -> Result<PSChar, Error> {
         if self.eof() {
-            return Err(Error("Unterminated string literal".to_string()));
+            return Err(self.loc_error("Unterminated string literal".to_string()));
         }
         let c = match self.peek() {
             '\\' => {
                 self.next_char();
                 if self.eof() {
-                    return Err(Error("Unterminated string literal".to_string()));
+                    return Err(self.loc_error("Unterminated string literal".to_string()));
                 }
                 match self.peek() {
                     'n' => '\n' as PSChar,
@@ -697,7 +748,9 @@ impl<'a> Lexer<'a> {
                         let mut value = 0;
                         while num_digits < 6 {
                             if self.eof() {
-                                return Err(Error("Unterminated string literal".to_string()));
+                                return Err(
+                                    self.loc_error("Unterminated string literal".to_string())
+                                );
                             }
                             let c = self.peek();
                             if !c.is_ascii_hexdigit() {
@@ -708,10 +761,12 @@ impl<'a> Lexer<'a> {
                             self.next_char();
                         }
                         if num_digits == 0 {
-                            return Err(Error("Invalid character escape".to_string()));
+                            return Err(self.loc_error("Invalid character escape".to_string()));
                         }
                         if value > 0x10ffff {
-                            return Err(Error(format!("character out of range: {:02x}", value)));
+                            return Err(
+                                self.loc_error(format!("character out of range: {:02x}", value))
+                            );
                         }
                         return Ok(value);
                     }
@@ -850,7 +905,7 @@ mod tests {
     use insta::{assert_debug_snapshot, assert_snapshot};
     use test_generator::test_resources;
 
-    use super::{Error, Token, TokenInfo};
+    use super::{Error, ErrorKind, LexerError, Token, TokenInfo};
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -949,11 +1004,19 @@ mod tests {
     fn test_string_literal_errors() {
         test_lex(
             r#"""#,
-            Err(Error("Unterminated string literal".to_string())),
+            Err(Error::new(
+                0,
+                1,
+                ErrorKind::Error(LexerError("Unterminated string literal".to_string())),
+            )),
         );
         test_lex(
             r#""\"#,
-            Err(Error("Unterminated string literal".to_string())),
+            Err(Error::new(
+                0,
+                2,
+                ErrorKind::Error(LexerError("Unterminated string literal".to_string())),
+            )),
         );
     }
 
