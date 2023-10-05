@@ -7,7 +7,13 @@ use unicode_general_category::{get_general_category, GeneralCategory::*};
 pub use crate::token::{Token, TokenInfo};
 
 #[derive(PartialEq, Eq, Debug, Clone)]
-pub struct Error(pub String, pub Loc);
+pub struct LexerError(pub String);
+
+impl Display for LexerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone)]
 pub struct Loc {
@@ -15,17 +21,38 @@ pub struct Loc {
     pub end: usize,
 }
 
+impl Loc {
+    pub fn new(start: usize, end: usize) -> Self {
+        Self { start, end }
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Clone)]
+pub struct Error {
+    pub loc: Loc,
+    pub kind: ErrorKind,
+}
+
+impl Error {
+    pub fn new(start: usize, end: usize, kind: ErrorKind) -> Self {
+        Self {
+            loc: Loc::new(start, end),
+            kind,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Error2 {
+pub enum ErrorKind {
     InvalidClassHead,
     InvalidInstanceHead,
     InvalidFloatingPointNumber,
     NonUsvChar,
-    Unknown,
-    LexerError(Error),
+    Unknown(String),
+    Error(LexerError),
 }
 
-impl Display for Error2 {
+impl Display for ErrorKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -33,11 +60,8 @@ impl Display for Error2 {
 
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
-pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Error2>> + '_ {
-    make_lexer(input).map(|r| {
-        r.map(|t| (t.start, t.token, t.end))
-            .map_err(|e| Error2::LexerError(e))
-    })
+pub fn lex(input: &str) -> impl Iterator<Item = Spanned<Token, usize, Error>> + '_ {
+    make_lexer(input).map(|r| r.map(|t| (t.start, t.token, t.end)))
 }
 
 fn make_lexer(input: &str) -> impl Iterator<Item = LexResult> + '_ {
@@ -430,14 +454,14 @@ impl<'a> Lexer<'a> {
         entry
     }
 
-    fn loc_error(&self, msg: String) -> Error {
-        Error(
-            msg,
-            Loc {
+    fn loc_error(&self, error: String) -> Error {
+        Error {
+            loc: Loc {
                 start: self.token_start,
                 end: self.pos,
             },
-        )
+            kind: ErrorKind::Error(LexerError(error)),
+        }
     }
 }
 
@@ -881,7 +905,7 @@ mod tests {
     use insta::{assert_debug_snapshot, assert_snapshot};
     use test_generator::test_resources;
 
-    use super::{Error, Loc, Token, TokenInfo};
+    use super::{Error, ErrorKind, LexerError, Token, TokenInfo};
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -980,16 +1004,18 @@ mod tests {
     fn test_string_literal_errors() {
         test_lex(
             r#"""#,
-            Err(Error(
-                "Unterminated string literal".to_string(),
-                Loc { start: 1, end: 1 },
+            Err(Error::new(
+                0,
+                1,
+                ErrorKind::Error(LexerError("Unterminated string literal".to_string())),
             )),
         );
         test_lex(
             r#""\"#,
-            Err(Error(
-                "Unterminated string literal".to_string(),
-                Loc { start: 1, end: 1 },
+            Err(Error::new(
+                0,
+                2,
+                ErrorKind::Error(LexerError("Unterminated string literal".to_string())),
             )),
         );
     }

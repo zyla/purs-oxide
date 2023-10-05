@@ -1,6 +1,6 @@
 use crate::token::Token;
 use crate::lexer;
-use crate::lexer::Error2;
+use crate::lexer::{Error, ErrorKind};
 use crate::ast::*;
 use crate::symbol::*;
 use crate::string::*;
@@ -208,10 +208,10 @@ ClassDeclaration: DeclarationKind = {
     <constraints:(<TypeClassConstraints> "<=")?>
     <head:Located<Constraint>>
     <fundeps:( "|" <SepBy<Fundep, ",">> )?>
-    <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> =>? {
-      let (name, params) = super::constraint_to_class_head(db, head)
+    <start:@L> <methods:("where" <MaybeLayoutBlock<TypeDeclaration>>)?> <end:@R> =>? {
+      let (name, params) = super::constraint_to_class_head(db, head)   
         .ok_or_else(|| ParseError::User {
-          error: Error2::InvalidClassHead
+            error: Error::new(start, end, ErrorKind::InvalidClassHead)
         })?;
       Ok(DeclarationKind::Class(TypeClassDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
@@ -235,10 +235,10 @@ InstanceDeclaration: InstanceDeclaration = {
     <instance_name:(<LowerIdent> "::")?>
     <constraints:(<TypeClassConstraints> "=>")?>
     <head:Located<Constraint>>
-    <body:("where" <MaybeLayoutBlock<LetDeclaration>>)?> =>? {
+    <start:@L> <body:("where" <MaybeLayoutBlock<LetDeclaration>>)?> <end:@R> =>? {
       let (class, args) = super::constraint_to_instance_head(head)
         .ok_or_else(|| ParseError::User {
-          error: Error2::InvalidInstanceHead
+            error: Error::new(start, end, ErrorKind::InvalidInstanceHead)
         })?;
       Ok(InstanceDeclaration {
         constraints: constraints.unwrap_or_else(|| vec![]),
@@ -404,21 +404,20 @@ DoItem: DoItem = {
 };
 
 AsPat<E>: Pat = {
-  <E> =>? {
-    super::expr_to_pat(db, <>)
+  <start:@L> <x:E> <end:@R> =>? {
+    super::expr_to_pat(db, x)
       .map_err(|err| ParseError::User {
-          // TODO: make it not a lexer error
-          // TODO: Extract error
-          error: Error2::Unknown
+          error: Error::new(start, end, ErrorKind::Unknown(err))
       })
   }
 };
 
 Literal<T, RecordShortcut>: Literal<T> = {
   int => Literal::Integer(<> as i64),
-  float =>? Ok(Literal::Float(f64::from_str(&<>)
+  <start:@L> <f:float> <end:@R> =>?
+      Ok(Literal::Float(f64::from_str(&f)
         .map_err(|_| ParseError::User {
-            error: Error2::InvalidFloatingPointNumber
+            error: Error::new(start, end, ErrorKind::InvalidFloatingPointNumber)
         })?.into())),
   string => Literal::String(<>),
   char => Literal::Char(<>),
@@ -559,8 +558,8 @@ RowRest: Box<Type> = {
 /// A record field label
 Label: Symbol = {
   LowerIdent,
-  string =>? Ok(Symbol::new(db, <>.try_into().map_err(|NonUsvChar| ParseError::User {
-      error: Error2::NonUsvChar
+  <start:@L> <s:string> <end:@R> =>? Ok(Symbol::new(db, s.try_into().map_err(|NonUsvChar| ParseError::User {
+      error: Error::new(start, end, ErrorKind::NonUsvChar)
   })?)),
 
   "ado" => Symbol::new(db, "ado".into()),
@@ -609,7 +608,7 @@ Box<T>: Box<T> = {
 
 extern {
   type Location = usize;
-  type Error = Error2;
+  type Error = lexer::Error;
 
   enum Token {
     int => Token::IntegerLiteral(<u64>),

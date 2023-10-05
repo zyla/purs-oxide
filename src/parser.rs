@@ -187,7 +187,7 @@ pub(self) fn normalize_app(f: Expr, x: Expr) -> ExprKind {
 
 type ParseResult<'a, T> = (
     Vec<ErrorRecovery<usize, Token, &'a str>>,
-    Result<T, ParseError<usize, Token, lexer::Error2>>,
+    Result<T, ParseError<usize, Token, lexer::Error>>,
 );
 
 pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
