@@ -1,3 +1,8 @@
+module Test where
+
 test = do
   foo
   bar
+
+test2 :: Int
+test2 = 1333.333.33

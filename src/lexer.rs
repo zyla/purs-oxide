@@ -1,62 +1,11 @@
+use crate::errors::{Error, ErrorKind, LexerError, Loc};
 use crate::string::{PSChar, PSString};
 use log::trace;
 use std::iter::Peekable;
-use std::{collections::VecDeque, fmt::Display, str::CharIndices};
+use std::{collections::VecDeque, str::CharIndices};
 use unicode_general_category::{get_general_category, GeneralCategory::*};
 
 pub use crate::token::{Token, TokenInfo};
-
-#[derive(PartialEq, Eq, Debug, Clone)]
-pub struct LexerError(pub String);
-
-impl Display for LexerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-#[derive(Eq, PartialEq, Debug, Hash, Clone)]
-pub struct Loc {
-    pub start: usize,
-    pub end: usize,
-}
-
-impl Loc {
-    pub fn new(start: usize, end: usize) -> Self {
-        Self { start, end }
-    }
-}
-
-#[derive(Eq, PartialEq, Debug, Clone)]
-pub struct Error {
-    pub loc: Loc,
-    pub kind: ErrorKind,
-}
-
-impl Error {
-    pub fn new(start: usize, end: usize, kind: ErrorKind) -> Self {
-        Self {
-            loc: Loc::new(start, end),
-            kind,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ErrorKind {
-    InvalidClassHead,
-    InvalidInstanceHead,
-    InvalidFloatingPointNumber,
-    NonUsvChar,
-    Unknown(String),
-    Error(LexerError),
-}
-
-impl Display for ErrorKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
 
 pub type Spanned<Tok, Loc, Error> = Result<(Loc, Tok, Loc), Error>;
 
@@ -110,7 +59,7 @@ struct LayoutEntry {
     after_patterns: bool,
 }
 
-pub type LexResult = Result<TokenInfo, self::Error>;
+pub type LexResult = Result<TokenInfo, Error>;
 
 impl<'a> Iterator for Lexer<'a> {
     type Item = LexResult;
@@ -905,7 +854,8 @@ mod tests {
     use insta::{assert_debug_snapshot, assert_snapshot};
     use test_generator::test_resources;
 
-    use super::{Error, ErrorKind, LexerError, Token, TokenInfo};
+    use super::{Token, TokenInfo};
+    use crate::errors::{Error, ErrorKind, LexerError};
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();

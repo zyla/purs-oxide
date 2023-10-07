@@ -1,6 +1,6 @@
 use crate::token::Token;
-use crate::lexer;
-use crate::lexer::{Error, ErrorKind};
+use crate::errors;
+use crate::errors::*;
 use crate::ast::*;
 use crate::symbol::*;
 use crate::string::*;
@@ -608,7 +608,7 @@ Box<T>: Box<T> = {
 
 extern {
   type Location = usize;
-  type Error = lexer::Error;
+  type Error = errors::Error;
 
   enum Token {
     int => Token::IntegerLiteral(<u64>),

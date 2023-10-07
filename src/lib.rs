@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::ast::{declarations, SourceSpan};
+use crate::errors::Error;
 
 #[macro_use]
 extern crate lalrpop_util;
@@ -40,7 +41,7 @@ pub struct Diagnostic {
 
 impl Diagnostic {
     fn from<T: std::fmt::Debug>(
-        val: &lalrpop_util::ParseError<usize, T, lexer::Error>,
+        val: &lalrpop_util::ParseError<usize, T, Error>,
         file: String,
     ) -> Self {
         use lalrpop_util::ParseError::*;
@@ -222,6 +223,7 @@ impl Clone for DbSnapshot {
 }
 
 pub mod ast;
+pub mod errors;
 pub mod lexer;
 pub mod parser;
 pub mod string;

@@ -6,6 +6,7 @@ use crate::ast::PatKind;
 use crate::ast::TypeParameter;
 use crate::ast::{Expr, ExprKind, Module, Type};
 use crate::ast::{QualifiedName, TypeKind};
+use crate::errors::Error;
 use crate::lexer;
 use crate::symbol::Symbol;
 use crate::token::Token;
@@ -187,7 +188,7 @@ pub(self) fn normalize_app(f: Expr, x: Expr) -> ExprKind {
 
 type ParseResult<'a, T> = (
     Vec<ErrorRecovery<usize, Token, &'a str>>,
-    Result<T, ParseError<usize, Token, lexer::Error>>,
+    Result<T, ParseError<usize, Token, Error>>,
 );
 
 pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
