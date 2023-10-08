@@ -1,6 +1,6 @@
 ---
-source: src/desugar_rename.rs
-expression: "index_module(indoc!(\"\n        module Test where\n        foreign import foo :: Int\n        \"))"
+source: src/indexed_module.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\n        \"))"
 ---
 (
     IndexedModule {
@@ -32,25 +32,25 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foreign 
                         text: "foo",
                     },
                 },
-                type_: Some(
-                    Located(
-                        SourceSpan {
-                            start: 40,
-                            end: 43,
-                        },
-                        TypeConstructor(
-                            QualifiedName {
-                                [salsa id]: 0,
-                                module: None,
-                                name: Symbol {
-                                    [salsa id]: 1,
-                                    text: "Int",
+                type_: None,
+                equations: [
+                    CaseBranch {
+                        pats: [],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 24,
+                                    end: 25,
                                 },
-                            },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
                         ),
-                    ),
-                ),
-                equations: [],
+                    },
+                ],
             },
         },
     },

@@ -1,6 +1,6 @@
 ---
-source: src/desugar_rename.rs
-expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\n        bar = 2\n        foo = 1\n        \"))"
+source: src/indexed_module.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 1\n        foo 2 = 2\n        \"))"
 ---
 (
     IndexedModule {
@@ -35,12 +35,24 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
                 type_: None,
                 equations: [
                     CaseBranch {
-                        pats: [],
+                        pats: [
+                            Located(
+                                SourceSpan {
+                                    start: 22,
+                                    end: 23,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ],
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
-                                    start: 24,
-                                    end: 25,
+                                    start: 26,
+                                    end: 27,
                                 },
                                 Literal(
                                     Integer(
@@ -50,39 +62,25 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
                             ),
                         ),
                     },
-                ],
-            },
-            AbsoluteName {
-                [salsa id]: 1,
-                module: ModuleId {
-                    [salsa id]: 0,
-                    name: "Test",
-                },
-                name: Symbol {
-                    [salsa id]: 1,
-                    text: "bar",
-                },
-            }: ValueDecl {
-                name: AbsoluteName {
-                    [salsa id]: 1,
-                    module: ModuleId {
-                        [salsa id]: 0,
-                        name: "Test",
-                    },
-                    name: Symbol {
-                        [salsa id]: 1,
-                        text: "bar",
-                    },
-                },
-                type_: None,
-                equations: [
                     CaseBranch {
-                        pats: [],
-                        expr: Unconditional(
+                        pats: [
                             Located(
                                 SourceSpan {
                                     start: 32,
                                     end: 33,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 36,
+                                    end: 37,
                                 },
                                 Literal(
                                     Integer(
@@ -96,12 +94,5 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
             },
         },
     },
-    [
-        Diagnostic {
-            start: 34,
-            end: 41,
-            message: "Duplicate value declaration foo",
-            file: "test.purs",
-        },
-    ],
+    [],
 )

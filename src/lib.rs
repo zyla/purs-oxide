@@ -16,8 +16,8 @@ pub struct Jar(
     crate::ModuleSource,
     crate::ModuleId,
     crate::parsed_module,
-    crate::desugar_rename::renamed_module,
-    crate::desugar_rename::indexed_module,
+    crate::renamed_module::renamed_module,
+    crate::indexed_module::indexed_module,
     crate::symbol::Symbol,
     crate::Diagnostics,
     crate::ast::QualifiedName,
@@ -244,10 +244,11 @@ impl Clone for DbSnapshot {
 }
 
 pub mod ast;
-pub mod desugar_rename;
 pub mod errors;
+pub mod indexed_module;
 pub mod lexer;
 pub mod parser;
+pub mod renamed_module;
 pub mod string;
 pub mod symbol;
 pub mod token;

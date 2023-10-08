@@ -1,6 +1,6 @@
 ---
-source: src/desugar_rename.rs
-expression: "index_module(indoc!(\"\n        module Test where\n        data Foo\n        data Foo\n        \"))"
+source: src/indexed_module.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        type Foo = Int\n        \"))"
 ---
 (
     IndexedModule {
@@ -19,9 +19,8 @@ expression: "index_module(indoc!(\"\n        module Test where\n        data Foo
                     [salsa id]: 0,
                     text: "Foo",
                 },
-            }: Data(
-                DataDecl {
-                    type_: Data,
+            }: Type(
+                TypeSynonymDecl {
                     name: AbsoluteName {
                         [salsa id]: 0,
                         module: ModuleId {
@@ -34,19 +33,26 @@ expression: "index_module(indoc!(\"\n        module Test where\n        data Foo
                         },
                     },
                     params: [],
-                    kind: None,
-                    constructors: [],
+                    body: Located(
+                        SourceSpan {
+                            start: 29,
+                            end: 32,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                [salsa id]: 0,
+                                module: None,
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Int",
+                                },
+                            },
+                        ),
+                    ),
                 },
             ),
         },
         values: {},
     },
-    [
-        Diagnostic {
-            start: 27,
-            end: 35,
-            message: "Duplicate type declaration Foo",
-            file: "test.purs",
-        },
-    ],
+    [],
 )

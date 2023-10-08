@@ -1,6 +1,6 @@
 ---
-source: src/desugar_rename.rs
-expression: "index_module(indoc!(\"\n        module Test where\n        type Foo = Int\n        \"))"
+source: src/indexed_module.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        type Foo = Int\n        data Foo\n        \"))"
 ---
 (
     IndexedModule {
@@ -54,5 +54,12 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
         },
         values: {},
     },
-    [],
+    [
+        Diagnostic {
+            start: 33,
+            end: 41,
+            message: "Duplicate type declaration Foo",
+            file: "test.purs",
+        },
+    ],
 )

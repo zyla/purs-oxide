@@ -289,12 +289,6 @@ pub struct IndexedModule {
 }
 
 #[salsa::tracked]
-pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> () {
-    let _ = indexed_module(db, module_id);
-    todo!()
-}
-
-#[salsa::tracked]
 pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
     let module = crate::parsed_module(db, module_id);
     let mut indexer = ModuleIndexer {
