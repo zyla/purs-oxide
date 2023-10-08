@@ -21,6 +21,7 @@ dashmap = "5.4.0"
 anyhow = "1.0.70"
 ordered-float = "3.6.0"
 rayon = "1.7.0"
+fxhash = "0.2.1"
 
 [dev-dependencies]
 insta = "1.14.0"

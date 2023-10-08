@@ -15,7 +15,8 @@ use crate::ast::TypeParameter;
 use crate::ParsedModule;
 use crate::{Db, ModuleId};
 use crate::{Diagnostic, Diagnostics};
-use std::collections::{hash_map::Entry, HashMap};
+use fxhash::FxHashMap;
+use std::collections::hash_map::Entry;
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub enum TypeDecl {
@@ -43,13 +44,17 @@ pub struct TypeSynonymDecl {
 pub struct ValueDecl {
     name: AbsoluteName,
     type_: Option<Type>,
+
+    /// Empty equations means foreign import.
+    /// TODO: maybe make it more explicit?
     equations: Vec<CaseBranch>,
 }
 
 struct ModuleIndexer<'a> {
     db: &'a dyn Db,
-    types: HashMap<AbsoluteName, TypeDecl>,
-    values: HashMap<AbsoluteName, ValueDecl>,
+    // Note: Using `FxHashMap` mostly because we want deterministic order for snapshots.
+    types: FxHashMap<AbsoluteName, TypeDecl>,
+    values: FxHashMap<AbsoluteName, ValueDecl>,
     module_id: ModuleId,
     filename: PathBuf,
 }
@@ -279,8 +284,8 @@ impl<'a> ModuleIndexer<'a> {
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub struct IndexedModule {
     pub module_id: ModuleId,
-    pub types: HashMap<AbsoluteName, TypeDecl>,
-    pub values: HashMap<AbsoluteName, ValueDecl>,
+    pub types: FxHashMap<AbsoluteName, TypeDecl>,
+    pub values: FxHashMap<AbsoluteName, ValueDecl>,
 }
 
 #[salsa::tracked]
@@ -294,8 +299,8 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
     let module = crate::parsed_module(db, module_id);
     let mut indexer = ModuleIndexer {
         db,
-        types: HashMap::new(),
-        values: HashMap::new(),
+        types: Default::default(),
+        values: Default::default(),
         module_id,
         filename: module.filename.clone(),
     };
@@ -427,6 +432,28 @@ mod tests {
         module Test where
         type Foo = Int
         data Foo
+        "
+        )));
+    }
+
+    #[test]
+    fn foreign_import() {
+        assert_snapshot!(index_module(indoc!(
+            "
+        module Test where
+        foreign import foo :: Int
+        "
+        )));
+    }
+
+    #[test]
+    fn duplicate_value() {
+        assert_snapshot!(index_module(indoc!(
+            "
+        module Test where
+        foo = 1
+        bar = 2
+        foo = 1
         "
         )));
     }
