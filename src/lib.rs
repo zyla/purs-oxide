@@ -16,9 +16,12 @@ pub struct Jar(
     crate::ModuleSource,
     crate::ModuleId,
     crate::parsed_module,
+    crate::desugar_rename::renamed_module,
+    crate::desugar_rename::indexed_module,
     crate::symbol::Symbol,
     crate::Diagnostics,
     crate::ast::QualifiedName,
+    crate::ast::AbsoluteName,
 );
 
 #[salsa::input]
@@ -109,8 +112,14 @@ pub struct ModuleId {
     pub name: String,
 }
 
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct ParsedModule {
+    pub filename: PathBuf,
+    pub ast: crate::ast::Module,
+}
+
 #[salsa::tracked]
-pub fn parsed_module(db: &dyn Db, module: ModuleId) -> crate::ast::Module {
+pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
     let (filename, input) = &db.module_source(module).contents(db).as_ref().unwrap();
     let (errs, result) = crate::parser::parse_module(db, input);
     if !errs.is_empty() {
@@ -122,16 +131,19 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> crate::ast::Module {
             );
         }
     }
-    match result {
-        Err(err) => {
-            Diagnostics::push(
-                db,
-                Diagnostic::from(&err, filename.to_string_lossy().to_string()),
-            );
+    ParsedModule {
+        filename: filename.clone(),
+        ast: match result {
+            Err(err) => {
+                Diagnostics::push(
+                    db,
+                    Diagnostic::from(&err, filename.to_string_lossy().to_string()),
+                );
 
-            declarations::corrupted(db, err.into())
-        }
-        Ok(module) => module,
+                declarations::corrupted(db, err.into())
+            }
+            Ok(module) => module,
+        },
     }
 }
 
@@ -158,6 +170,7 @@ pub struct Database {
     module_sources: Arc<DashMap<String, ModuleSource>>,
 }
 
+#[derive(Debug)]
 pub struct ModuleNameNotSpecified;
 
 impl Database {
@@ -192,6 +205,14 @@ impl Database {
             .map(|x| ModuleId::new(self, x.key().clone()))
             .collect()
     }
+
+    #[cfg(test)]
+    pub fn test_single_file_db(contents: &str) -> Self {
+        let mut db = Self::new();
+        db.add_source_file("test.purs".into(), contents.into())
+            .unwrap();
+        db
+    }
 }
 
 impl Db for Database {
@@ -223,9 +244,11 @@ impl Clone for DbSnapshot {
 }
 
 pub mod ast;
+pub mod desugar_rename;
 pub mod errors;
 pub mod lexer;
 pub mod parser;
 pub mod string;
 pub mod symbol;
 pub mod token;
+pub mod types;

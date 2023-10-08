@@ -1,0 +1,78 @@
+---
+source: src/desugar_rename.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        data Foo = Foo | Bar\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "Foo",
+                },
+            }: Data(
+                DataDecl {
+                    type_: Data,
+                    name: AbsoluteName {
+                        [salsa id]: 0,
+                        module: ModuleId {
+                            [salsa id]: 0,
+                            name: "Test",
+                        },
+                        name: Symbol {
+                            [salsa id]: 0,
+                            text: "Foo",
+                        },
+                    },
+                    params: [],
+                    kind: None,
+                    constructors: [
+                        Located(
+                            SourceSpan {
+                                start: 29,
+                                end: 32,
+                            },
+                            Commented(
+                                [],
+                                DataConstructorDeclarationData {
+                                    name: Symbol {
+                                        [salsa id]: 0,
+                                        text: "Foo",
+                                    },
+                                    fields: [],
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 35,
+                                end: 38,
+                            },
+                            Commented(
+                                [],
+                                DataConstructorDeclarationData {
+                                    name: Symbol {
+                                        [salsa id]: 1,
+                                        text: "Bar",
+                                    },
+                                    fields: [],
+                                },
+                            ),
+                        ),
+                    ],
+                },
+            ),
+        },
+        values: {},
+    },
+    [],
+)

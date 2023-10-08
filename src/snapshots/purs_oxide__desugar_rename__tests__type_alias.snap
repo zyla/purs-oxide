@@ -1,0 +1,58 @@
+---
+source: src/desugar_rename.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        type Foo = Int\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "Foo",
+                },
+            }: Type(
+                TypeSynonymDecl {
+                    name: AbsoluteName {
+                        [salsa id]: 0,
+                        module: ModuleId {
+                            [salsa id]: 0,
+                            name: "Test",
+                        },
+                        name: Symbol {
+                            [salsa id]: 0,
+                            text: "Foo",
+                        },
+                    },
+                    params: [],
+                    body: Located(
+                        SourceSpan {
+                            start: 29,
+                            end: 32,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                [salsa id]: 0,
+                                module: None,
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Int",
+                                },
+                            },
+                        ),
+                    ),
+                },
+            ),
+        },
+        values: {},
+    },
+    [],
+)

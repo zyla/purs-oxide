@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
             println!(
                 "parsed {}, {} declarations, diagnostics: {}",
                 module.name(db),
-                parsed_module.declarations.len(),
+                parsed_module.ast.declarations.len(),
                 accumulated
                     .into_iter()
                     .map(|d| format!("\n - {:?}", d))

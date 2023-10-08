@@ -1,0 +1,98 @@
+---
+source: src/desugar_rename.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 1\n        foo 2 = 2\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {},
+        values: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "foo",
+                },
+            }: ValueDecl {
+                name: AbsoluteName {
+                    [salsa id]: 0,
+                    module: ModuleId {
+                        [salsa id]: 0,
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        [salsa id]: 0,
+                        text: "foo",
+                    },
+                },
+                type_: None,
+                equations: [
+                    CaseBranch {
+                        pats: [
+                            Located(
+                                SourceSpan {
+                                    start: 22,
+                                    end: 23,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 26,
+                                    end: 27,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                    CaseBranch {
+                        pats: [
+                            Located(
+                                SourceSpan {
+                                    start: 32,
+                                    end: 33,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 36,
+                                    end: 37,
+                                },
+                                Literal(
+                                    Integer(
+                                        2,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+    },
+    [],
+)

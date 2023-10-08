@@ -1,0 +1,75 @@
+---
+source: src/desugar_rename.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        foo :: Int\n        foo = 1\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {},
+        values: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "foo",
+                },
+            }: ValueDecl {
+                name: AbsoluteName {
+                    [salsa id]: 0,
+                    module: ModuleId {
+                        [salsa id]: 0,
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        [salsa id]: 0,
+                        text: "foo",
+                    },
+                },
+                type_: Some(
+                    Located(
+                        SourceSpan {
+                            start: 25,
+                            end: 28,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                [salsa id]: 0,
+                                module: None,
+                                name: Symbol {
+                                    [salsa id]: 1,
+                                    text: "Int",
+                                },
+                            },
+                        ),
+                    ),
+                ),
+                equations: [
+                    CaseBranch {
+                        pats: [],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 35,
+                                    end: 36,
+                                },
+                                Literal(
+                                    Integer(
+                                        1,
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+    },
+    [],
+)

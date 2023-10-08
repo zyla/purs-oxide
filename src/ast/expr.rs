@@ -1,3 +1,4 @@
+use super::ValueDeclaration;
 use super::{Declaration, Located, Type};
 use crate::ast::QualifiedName;
 use crate::string::PSChar;
@@ -89,6 +90,15 @@ pub enum RecordLiteralOrUpdate {
 pub struct CaseBranch {
     pub pats: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
+}
+
+impl From<ValueDeclaration> for CaseBranch {
+    fn from(value: ValueDeclaration) -> Self {
+        Self {
+            pats: value.params,
+            expr: value.expr,
+        }
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]

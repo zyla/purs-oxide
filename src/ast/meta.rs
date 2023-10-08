@@ -1,6 +1,6 @@
 use salsa::DebugWithDb;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
 pub struct SourceSpan {
     pub start: usize,
     pub end: usize,
@@ -16,8 +16,16 @@ impl SourceSpan {
 pub struct Located<T>(pub SourceSpan, pub T);
 
 impl<T> Located<T> {
+    pub fn new(span: SourceSpan, x: T) -> Self {
+        Self(span, x)
+    }
+
     pub fn into_inner(self) -> T {
         self.1
+    }
+
+    pub fn span(&self) -> SourceSpan {
+        self.0
     }
 }
 
@@ -33,6 +41,12 @@ pub struct Comment(pub String);
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Commented<T>(pub Vec<Comment>, pub T);
+
+impl<T> Commented<T> {
+    pub fn into_inner(self) -> T {
+        self.1
+    }
+}
 
 impl<T> std::ops::Deref for Commented<T> {
     type Target = T;

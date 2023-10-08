@@ -12,6 +12,12 @@ pub use types::*;
 use crate::symbol::Symbol;
 
 #[salsa::interned]
+pub struct AbsoluteName {
+    pub module: ModuleId,
+    pub name: Symbol,
+}
+
+#[salsa::interned]
 pub struct QualifiedName {
     pub module: Option<ModuleId>,
     pub name: Symbol,

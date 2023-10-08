@@ -96,6 +96,7 @@ pub enum Role {
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
+// TODO: rename to TypeSignatureData or something?
 pub struct TypeDeclarationData {
     pub ident: Symbol,
     pub r#type: Type,
@@ -118,9 +119,6 @@ pub enum DeclarationKind {
         kind: Option<Type>,
         constructors: Vec<DataConstructorDeclaration>,
     },
-
-    // TODO: do we need this? seems internal
-    DataBindingGroup(Vec<Declaration>),
 
     TypeSynonym {
         name: Symbol,
@@ -214,7 +212,7 @@ pub enum InstanceType {
 }
 
 // Note: `data` and `newtype` signatures are actually declarations without constructors
-#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb, Copy)]
 pub enum KindSignatureFor {
     TypeSynonym,
     Class,
@@ -230,7 +228,7 @@ pub struct DataConstructorDeclarationData {
     pub fields: Vec<Type>,
 }
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb, Copy)]
 pub enum DataDeclType {
     Data,
     ForeignData,
@@ -240,9 +238,6 @@ pub enum DataDeclType {
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct ValueDeclaration {
     pub ident: Symbol,
-
-    // TODO: what is this?
-    // pub name: NameKind
     pub params: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
 }
