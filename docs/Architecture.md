@@ -43,7 +43,11 @@ Computes a parsed AST of the given module.
 
 Source files are keyed by module ID, not filename - this mapping is done outside the incremental system.
 
-The parsed representation contains spans relative to the start of the declaration, so that changing a declaration at the beginning of the file doesn't change the AST for subsequent ones. The spans are resolved when needed e.g. for error reporting.
+### `indexed_module(module: ModuleId) -> IndexedModule`
+
+While `parsed_module` returns the raw AST, `indexed_module` post-processes it and collects declarations by their name.
+
+The indexed representation will contain spans relative to the start of the declaration, so that changing a declaration at the beginning of the file doesn't change the AST for subsequent ones. The spans are resolved when needed e.g. for error reporting.
 
 ### `renamed_module(id: DeclId) -> RenamedModule`
 

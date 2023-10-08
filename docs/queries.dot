@@ -34,15 +34,18 @@ digraph {
   renamed_decl -> renamed_module
 
   renamed_module [label="renamed_module(module: ModuleId)"]
-  renamed_module -> parsed_module
+  renamed_module -> indexed_module
   renamed_module -> imported_decls
 
+  indexed_module [label="indexed_module(module: ModuleId) -> Module"]
+  indexed_module -> parsed_module
+
   imported_decls [label="imported_decls(module: ModuleId)\n-> Vec<DeclId>"]
-  imported_decls -> parsed_module
+  imported_decls -> indexed_module
   imported_decls -> exported_decls [label=" (blanket imports)"]
 
   exported_decls [label="exported_decls(module: ModuleId)\n -> Vec<DeclId>"]
-  exported_decls -> parsed_module
+  exported_decls -> indexed_module
   exported_decls -> exported_decls [label=" (blanket reexports)"]
   
   parsed_module [label="parsed_module(module: ModuleId) -> Module"]
