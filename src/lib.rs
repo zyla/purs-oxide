@@ -252,4 +252,3 @@ pub mod renamed_module;
 pub mod string;
 pub mod symbol;
 pub mod token;
-pub mod types;
