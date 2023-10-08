@@ -1,0 +1,50 @@
+digraph {
+  rankdir=UD
+
+  typecheck_module [label="typecheck_module(module: ModuleId)"]
+  typecheck_module -> parsed_module [label="(get SCCs)"]
+  typecheck_module -> typechecked_scc [label="(for each SCC)"]
+
+  type_of [label="type_of(id: DeclId) -> Type"]
+  type_of -> scc_of [label="(if no explicit_type_signature)"]
+  type_of -> typechecked_scc [label="(if no explicit_type_signature)"]
+  type_of -> type_signature
+
+  scc_of [label="scc_of(id: DeclId) -> SccId"]
+  scc_of -> parsed_module
+
+  decls_in_scc [label="decls_in_scc(id: SccId)\n -> Vec<DeclId>"]
+  decls_in_scc -> parsed_module
+
+  typechecked_scc [label="typechecked_scc(id: SccId)\n -> Vec<(DeclId, Expr, Type)>"]
+  typechecked_scc -> decls_in_scc
+  typechecked_scc -> desugared_decl [label="(each decl in SCC)"]
+  typechecked_scc -> type_of [label="(used decls)"]
+  typechecked_scc -> instances_in_module [label="(for each module referenced in\n a constraint being solved)"]
+
+  instances_in_module [label="instances_in_module(class: DeclId, module: ModuleId)"]
+  instances_in_module -> renamed_decl [label="(for each instance in module)"]
+  instances_in_module -> parsed_module [label="(get list of instances)"]
+
+  type_signature [label="explicit_type_signature(id: DeclId)\n-> Option<Type>"]
+  type_signature -> renamed_decl
+
+  desugared_decl [label="desugared_decl(id: DeclId)"]
+  desugared_decl -> renamed_decl
+  
+  renamed_decl [label="renamed_decl(id: DeclId)"]
+  renamed_decl -> parsed_decl
+  renamed_decl -> imported_decls
+
+  imported_decls [label="imported_decls(module: ModuleId)\n-> Vec<DeclId>"]
+  imported_decls -> parsed_module
+  imported_decls -> exported_decls [label="  (modules imported without import list)"]
+
+  exported_decls [label="exported_decls(module: ModuleId)\n -> Vec<DeclId>"]
+  exported_decls -> parsed_module
+  
+  parsed_decl -> parsed_module
+  parsed_decl [label="parsed_decl(id: DeclId)"]
+  parsed_module [label="parsed_module(module: ModuleId) -> Module"]
+}
+
