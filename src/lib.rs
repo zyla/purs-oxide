@@ -18,6 +18,7 @@ pub struct Jar(
     crate::parsed_module,
     crate::renamed_module::renamed_module,
     crate::indexed_module::indexed_module,
+    crate::renamed_module::exported_decls,
     crate::symbol::Symbol,
     crate::Diagnostics,
     crate::ast::QualifiedName,
