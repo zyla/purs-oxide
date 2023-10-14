@@ -25,13 +25,21 @@ pub enum Namespace {
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub struct RenamedModule {
     pub module_id: ModuleId,
-    pub imported: Vec<(Option<Symbol>, DeclId)>,
+    pub imported: Vec<(Option<ModuleId>, DeclId)>,
+    pub exported: Vec<DeclId>,
 }
 
 #[salsa::tracked]
-pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> () {
-    let _ = crate::indexed_module::indexed_module(db, module_id);
-    todo!()
+pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
+    let indexed = crate::indexed_module::indexed_module(db, module_id);
+    let imported = crate::renamed_module::imported_decls(db, module_id);
+    let exported = crate::renamed_module::exported_decls(db, module_id);
+
+    RenamedModule {
+        module_id,
+        imported,
+        exported,
+    }
 }
 
 struct ExportedDeclExtractor<'a> {
@@ -148,7 +156,7 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Explicit(decls) => {
                 decls
                     .into_iter()
-                    .map(|i| to_decl_id(import.module, i))
+                    .map(|i| to_decl_id(import.module, &i))
                     .for_each(|i| imports.push((import.alias, i)));
 
                 iter.next();
@@ -156,7 +164,7 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Hiding(decls) => {
                 let excluded: HashSet<DeclId> = decls
                     .into_iter()
-                    .map(|i| to_decl_id(import.module, i))
+                    .map(|i| to_decl_id(import.module, &i))
                     .collect();
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
@@ -205,6 +213,6 @@ fn to_decl_id(module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
             module: module_id,
             namespace: Namespace::Type,
         },
-        Module { name } => todo!("What's here?"),
+        Module { .. } => panic!("Cannot map module to DeclId"),
     }
 }
