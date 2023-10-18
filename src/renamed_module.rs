@@ -4,12 +4,8 @@ use salsa::DebugWithDb;
 
 use petgraph::{algo::tarjan_scc, prelude::DiGraph};
 
-use crate::{
-    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
-    indexed_module::ValueDecl,
-    symbol::Symbol,
-    Db, ModuleId, ParsedModule,
-};
+use crate::ast::*;
+use crate::{symbol::Symbol, Db, ModuleId, ParsedModule};
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
 pub struct DeclId {
@@ -250,5 +246,162 @@ fn to_decl_id(module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
             namespace: Namespace::Type,
         },
         Module { .. } => panic!("Cannot map module to DeclId"),
+    }
+}
+
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+pub enum DesugaredExpr {
+    Bind(Box<DesugaredExpr>, Box<DesugaredExpr>),
+    Pure(Box<DesugaredExpr>),
+    App(Box<DesugaredExpr>, Vec<DesugaredExpr>),
+    Unit,
+    Literal(Literal<Expr>), // change it to DesugaredExpr
+    If {
+        cond: Box<DesugaredExpr>,
+        then_: Box<DesugaredExpr>,
+        else_: Box<DesugaredExpr>,
+    },
+}
+
+fn desugar_let(declarations: Vec<Declaration>, expression: DesugaredExpr) -> DesugaredExpr {
+    declarations
+        .into_iter()
+        .rev()
+        .fold(expression, |acc, declaration| {
+            use crate::ast::DeclarationKind;
+            let commented_declaration = declaration.1;
+            let inner_declaration = commented_declaration.1;
+            match inner_declaration {
+                DeclarationKind::ValueDeclaration(value_declaration) => {
+                    let pattern = value_declaration.ident;
+                    let bound_expression = desugar_possibly_guarded_expr(value_declaration.expr);
+                    DesugaredExpr::Bind(Box::new(bound_expression), Box::new(acc))
+                }
+                _ => acc,
+            }
+        })
+}
+
+fn desugar_ado(expr: Expr) -> DesugaredExpr {
+    use crate::ast::ExprKind;
+
+    match expr.1 {
+        ExprKind::Ado(actions, final_expression) => {
+            let mut result = desugar_expr(*final_expression);
+
+            for action in actions.into_iter().rev() {
+                use crate::ast::DoItem;
+                match action {
+                    DoItem::Expr(expr) => {
+                        result =
+                            DesugaredExpr::Bind(Box::new(desugar_expr(expr)), Box::new(result));
+                    }
+                    DoItem::Let(declarations) => {
+                        result = desugar_let(declarations, result);
+                    }
+                    DoItem::Bind(pat, expr) => {
+                        result = desugar_bind(pat, desugar_expr(expr), result);
+                    }
+                }
+            }
+
+            result
+        }
+        _ => desugar_expr(expr),
+    }
+}
+
+fn desugar_possibly_guarded_expr(expr: PossiblyGuardedExpr) -> DesugaredExpr {
+    match expr {
+        PossiblyGuardedExpr::Unconditional(unconditional_expr) => {
+            DesugaredExpr::Pure(Box::new(desugar_expr(unconditional_expr)))
+        }
+        PossiblyGuardedExpr::Guarded(guarded_exprs) => {
+            let mut result = DesugaredExpr::Pure(Box::new(DesugaredExpr::Unit));
+            for guarded_expr in guarded_exprs {
+                use crate::ast::GuardedExpr;
+                match guarded_expr {
+                    GuardedExpr { guards, expr } => {
+                        for guard in guards {
+                            result = DesugaredExpr::Bind(
+                                Box::new(desugar_guard(guard, desugar_expr(expr.clone()))),
+                                Box::new(result),
+                            );
+                        }
+                        result =
+                            DesugaredExpr::Bind(Box::new(desugar_expr(expr)), Box::new(result));
+                    }
+                }
+            }
+
+            result
+        }
+    }
+}
+
+fn desugar_guard(guard: Guard, expr: DesugaredExpr) -> DesugaredExpr {
+    match guard {
+        Guard::Expr(expr_condition) => DesugaredExpr::If {
+            cond: Box::new(desugar_expr(expr_condition)),
+            then_: Box::new(expr),
+            else_: Box::new(DesugaredExpr::Pure(Box::new(DesugaredExpr::Unit))),
+        },
+        Guard::Bind(pat, guarded_expr) => {
+            DesugaredExpr::Bind(Box::new(desugar_expr(guarded_expr)), Box::new(expr))
+        }
+    }
+}
+
+fn desugar_bind(pattern: Pat, expr: DesugaredExpr, expression: DesugaredExpr) -> DesugaredExpr {
+    let inner_pattern = pattern.1;
+    match inner_pattern {
+        PatKind::Var(symbol) => {
+            // Handle a simple variable binding (e.g., x <- expr)
+            DesugaredExpr::Bind(Box::new(expr), Box::new(expression))
+        }
+        // TODO: Handle other needed types of patterns
+        _ => expression,
+    }
+}
+
+fn desugar_expr(expr: Expr) -> DesugaredExpr {
+    use crate::ast::ExprKind;
+    let inner_expr = expr.1.clone();
+    match inner_expr {
+        ExprKind::Literal(literal) => {
+            DesugaredExpr::Pure(Box::new(DesugaredExpr::Literal(literal)))
+        }
+        ExprKind::Infix(left, ops) => {
+            let desugared_left = desugar_expr(*left);
+
+            let desugared_ops: Vec<DesugaredExpr> = ops
+                .into_iter()
+                .map(|(infixOp, right)| desugar_infix_op(infixOp, right, desugared_left.clone()))
+                .collect();
+
+            let result = desugared_ops
+                .into_iter()
+                .fold(desugared_left, |acc, desugared_op| {
+                    DesugaredExpr::Bind(Box::new(desugared_op), Box::new(acc))
+                });
+
+            result
+        }
+        // TODO: Handle other cases
+        _ => DesugaredExpr::from(desugar_expr(expr)),
+    }
+}
+
+fn desugar_infix_op(op: InfixOp, right_expr: Expr, left_expr: DesugaredExpr) -> DesugaredExpr {
+    match op {
+        InfixOp::Symbol(s) => {
+            // TODO Desugar plus operator
+            // Make (a + b) be bind(a, fn(a) => bind(b, fn(b) => pure(a + b)))
+            let right_desugared = desugar_expr(right_expr);
+
+            DesugaredExpr::Bind(Box::new(left_expr), Box::new(right_desugared))
+        }
+
+        _ => todo!("Handle other operators +, -"),
     }
 }
