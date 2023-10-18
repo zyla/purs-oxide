@@ -1,9 +1,12 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use salsa::DebugWithDb;
 
+use petgraph::{algo::tarjan_scc, prelude::DiGraph};
+
 use crate::{
-    ast::{DeclarationRefKind, ImportDeclarationKind},
+    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
+    indexed_module::ValueDecl,
     symbol::Symbol,
     Db, ModuleId, ParsedModule,
 };
@@ -27,6 +30,7 @@ pub struct RenamedModule {
     pub module_id: ModuleId,
     pub imported: Vec<(Option<ModuleId>, DeclId)>,
     pub exported: Vec<DeclId>,
+    pub declarations: Vec<Declaration>,
 }
 
 #[salsa::tracked]
@@ -34,11 +38,43 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
     let indexed = crate::indexed_module::indexed_module(db, module_id);
     let imported = crate::renamed_module::imported_decls(db, module_id);
     let exported = crate::renamed_module::exported_decls(db, module_id);
+    let declarations = vec![];
+
+    let module = crate::parsed_module(db, module_id);
+
+    let mut graph = DiGraph::<Declaration, ()>::new();
+    let mut node_indices = HashMap::new();
+
+    for declaration in module.ast.declarations.iter() {
+        let node_index = graph.add_node(declaration.clone());
+        node_indices.insert(declaration.clone(), node_index);
+    }
+
+    // TODO: Add edges between nodes based on data structure
+    // for declaration in module.ast.declarations.iter() {
+    //     use crate::ast::DeclarationKind;
+    //     match &***declaration {
+    //         // Handle each variant of DeclarationKind
+    //         DeclarationKind::Data { constructors, .. } => {
+    //             for constructor in constructors {
+    //                 if let Some(target_node) = node_indices
+    //                     .get(&DeclarationKind::ValueDeclaration(constructor.name.clone()))
+    //                 {
+    //                     graph.add_edge(node_indices[declaration], *target_node, ());
+    //                 }
+    //             }
+    //         }
+    //         DeclarationKind::TypeSynonym { body, .. } => todo!(),
+    //     }
+    // }
+
+    let scc = tarjan_scc(&graph);
 
     RenamedModule {
         module_id,
         imported,
         exported,
+        declarations,
     }
 }
 
