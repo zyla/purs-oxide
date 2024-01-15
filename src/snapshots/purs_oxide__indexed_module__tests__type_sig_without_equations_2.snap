@@ -53,6 +53,7 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
                 ],
             },
         },
+        classes: {},
     },
     [
         Diagnostic {

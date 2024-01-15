@@ -1,0 +1,95 @@
+---
+source: src/indexed_module.rs
+expression: "index_module(indoc!(\"\n        module Test where\n        \n        class Show a where\n          show :: a -> String\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {},
+        values: {},
+        classes: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "Show",
+                },
+            }: TypeClassDecl {
+                name: AbsoluteName {
+                    [salsa id]: 0,
+                    module: ModuleId {
+                        [salsa id]: 0,
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        [salsa id]: 0,
+                        text: "Show",
+                    },
+                },
+                constraints: [],
+                params: [
+                    (
+                        Symbol {
+                            [salsa id]: 1,
+                            text: "a",
+                        },
+                        None,
+                    ),
+                ],
+                fundeps: [],
+                methods: [
+                    TypeDeclarationData {
+                        ident: Symbol {
+                            [salsa id]: 2,
+                            text: "show",
+                        },
+                        r#type: Located(
+                            SourceSpan {
+                                start: 48,
+                                end: 59,
+                            },
+                            FunctionType(
+                                Located(
+                                    SourceSpan {
+                                        start: 48,
+                                        end: 49,
+                                    },
+                                    Var(
+                                        Symbol {
+                                            [salsa id]: 1,
+                                            text: "a",
+                                        },
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 53,
+                                        end: 59,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName {
+                                            [salsa id]: 1,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 3,
+                                                text: "String",
+                                            },
+                                        },
+                                    ),
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+    },
+    [],
+)

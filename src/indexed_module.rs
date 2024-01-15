@@ -4,6 +4,7 @@ use crate::ast::DataConstructorDeclaration;
 use crate::ast::DataDeclType;
 use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
+use crate::ast::Fundep;
 use crate::ast::Located;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
@@ -22,6 +23,7 @@ use std::collections::hash_map::Entry;
 pub enum TypeDecl {
     Data(DataDecl),
     Type(TypeSynonymDecl),
+    TypeClass(TypeClassDecl),
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
@@ -41,9 +43,18 @@ pub struct TypeSynonymDecl {
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
+pub struct TypeClassDecl {
+    pub name: AbsoluteName,
+    pub constraints: Vec<Type>,
+    pub params: Vec<TypeParameter>,
+    pub fundeps: Vec<Fundep>,
+    pub methods: Vec<TypeDeclarationData>,
+}
+
+#[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub struct ValueDecl {
-    name: AbsoluteName,
-    type_: Option<Type>,
+    pub name: AbsoluteName,
+    pub type_: Option<Type>,
 
     /// Empty equations means foreign import.
     /// TODO: maybe make it more explicit?
@@ -55,6 +66,7 @@ struct ModuleIndexer<'a> {
     // Note: Using `FxHashMap` mostly because we want deterministic order for snapshots.
     types: FxHashMap<AbsoluteName, TypeDecl>,
     values: FxHashMap<AbsoluteName, ValueDecl>,
+    classes: FxHashMap<AbsoluteName, TypeClassDecl>,
     module_id: ModuleId,
     filename: PathBuf,
 }
@@ -201,7 +213,34 @@ impl<'a> ModuleIndexer<'a> {
                     }
                     iter.next();
                 }
-                Class(_) => todo!(),
+                Class(type_class_decl) => {
+                    let abs_name = AbsoluteName::new(db, self.module_id, type_class_decl.name);
+
+                    match self.classes.entry(abs_name) {
+                        Entry::Occupied(_) => {
+                            Diagnostics::push(
+                                db,
+                                Diagnostic::new(
+                                    src_decl.span().start,
+                                    src_decl.span().end,
+                                    format!("Duplicate typeclass declaration {}", type_class_decl.name.text(db)),
+                                    self.filename.to_string_lossy().into(),
+                                ),
+                            );
+                        },
+                        Entry::Vacant(e) => {
+                            e.insert(TypeClassDecl {
+                                name: abs_name,
+                                constraints: type_class_decl.constraints.clone(), 
+                                params: type_class_decl.params.clone(),
+                                fundeps: type_class_decl.fundeps.clone(),
+                                methods: type_class_decl.methods.clone(),
+                            });
+                        }
+                    }
+
+                    iter.next();
+                }
                 InstanceChain(_) => todo!(),
                 Operator { .. } => todo!(),
             }
@@ -286,6 +325,7 @@ pub struct IndexedModule {
     pub module_id: ModuleId,
     pub types: FxHashMap<AbsoluteName, TypeDecl>,
     pub values: FxHashMap<AbsoluteName, ValueDecl>,
+    pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
 }
 
 #[salsa::tracked]
@@ -295,6 +335,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         db,
         types: Default::default(),
         values: Default::default(),
+        classes: Default::default(),
         module_id,
         filename: module.filename.clone(),
     };
@@ -303,6 +344,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         module_id,
         types: indexer.types,
         values: indexer.values,
+        classes: indexer.classes,
     }
 }
 
@@ -450,5 +492,17 @@ mod tests {
         foo = 1
         "
         )));
+    }
+
+    #[test]
+    fn typeclass() {
+        assert_snapshot!(index_module(indoc!(
+            "
+        module Test where
+        
+        class Show a where
+          show :: a -> String
+        "
+        ))); 
     }
 }
