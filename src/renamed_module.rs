@@ -311,6 +311,29 @@ mod tests {
         )
     }
 
+    fn import_decls(input: &str) -> String {
+        let db = &mut crate::Database::test_single_file_db(input);
+
+        let lib = indoc!(
+            "
+        module Lib where
+        
+        data Foo = Bar
+        "
+        );
+        db.add_source_file("lib.purs".into(), lib.into()).unwrap();
+
+        let module_id = ModuleId::new(db, "Test".into());
+
+        format!(
+            "{:#?}",
+            (
+                imported_decls(db, module_id).into_debug_all(db),
+                renamed_module::accumulated::<Diagnostics>(db, module_id)
+            )
+        )
+    }
+
     #[test]
     fn export_data_decl() {
         assert_snapshot!(export_decls(indoc!(
@@ -340,6 +363,28 @@ mod tests {
     class Foo a where
       foo :: a
     "
+        )))
+    }
+
+    #[test]
+    fn import_data_decl() {
+        assert_snapshot!(import_decls(indoc!(
+            "
+        module Test where
+        
+        import Foo (Foo(..))
+        "
+        )))
+    }
+    
+    #[test]
+    fn import_data_qualified_decl() {
+        assert_snapshot!(import_decls(indoc!(
+            "
+        module Test where
+        
+        import Lib as Lib
+        "
         )))
     }
 }
