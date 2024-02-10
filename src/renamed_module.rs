@@ -185,7 +185,7 @@ impl<'a> ExportedDeclExtractor<'a> {
                     self.exported_decls.push(DeclId {
                         namespace: Namespace::Class,
                         module: indexed.module_id,
-                        name:abs_name.name(db),
+                        name: abs_name.name(db),
                     });
                     class_iter.next();
                 }
@@ -376,7 +376,7 @@ mod tests {
         "
         )))
     }
-    
+
     #[test]
     fn import_data_qualified_decl() {
         assert_snapshot!(import_decls(indoc!(

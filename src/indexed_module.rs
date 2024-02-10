@@ -223,15 +223,18 @@ impl<'a> ModuleIndexer<'a> {
                                 Diagnostic::new(
                                     src_decl.span().start,
                                     src_decl.span().end,
-                                    format!("Duplicate typeclass declaration {}", type_class_decl.name.text(db)),
+                                    format!(
+                                        "Duplicate typeclass declaration {}",
+                                        type_class_decl.name.text(db)
+                                    ),
                                     self.filename.to_string_lossy().into(),
                                 ),
                             );
-                        },
+                        }
                         Entry::Vacant(e) => {
                             e.insert(TypeClassDecl {
                                 name: abs_name,
-                                constraints: type_class_decl.constraints.clone(), 
+                                constraints: type_class_decl.constraints.clone(),
                                 params: type_class_decl.params.clone(),
                                 fundeps: type_class_decl.fundeps.clone(),
                                 methods: type_class_decl.methods.clone(),
@@ -503,6 +506,6 @@ mod tests {
         class Show a where
           show :: a -> String
         "
-        ))); 
+        )));
     }
 }
