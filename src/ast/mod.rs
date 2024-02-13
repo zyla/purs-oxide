@@ -17,6 +17,12 @@ pub struct AbsoluteName {
     pub name: Symbol,
 }
 
+impl AbsoluteName {
+    pub fn to_qualified_name(&self, db: &dyn crate::Db) -> QualifiedName {
+        QualifiedName::new_qualified(db, self.module(db), self.name(db))
+    }
+}
+
 #[salsa::interned]
 pub struct QualifiedName {
     pub module: Option<ModuleId>,

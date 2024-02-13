@@ -58,7 +58,7 @@ pub struct ValueDecl {
 
     /// Empty equations means foreign import.
     /// TODO: maybe make it more explicit?
-    equations: Vec<CaseBranch>,
+    pub equations: Vec<CaseBranch>,
 }
 
 struct ModuleIndexer<'a> {

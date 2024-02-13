@@ -249,6 +249,7 @@ pub mod errors;
 pub mod indexed_module;
 pub mod lexer;
 pub mod parser;
+pub mod rename;
 pub mod renamed_module;
 pub mod string;
 pub mod symbol;
