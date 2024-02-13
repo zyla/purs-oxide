@@ -323,6 +323,16 @@ mod tests {
         );
         db.add_source_file("lib.purs".into(), lib.into()).unwrap();
 
+        let lib2 = indoc!(
+            "
+        module Lib2 where
+        
+        x = 1
+        y = 2
+        "
+        );
+        db.add_source_file("Lib2.purs".into(), lib2.into()).unwrap();
+
         let module_id = ModuleId::new(db, "Test".into());
 
         format!(
@@ -384,6 +394,26 @@ mod tests {
         module Test where
         
         import Lib as Lib
+        "
+        )))
+    }
+
+    #[test]
+    fn import_all_fns() {
+        assert_snapshot!(import_decls(indoc!(
+            "
+        module Test where
+        import Lib2
+        "
+        )))
+    }
+
+    #[test]
+    fn import_subset() {
+        assert_snapshot!(import_decls(indoc!(
+            "
+        module Test where
+        import Lib2 (x)
         "
         )))
     }
