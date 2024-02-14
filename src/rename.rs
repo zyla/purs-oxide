@@ -163,3 +163,44 @@ impl Rename for ExprKind {
         }
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use std::borrow::Borrow;
+
+    use crate::Diagnostic;
+
+    use super::*;
+    use indoc::indoc;
+    use insta::{self, assert_snapshot};
+
+    fn rename(input: &str) -> String {
+        let db = &mut crate::Database::test_single_file_db(input);
+        let module_id = ModuleId::new(db, "Test".into());
+
+        let ref mut module = crate::indexed_module::indexed_module(db, module_id);
+        let imported = crate::renamed_module::imported_decls(db, module_id);
+
+        rename_module(db,module, imported);
+
+        format!(
+            "{:#?}",
+            (
+                *module
+            )
+        )
+    }
+
+
+    #[test]
+    fn smoke() {
+        assert_snapshot!(rename(indoc!(
+            "
+        module Test where
+        
+        f a = a 
+        "
+        )))
+    }
+}
