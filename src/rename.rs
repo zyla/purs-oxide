@@ -159,6 +159,12 @@ impl Rename for ExprKind {
                 expr.rename(r);
                 r.pop_scope();
             }
+            Self::App(ref mut expr, ref mut exprs) => {
+                expr.rename(r);
+                for ref mut expr in exprs {
+                    expr.rename(r);
+                }
+            }
             _ => todo!("renaming ExprKind {:?} not supported", self),
         }
     }
@@ -171,9 +177,38 @@ mod test {
     use insta::{self, assert_snapshot};
     use salsa::DebugWithDb;
 
-    fn rename(input: &str) -> String {
+    fn rename_mod(input: &str) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
         let module_id = ModuleId::new(db, "Test".into());
+
+        let lib = indoc!(
+            "
+        module Lib where
+        
+        data A = A
+        data B = B
+
+        a :: A
+        a = A
+
+        b :: B
+        b = B
+
+        "
+        );
+        db.add_source_file("lib.purs".into(), lib.into()).unwrap();
+
+        let lib2 = indoc!(
+            "
+        module Lib2 where
+                
+        import Lib        
+
+        f :: A -> B -> A
+        f a _ = a
+        "
+        );
+        db.add_source_file("Lib2.purs".into(), lib2.into()).unwrap();
 
         let mut module = crate::indexed_module::indexed_module(db, module_id);
         let imported = crate::renamed_module::imported_decls(db, module_id);
@@ -185,7 +220,7 @@ mod test {
 
     #[test]
     fn smoke() {
-        assert_snapshot!(rename(indoc!(
+        assert_snapshot!(rename_mod(indoc!(
             "
         module Test where
         
@@ -193,5 +228,25 @@ mod test {
         "
         )))
     }
+
+    #[test]
+    fn some_modules() {
+        assert_snapshot!(rename_mod(indoc!(
+            "
+        module Test where 
+        
+        import Lib (a, b)
+        import Lib2 (f)
+
+        g :: A -> B -> A
+        g a b = f a b
+
+        h :: A
+        h = g a b
+        "
+    )))
+    }
+
+    
 }
 
