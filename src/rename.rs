@@ -99,7 +99,7 @@ impl Rename for ValueDecl {
 }
 
 impl Rename for Type {
-    fn rename(&mut self, r: &mut Renamer) {
+    fn rename(&mut self, _r: &mut Renamer) {
         // TODO
     }
 }
@@ -164,34 +164,24 @@ impl Rename for ExprKind {
     }
 }
 
-
 #[cfg(test)]
 mod test {
-    use std::borrow::Borrow;
-
-    use crate::Diagnostic;
-
     use super::*;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
+    use salsa::DebugWithDb;
 
     fn rename(input: &str) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
         let module_id = ModuleId::new(db, "Test".into());
 
-        let ref mut module = crate::indexed_module::indexed_module(db, module_id);
+        let mut module = crate::indexed_module::indexed_module(db, module_id);
         let imported = crate::renamed_module::imported_decls(db, module_id);
 
-        rename_module(db,module, imported);
+        rename_module(db, &mut module, imported);
 
-        format!(
-            "{:#?}",
-            (
-                *module
-            )
-        )
+        format!("{:#?}", module.into_debug_all(db))
     }
-
 
     #[test]
     fn smoke() {
@@ -204,3 +194,4 @@ mod test {
         )))
     }
 }
+

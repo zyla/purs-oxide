@@ -1,26 +1,37 @@
 ---
 source: src/rename.rs
-assertion_line: 198
+assertion_line: 188
 expression: "rename(indoc!(\"\n        module Test where\n        \n        f a = a \n        \"))"
 ---
 IndexedModule {
-    module_id: ModuleId(
-        Id {
-            value: 1,
-        },
-    ),
+    module_id: ModuleId {
+        [salsa id]: 0,
+        name: "Test",
+    },
     types: {},
     values: {
-        AbsoluteName(
-            Id {
-                value: 1,
+        AbsoluteName {
+            [salsa id]: 0,
+            module: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
             },
-        ): ValueDecl {
-            name: AbsoluteName(
-                Id {
-                    value: 1,
+            name: Symbol {
+                [salsa id]: 0,
+                text: "f",
+            },
+        }: ValueDecl {
+            name: AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
                 },
-            ),
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "f",
+                },
+            },
             type_: None,
             equations: [
                 CaseBranch {
@@ -31,11 +42,10 @@ IndexedModule {
                                 end: 22,
                             },
                             Var(
-                                Symbol(
-                                    Id {
-                                        value: 2,
-                                    },
-                                ),
+                                Symbol {
+                                    [salsa id]: 1,
+                                    text: "a",
+                                },
                             ),
                         ),
                     ],
@@ -46,11 +56,14 @@ IndexedModule {
                                 end: 26,
                             },
                             Var(
-                                QualifiedName(
-                                    Id {
-                                        value: 1,
+                                QualifiedName {
+                                    [salsa id]: 0,
+                                    module: None,
+                                    name: Symbol {
+                                        [salsa id]: 1,
+                                        text: "a",
                                     },
-                                ),
+                                },
                             ),
                         ),
                     ),
