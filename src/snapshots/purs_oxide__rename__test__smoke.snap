@@ -1,6 +1,5 @@
 ---
 source: src/rename.rs
-assertion_line: 188
 expression: "rename(indoc!(\"\n        module Test where\n        \n        f a = a \n        \"))"
 ---
 IndexedModule {
