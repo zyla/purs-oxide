@@ -35,14 +35,14 @@ pub struct RenamedModule {
 
 #[salsa::tracked]
 pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
-    let indexed = crate::indexed_module::indexed_module(db, module_id);
+    let mut indexed = crate::indexed_module::indexed_module(db, module_id);
     let imported = crate::renamed_module::imported_decls(db, module_id);
     let exported = crate::renamed_module::exported_decls(db, module_id);
     let declarations = vec![];
 
-    let mut module = crate::parsed_module(db, module_id);
+    let module = crate::parsed_module(db, module_id);
 
-    crate::rename::rename_module(indexed);
+    crate::rename::rename_module(db, &mut indexed, imported.clone());
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();

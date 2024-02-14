@@ -81,7 +81,7 @@ where
 
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
-        for (_, mut v) in self.values {
+        for (_, ref mut v) in self.values.clone() {
             v.rename(r);
         }
         // TODO: self.types
@@ -92,7 +92,7 @@ impl Rename for IndexedModule {
 impl Rename for ValueDecl {
     fn rename(&mut self, r: &mut Renamer) {
         self.type_.rename(r);
-        for mut x in self.equations {
+        for ref mut x in self.equations.clone() {
             x.rename(r);
         }
     }
@@ -107,7 +107,7 @@ impl Rename for Type {
 impl Rename for CaseBranch {
     fn rename(&mut self, r: &mut Renamer) {
         r.push_scope();
-        for mut pat in self.pats {
+        for ref mut pat in self.pats.clone() {
             pat.rename(r);
         }
         self.expr.rename(r);
@@ -118,7 +118,7 @@ impl Rename for CaseBranch {
 impl Rename for PossiblyGuardedExpr {
     fn rename(&mut self, r: &mut Renamer) {
         match self {
-            Self::Unconditional(mut e) => e.rename(r),
+            Self::Unconditional(ref mut e) => e.rename(r),
             Self::Guarded(_) => todo!("Pattern guards not implemented"),
         }
     }
@@ -141,18 +141,19 @@ impl Rename for ExprKind {
     fn rename(&mut self, r: &mut Renamer) {
         match self {
             Self::Var(ref mut v) => {
+                let db = r.db;
                 let local_vars = r.top_scope();
-                let is_local = v.module(r.db).is_none() && local_vars.contains(&v.name(r.db));
+                let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
                     match r.module_scope.get(&v) {
                         None => todo!("report error: unknown variable {v:?}"),
-                        Some(abs) => *v = abs.to_qualified_name(r.db),
+                        Some(abs) => *v = abs.to_qualified_name(db),
                     }
                 }
             }
-            Self::Lam(mut pats, mut expr) => {
+            Self::Lam(ref mut pats, ref mut expr) => {
                 r.push_scope();
-                for mut pat in pats {
+                for ref mut pat in pats {
                     pat.rename(r);
                 }
                 expr.rename(r);
