@@ -1,0 +1,299 @@
+---
+source: src/rename.rs
+expression: "rename_mod(indoc!(\"\n        module Test where \n        \n        import Lib\n        import Lib2 \n\n        g :: A -> B -> A\n        g a b = f a b\n\n        h :: A\n        h = g a b\n        \"))"
+---
+IndexedModule {
+    module_id: ModuleId {
+        [salsa id]: 0,
+        name: "Test",
+    },
+    types: {},
+    values: {
+        AbsoluteName {
+            [salsa id]: 0,
+            module: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
+            },
+            name: Symbol {
+                [salsa id]: 0,
+                text: "g",
+            },
+        }: ValueDecl {
+            name: AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "g",
+                },
+            },
+            type_: Some(
+                Located(
+                    SourceSpan {
+                        start: 50,
+                        end: 61,
+                    },
+                    FunctionType(
+                        Located(
+                            SourceSpan {
+                                start: 50,
+                                end: 51,
+                            },
+                            TypeConstructor(
+                                QualifiedName {
+                                    [salsa id]: 0,
+                                    module: None,
+                                    name: Symbol {
+                                        [salsa id]: 1,
+                                        text: "A",
+                                    },
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 55,
+                                end: 61,
+                            },
+                            FunctionType(
+                                Located(
+                                    SourceSpan {
+                                        start: 55,
+                                        end: 56,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName {
+                                            [salsa id]: 1,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 2,
+                                                text: "B",
+                                            },
+                                        },
+                                    ),
+                                ),
+                                Located(
+                                    SourceSpan {
+                                        start: 60,
+                                        end: 61,
+                                    },
+                                    TypeConstructor(
+                                        QualifiedName {
+                                            [salsa id]: 0,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 1,
+                                                text: "A",
+                                            },
+                                        },
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+            equations: [
+                CaseBranch {
+                    pats: [
+                        Located(
+                            SourceSpan {
+                                start: 64,
+                                end: 65,
+                            },
+                            Var(
+                                Symbol {
+                                    [salsa id]: 3,
+                                    text: "a",
+                                },
+                            ),
+                        ),
+                        Located(
+                            SourceSpan {
+                                start: 66,
+                                end: 67,
+                            },
+                            Var(
+                                Symbol {
+                                    [salsa id]: 4,
+                                    text: "b",
+                                },
+                            ),
+                        ),
+                    ],
+                    expr: Unconditional(
+                        Located(
+                            SourceSpan {
+                                start: 70,
+                                end: 75,
+                            },
+                            App(
+                                Located(
+                                    SourceSpan {
+                                        start: 70,
+                                        end: 71,
+                                    },
+                                    Var(
+                                        QualifiedName {
+                                            [salsa id]: 4,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 5,
+                                                text: "f",
+                                            },
+                                        },
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 72,
+                                            end: 73,
+                                        },
+                                        Var(
+                                            QualifiedName {
+                                                [salsa id]: 2,
+                                                module: None,
+                                                name: Symbol {
+                                                    [salsa id]: 3,
+                                                    text: "a",
+                                                },
+                                            },
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 74,
+                                            end: 75,
+                                        },
+                                        Var(
+                                            QualifiedName {
+                                                [salsa id]: 3,
+                                                module: None,
+                                                name: Symbol {
+                                                    [salsa id]: 4,
+                                                    text: "b",
+                                                },
+                                            },
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                    ),
+                },
+            ],
+        },
+        AbsoluteName {
+            [salsa id]: 1,
+            module: ModuleId {
+                [salsa id]: 0,
+                name: "Test",
+            },
+            name: Symbol {
+                [salsa id]: 6,
+                text: "h",
+            },
+        }: ValueDecl {
+            name: AbsoluteName {
+                [salsa id]: 1,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 6,
+                    text: "h",
+                },
+            },
+            type_: Some(
+                Located(
+                    SourceSpan {
+                        start: 82,
+                        end: 83,
+                    },
+                    TypeConstructor(
+                        QualifiedName {
+                            [salsa id]: 0,
+                            module: None,
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "A",
+                            },
+                        },
+                    ),
+                ),
+            ),
+            equations: [
+                CaseBranch {
+                    pats: [],
+                    expr: Unconditional(
+                        Located(
+                            SourceSpan {
+                                start: 88,
+                                end: 93,
+                            },
+                            App(
+                                Located(
+                                    SourceSpan {
+                                        start: 88,
+                                        end: 89,
+                                    },
+                                    Var(
+                                        QualifiedName {
+                                            [salsa id]: 5,
+                                            module: None,
+                                            name: Symbol {
+                                                [salsa id]: 0,
+                                                text: "g",
+                                            },
+                                        },
+                                    ),
+                                ),
+                                [
+                                    Located(
+                                        SourceSpan {
+                                            start: 90,
+                                            end: 91,
+                                        },
+                                        Var(
+                                            QualifiedName {
+                                                [salsa id]: 2,
+                                                module: None,
+                                                name: Symbol {
+                                                    [salsa id]: 3,
+                                                    text: "a",
+                                                },
+                                            },
+                                        ),
+                                    ),
+                                    Located(
+                                        SourceSpan {
+                                            start: 92,
+                                            end: 93,
+                                        },
+                                        Var(
+                                            QualifiedName {
+                                                [salsa id]: 3,
+                                                module: None,
+                                                name: Symbol {
+                                                    [salsa id]: 4,
+                                                    text: "b",
+                                                },
+                                            },
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ),
+                    ),
+                },
+            ],
+        },
+    },
+    classes: {},
+}

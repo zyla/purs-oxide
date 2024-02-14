@@ -12,7 +12,16 @@ pub fn rename_module(
     db: &dyn Db,
     module: &mut IndexedModule,
     imported_decls: Vec<(Option<ModuleId>, DeclId)>,
+    exported_decls: Vec<DeclId>,
 ) {
+    let exported = exported_decls.iter()
+        .map(|decl_id| {
+            (
+                QualifiedName::new(db, Option::None, decl_id.name),
+                AbsoluteName::new(db, decl_id.module, decl_id.name),
+            )
+        });
+
     let module_scope = imported_decls
         .iter()
         .map(|(qualified_as, id)| {
@@ -21,6 +30,7 @@ pub fn rename_module(
                 AbsoluteName::new(db, id.module, id.name),
             )
         })
+        .chain(exported)
         .collect::<HashMap<_, _>>();
     let mut r = Renamer {
         db,
@@ -212,8 +222,9 @@ mod test {
 
         let mut module = crate::indexed_module::indexed_module(db, module_id);
         let imported = crate::renamed_module::imported_decls(db, module_id);
+        let exported = crate::renamed_module::exported_decls(db, module_id);
 
-        rename_module(db, &mut module, imported);
+        rename_module(db, &mut module, imported, exported);
 
         format!("{:#?}", module.into_debug_all(db))
     }
@@ -235,8 +246,8 @@ mod test {
             "
         module Test where 
         
-        import Lib (a, b)
-        import Lib2 (f)
+        import Lib
+        import Lib2 
 
         g :: A -> B -> A
         g a b = f a b
