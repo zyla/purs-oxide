@@ -14,13 +14,12 @@ pub fn rename_module(
     imported_decls: Vec<(Option<ModuleId>, DeclId)>,
     exported_decls: Vec<DeclId>,
 ) {
-    let exported = exported_decls.iter()
-        .map(|decl_id| {
-            (
-                QualifiedName::new(db, Option::None, decl_id.name),
-                AbsoluteName::new(db, decl_id.module, decl_id.name),
-            )
-        });
+    let exported = exported_decls.iter().map(|decl_id| {
+        (
+            QualifiedName::new(db, Option::None, decl_id.name),
+            AbsoluteName::new(db, decl_id.module, decl_id.name),
+        )
+    });
 
     let module_scope = imported_decls
         .iter()
@@ -157,7 +156,11 @@ impl Rename for ExprKind {
                 if !is_local {
                     match r.module_scope.get(&v) {
                         None => todo!("report error: unknown variable {v:?}"),
-                        Some(abs) => *v = abs.to_qualified_name(db),
+                        Some(abs) => {
+                            *v = abs.to_qualified_name(db);
+                            use salsa::DebugWithDb;
+                            eprintln!("replacing with {:?}", v.clone().into_debug_all(db));
+                        }
                     }
                 }
             }
@@ -255,9 +258,6 @@ mod test {
         h :: A
         h = g a b
         "
-    )))
+        )))
     }
-
-    
 }
-
