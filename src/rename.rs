@@ -90,7 +90,7 @@ where
 
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
-        for (_, ref mut v) in self.values.clone() {
+        for (_, ref mut v) in &mut self.values {
             v.rename(r);
         }
         // TODO: self.types
@@ -101,7 +101,7 @@ impl Rename for IndexedModule {
 impl Rename for ValueDecl {
     fn rename(&mut self, r: &mut Renamer) {
         self.type_.rename(r);
-        for ref mut x in self.equations.clone() {
+        for ref mut x in &mut self.equations {
             x.rename(r);
         }
     }
@@ -116,7 +116,7 @@ impl Rename for Type {
 impl Rename for CaseBranch {
     fn rename(&mut self, r: &mut Renamer) {
         r.push_scope();
-        for ref mut pat in self.pats.clone() {
+        for ref mut pat in &mut self.pats {
             pat.rename(r);
         }
         self.expr.rename(r);

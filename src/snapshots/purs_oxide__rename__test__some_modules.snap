@@ -139,8 +139,13 @@ IndexedModule {
                                     },
                                     Var(
                                         QualifiedName {
-                                            [salsa id]: 4,
-                                            module: None,
+                                            [salsa id]: 7,
+                                            module: Some(
+                                                ModuleId {
+                                                    [salsa id]: 2,
+                                                    name: "Lib2",
+                                                },
+                                            ),
                                             name: Symbol {
                                                 [salsa id]: 5,
                                                 text: "f",
@@ -245,8 +250,13 @@ IndexedModule {
                                     },
                                     Var(
                                         QualifiedName {
-                                            [salsa id]: 5,
-                                            module: None,
+                                            [salsa id]: 8,
+                                            module: Some(
+                                                ModuleId {
+                                                    [salsa id]: 0,
+                                                    name: "Test",
+                                                },
+                                            ),
                                             name: Symbol {
                                                 [salsa id]: 0,
                                                 text: "g",
@@ -262,8 +272,13 @@ IndexedModule {
                                         },
                                         Var(
                                             QualifiedName {
-                                                [salsa id]: 2,
-                                                module: None,
+                                                [salsa id]: 9,
+                                                module: Some(
+                                                    ModuleId {
+                                                        [salsa id]: 1,
+                                                        name: "Lib",
+                                                    },
+                                                ),
                                                 name: Symbol {
                                                     [salsa id]: 3,
                                                     text: "a",
@@ -278,8 +293,13 @@ IndexedModule {
                                         },
                                         Var(
                                             QualifiedName {
-                                                [salsa id]: 3,
-                                                module: None,
+                                                [salsa id]: 10,
+                                                module: Some(
+                                                    ModuleId {
+                                                        [salsa id]: 1,
+                                                        name: "Lib",
+                                                    },
+                                                ),
                                                 name: Symbol {
                                                     [salsa id]: 4,
                                                     text: "b",
