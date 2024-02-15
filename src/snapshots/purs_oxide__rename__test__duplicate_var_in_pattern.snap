@@ -1,6 +1,6 @@
 ---
 source: src/rename.rs
-expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        f a = a \n        \"))"
+expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        f a a = a\n        \"))"
 ---
 (
     IndexedModule {
@@ -48,12 +48,24 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                                     },
                                 ),
                             ),
+                            Located(
+                                SourceSpan {
+                                    start: 23,
+                                    end: 24,
+                                },
+                                Var(
+                                    Symbol {
+                                        [salsa id]: 1,
+                                        text: "a",
+                                    },
+                                ),
+                            ),
                         ],
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
-                                    start: 25,
-                                    end: 26,
+                                    start: 27,
+                                    end: 28,
                                 },
                                 Var(
                                     QualifiedName {
@@ -73,5 +85,14 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
         },
         classes: {},
     },
-    [],
+    [
+        Diagnostic {
+            name: Symbol(
+                Id {
+                    value: 2,
+                },
+            ),
+            error: "Duplicate viariable 'a' in pattern",
+        },
+    ],
 )

@@ -1,6 +1,6 @@
 ---
 source: src/rename.rs
-expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        f a = a \n        \"))"
+expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        g = x\n        \"))"
 ---
 (
     IndexedModule {
@@ -18,7 +18,7 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                 },
                 name: Symbol {
                     [salsa id]: 0,
-                    text: "f",
+                    text: "g",
                 },
             }: ValueDecl {
                 name: AbsoluteName {
@@ -29,31 +29,18 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                     },
                     name: Symbol {
                         [salsa id]: 0,
-                        text: "f",
+                        text: "g",
                     },
                 },
                 type_: None,
                 equations: [
                     CaseBranch {
-                        pats: [
-                            Located(
-                                SourceSpan {
-                                    start: 21,
-                                    end: 22,
-                                },
-                                Var(
-                                    Symbol {
-                                        [salsa id]: 1,
-                                        text: "a",
-                                    },
-                                ),
-                            ),
-                        ],
+                        pats: [],
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
-                                    start: 25,
-                                    end: 26,
+                                    start: 23,
+                                    end: 24,
                                 },
                                 Var(
                                     QualifiedName {
@@ -61,7 +48,7 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                                         module: None,
                                         name: Symbol {
                                             [salsa id]: 1,
-                                            text: "a",
+                                            text: "x",
                                         },
                                     },
                                 ),
@@ -73,5 +60,14 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
         },
         classes: {},
     },
-    [],
+    [
+        Diagnostic {
+            name: Symbol(
+                Id {
+                    value: 2,
+                },
+            ),
+            error: "Unknown viariable 'x'",
+        },
+    ],
 )

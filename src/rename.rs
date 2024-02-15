@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::indexed_module::ValueDecl;
 use crate::symbol::Symbol;
 use crate::Db;
@@ -13,6 +15,7 @@ pub fn rename_module(
     module: &mut IndexedModule,
     imported_decls: Vec<(Option<ModuleId>, DeclId)>,
     exported_decls: Vec<DeclId>,
+    diagnostics: &mut Vec<Diagnostic>,
 ) {
     let exported = exported_decls.iter().map(|decl_id| {
         (
@@ -35,8 +38,17 @@ pub fn rename_module(
         db,
         module_scope,
         local_scopes: vec![HashSet::new()],
+        diagnostics: vec![],
     };
     module.rename(&mut r);
+
+    *diagnostics = r.diagnostics;
+}
+
+#[derive(Clone, Debug, new)]
+pub struct Diagnostic {
+    pub name: Symbol,
+    pub error: String,
 }
 
 struct Renamer<'db> {
@@ -44,6 +56,7 @@ struct Renamer<'db> {
     /// Maps from names as appear in source code to actual absolute names
     module_scope: HashMap<QualifiedName, AbsoluteName>,
     local_scopes: Vec<HashSet<Symbol>>,
+    diagnostics: Vec<Diagnostic>,
 }
 
 impl<'db> Renamer<'db> {
@@ -60,6 +73,10 @@ impl<'db> Renamer<'db> {
         self.local_scopes
             .last_mut()
             .expect("top_scope called when there are no scopes")
+    }
+
+    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.push(diagnostic)
     }
 }
 
@@ -90,20 +107,20 @@ where
 
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
-        for (_, ref mut v) in &mut self.values {
+        self.values.iter_mut().for_each(|(_, ref mut v)| {
             v.rename(r);
-        }
+        });
+
         // TODO: self.types
         // TODO: self.classes
+        assert!(self.types.is_empty(), "renaming types not yet supported")
     }
 }
 
 impl Rename for ValueDecl {
     fn rename(&mut self, r: &mut Renamer) {
         self.type_.rename(r);
-        for ref mut x in &mut self.equations {
-            x.rename(r);
-        }
+        self.equations.iter_mut().for_each(|ref mut x| x.rename(r));
     }
 }
 
@@ -138,7 +155,9 @@ impl Rename for PatKind {
         match self {
             Self::Var(v) => {
                 if !r.top_scope().insert(*v) {
-                    todo!("duplicate variable in pattern, TODO: report error");
+                    r.push_diagnostic(
+                        Diagnostic::new(*v, format!("Duplicate viariable '{}' in pattern", v.text(r.db)))
+                    );
                 }
             }
             _ => todo!("renaming PatKind {:?} not supported", self),
@@ -155,7 +174,12 @@ impl Rename for ExprKind {
                 let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
                     match r.module_scope.get(&v) {
-                        None => todo!("report error: unknown variable {v:?}"),
+                        None => {
+                            r.push_diagnostic(
+                                Diagnostic::new(v.name(db), format!("Unknown viariable '{}'", v.name(db).text(db)))
+                            );
+                        }
+
                         Some(abs) => {
                             *v = abs.to_qualified_name(db);
                             use salsa::DebugWithDb;
@@ -226,10 +250,11 @@ mod test {
         let mut module = crate::indexed_module::indexed_module(db, module_id);
         let imported = crate::renamed_module::imported_decls(db, module_id);
         let exported = crate::renamed_module::exported_decls(db, module_id);
+        let mut diagnostics = vec![];
 
-        rename_module(db, &mut module, imported, exported);
+        rename_module(db, &mut module, imported, exported, &mut diagnostics);
 
-        format!("{:#?}", module.into_debug_all(db))
+        format!("{:#?}", (module.into_debug_all(db), diagnostics))
     }
 
     #[test]
@@ -257,6 +282,28 @@ mod test {
 
         h :: A
         h = g a b
+        "
+        )))
+    }
+
+    #[test]
+    fn duplicate_var_in_pattern() {
+        assert_snapshot!(rename_mod(indoc!(
+            "
+        module Test where
+        
+        f a a = a
+        "
+        )))
+    }
+
+    #[test]
+    fn unknown_var() {
+        assert_snapshot!(rename_mod(indoc!(
+            "
+        module Test where
+        
+        g = x
         "
         )))
     }
