@@ -13,8 +13,8 @@ use crate::ModuleId;
 pub fn rename_module(
     db: &dyn Db,
     module: &mut IndexedModule,
-    imported_decls: Vec<(Option<ModuleId>, DeclId)>,
-    exported_decls: Vec<DeclId>,
+    imported_decls: &mut [(Option<ModuleId>, DeclId)],
+    exported_decls: &mut [DeclId],
     diagnostics: &mut Vec<Diagnostic>,
 ) {
     let exported = exported_decls.iter().map(|decl_id| {
@@ -48,6 +48,7 @@ pub fn rename_module(
 #[derive(Clone, Debug, new)]
 pub struct Diagnostic {
     pub name: Symbol,
+    pub span: SourceSpan,
     pub error: String,
 }
 
@@ -96,14 +97,14 @@ where
     }
 }
 
-impl<T> Rename for Located<T>
-where
-    T: Rename,
-{
-    fn rename(&mut self, r: &mut Renamer) {
-        self.1.rename(r);
-    }
-}
+// impl<T> Rename for Located<T>
+// where
+//     T: Rename,
+// {
+//     fn rename(&mut self, r: &mut Renamer) {
+//         self.1.rename(r);
+//     }
+// }
 
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
@@ -113,7 +114,7 @@ impl Rename for IndexedModule {
 
         // TODO: self.types
         // TODO: self.classes
-        assert!(self.types.is_empty(), "renaming types not yet supported")
+        // assert!(!self.types.is_empty(), "renaming types not yet supported")
     }
 }
 
@@ -150,13 +151,15 @@ impl Rename for PossiblyGuardedExpr {
     }
 }
 
-impl Rename for PatKind {
+impl Rename for Located<PatKind> {
     fn rename(&mut self, r: &mut Renamer) {
-        match self {
-            Self::Var(v) => {
+        let pat = &mut self.1;
+        match pat {
+            PatKind::Var(v) => {
                 if !r.top_scope().insert(*v) {
+                    let span = &self.0;
                     r.push_diagnostic(
-                        Diagnostic::new(*v, format!("Duplicate variable '{}' in pattern", v.text(r.db)))
+                        Diagnostic::new(*v, *span, format!("Duplicate variable '{}' in pattern", v.text(r.db)))
                     );
                 }
             }
@@ -165,18 +168,20 @@ impl Rename for PatKind {
     }
 }
 
-impl Rename for ExprKind {
+impl Rename for Located<ExprKind> {
     fn rename(&mut self, r: &mut Renamer) {
-        match self {
-            Self::Var(ref mut v) => {
+        let expr = &mut self.1;
+        match expr {
+            ExprKind::Var(ref mut v) => {
                 let db = r.db;
                 let local_vars = r.top_scope();
                 let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
                     match r.module_scope.get(v) {
                         None => {
+                            let span = &self.0;
                             r.push_diagnostic(
-                                Diagnostic::new(v.name(db), format!("Unknown variable '{}'", v.name(db).text(db)))
+                                Diagnostic::new(v.name(db), *span, format!("Unknown variable '{}'", v.name(db).text(db)))
                             );
                         }
 
@@ -188,7 +193,7 @@ impl Rename for ExprKind {
                     }
                 }
             }
-            Self::Lam(ref mut pats, ref mut expr) => {
+            ExprKind::Lam(ref mut pats, ref mut expr) => {
                 r.push_scope();
                 for ref mut pat in pats {
                     pat.rename(r);
@@ -196,7 +201,7 @@ impl Rename for ExprKind {
                 expr.rename(r);
                 r.pop_scope();
             }
-            Self::App(ref mut expr, ref mut exprs) => {
+            ExprKind::App(ref mut expr, ref mut exprs) => {
                 expr.rename(r);
                 for ref mut expr in exprs {
                     expr.rename(r);
@@ -248,11 +253,11 @@ mod test {
         db.add_source_file("Lib2.purs".into(), lib2.into()).unwrap();
 
         let mut module = crate::indexed_module::indexed_module(db, module_id);
-        let imported = crate::renamed_module::imported_decls(db, module_id);
-        let exported = crate::renamed_module::exported_decls(db, module_id);
+        let mut imported = crate::renamed_module::imported_decls(db, module_id);
+        let mut exported = crate::renamed_module::exported_decls(db, module_id);
         let mut diagnostics = vec![];
 
-        rename_module(db, &mut module, imported, exported, &mut diagnostics);
+        rename_module(db, &mut module, &mut imported, &mut exported, &mut diagnostics);
 
         format!("{:#?}", (module.into_debug_all(db), diagnostics))
     }

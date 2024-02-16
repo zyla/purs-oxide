@@ -92,6 +92,10 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                     value: 2,
                 },
             ),
+            span: SourceSpan {
+                start: 23,
+                end: 24,
+            },
             error: "Duplicate variable 'a' in pattern",
         },
     ],

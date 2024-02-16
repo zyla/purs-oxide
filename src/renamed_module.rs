@@ -5,10 +5,7 @@ use salsa::DebugWithDb;
 use petgraph::{algo::tarjan_scc, prelude::DiGraph};
 
 use crate::{
-    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
-    indexed_module::IndexedModule,
-    symbol::Symbol,
-    Db, ModuleId, ParsedModule,
+    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind}, indexed_module::IndexedModule, rename::rename_module, symbol::Symbol, Db, ModuleId, ParsedModule
 };
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
@@ -35,16 +32,16 @@ pub struct RenamedModule {
 
 #[salsa::tracked]
 pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
-    let ref mut indexed = crate::indexed_module::indexed_module(db, module_id);
-    let ref imported = crate::renamed_module::imported_decls(db, module_id);
-    let ref exported = crate::renamed_module::exported_decls(db, module_id);
+    let mut indexed = crate::indexed_module::indexed_module(db, module_id);
+    let mut imported = crate::renamed_module::imported_decls(db, module_id);
+    let mut exported = crate::renamed_module::exported_decls(db, module_id);
     let declarations = vec![];
     let mut diagnositics = vec![];
 
 
     let module = crate::parsed_module(db, module_id);
 
-    crate::rename::rename_module(db, indexed, imported.to_vec(), exported.to_vec(), &mut diagnositics);
+    rename_module(db, &mut indexed, &mut imported, &mut exported, &mut diagnositics);
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();
