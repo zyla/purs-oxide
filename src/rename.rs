@@ -222,10 +222,10 @@ impl Rename for Located<ExprKind> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
     use salsa::DebugWithDb;
-    use crate::utils::tests::DropSalsaId;
 
     fn rename_mod(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);

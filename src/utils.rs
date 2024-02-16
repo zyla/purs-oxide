@@ -9,7 +9,6 @@ pub mod tests {
                 .filter(|l| !l.contains("[salsa id]"))
                 .collect::<Vec<_>>()
                 .join("\n")
-        }     
+        }
     }
 }
-

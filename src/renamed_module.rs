@@ -263,9 +263,9 @@ mod tests {
     use crate::Diagnostics;
 
     use super::*;
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
-    use crate::utils::tests::DropSalsaId;
 
     const LIB1: &str = indoc!(
         "
@@ -299,7 +299,8 @@ mod tests {
                 exported_decls(db, module_id).into_debug_all(db),
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
-        ).drop_salsa_id()
+        )
+        .drop_salsa_id()
     }
 
     fn import_decls(input: &str, deps: Vec<&str>) -> String {
@@ -316,7 +317,8 @@ mod tests {
                 imported_decls(db, module_id).into_debug_all(db),
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
-        ).drop_salsa_id()
+        )
+        .drop_salsa_id()
     }
 
     #[test]
