@@ -251,6 +251,7 @@ pub mod lexer;
 pub mod parser;
 pub mod rename;
 pub mod renamed_module;
+pub mod scc;
 pub mod string;
 pub mod symbol;
 pub mod token;
