@@ -176,7 +176,7 @@ impl Rename for ExprKind {
                     match r.module_scope.get(&v) {
                         None => {
                             r.push_diagnostic(
-                                Diagnostic::new(v.name(db), format!("Unknown viariable '{}'", v.name(db).text(db)))
+                                Diagnostic::new(v.name(db), format!("Unknown variable '{}'", v.name(db).text(db)))
                             );
                         }
 
