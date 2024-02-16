@@ -23,6 +23,11 @@ pub struct Jar(
     crate::Diagnostics,
     crate::ast::QualifiedName,
     crate::ast::AbsoluteName,
+    crate::renamed_module::DeclId,
+    crate::scc::scc_of,
+    crate::scc::decls_in_scc,
+    crate::scc::SccId,
+    crate::renamed_module::renamed_value_decl,
 );
 
 #[salsa::input]
@@ -121,7 +126,11 @@ pub struct ParsedModule {
 
 #[salsa::tracked]
 pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
-    let (filename, input) = &db.module_source(module).contents(db).as_ref().unwrap();
+    let (filename, input) = &db
+        .module_source(module)
+        .contents(db)
+        .as_ref()
+        .unwrap_or_else(|| panic!("module not found: {:?}", module.name(db)));
     let (errs, result) = crate::parser::parse_module(db, input);
     if !errs.is_empty() {
         for err in errs.iter().take(1) {
@@ -249,7 +258,9 @@ pub mod errors;
 pub mod indexed_module;
 pub mod lexer;
 pub mod parser;
+pub mod rename;
 pub mod renamed_module;
+pub mod scc;
 pub mod string;
 pub mod symbol;
 pub mod token;

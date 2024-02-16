@@ -58,7 +58,7 @@ pub struct ValueDecl {
 
     /// Empty equations means foreign import.
     /// TODO: maybe make it more explicit?
-    equations: Vec<CaseBranch>,
+    pub equations: Vec<CaseBranch>,
 }
 
 struct ModuleIndexer<'a> {
@@ -343,6 +343,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         filename: module.filename.clone(),
     };
     indexer.index(&module);
+    // TODO: rewrite spans relative to declaration
     IndexedModule {
         module_id,
         types: indexer.types,

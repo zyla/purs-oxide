@@ -1,0 +1,102 @@
+---
+source: src/rename.rs
+expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        f a a = a\n        \"))"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            [salsa id]: 0,
+            name: "Test",
+        },
+        types: {},
+        values: {
+            AbsoluteName {
+                [salsa id]: 0,
+                module: ModuleId {
+                    [salsa id]: 0,
+                    name: "Test",
+                },
+                name: Symbol {
+                    [salsa id]: 0,
+                    text: "f",
+                },
+            }: ValueDecl {
+                name: AbsoluteName {
+                    [salsa id]: 0,
+                    module: ModuleId {
+                        [salsa id]: 0,
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        [salsa id]: 0,
+                        text: "f",
+                    },
+                },
+                type_: None,
+                equations: [
+                    CaseBranch {
+                        pats: [
+                            Located(
+                                SourceSpan {
+                                    start: 21,
+                                    end: 22,
+                                },
+                                Var(
+                                    Symbol {
+                                        [salsa id]: 1,
+                                        text: "a",
+                                    },
+                                ),
+                            ),
+                            Located(
+                                SourceSpan {
+                                    start: 23,
+                                    end: 24,
+                                },
+                                Var(
+                                    Symbol {
+                                        [salsa id]: 1,
+                                        text: "a",
+                                    },
+                                ),
+                            ),
+                        ],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 27,
+                                    end: 28,
+                                },
+                                Var(
+                                    QualifiedName {
+                                        [salsa id]: 0,
+                                        module: None,
+                                        name: Symbol {
+                                            [salsa id]: 1,
+                                            text: "a",
+                                        },
+                                    },
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+        classes: {},
+    },
+    [
+        Diagnostic {
+            name: Symbol(
+                Id {
+                    value: 2,
+                },
+            ),
+            span: SourceSpan {
+                start: 23,
+                end: 24,
+            },
+            error: "Duplicate variable 'a' in pattern",
+        },
+    ],
+)

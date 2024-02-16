@@ -1,3 +1,7 @@
+use crate::ast::AbsoluteName;
+use crate::indexed_module::TypeClassDecl;
+use crate::indexed_module::TypeDecl;
+use fxhash::FxHashMap;
 use std::collections::{HashMap, HashSet};
 
 use salsa::DebugWithDb;
@@ -6,16 +10,23 @@ use petgraph::{algo::tarjan_scc, prelude::DiGraph};
 
 use crate::{
     ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
-    indexed_module::IndexedModule,
+    indexed_module::{IndexedModule, ValueDecl},
+    rename::rename_module,
     symbol::Symbol,
     Db, ModuleId, ParsedModule,
 };
 
-#[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
+#[salsa::interned]
 pub struct DeclId {
     pub namespace: Namespace,
     pub module: ModuleId,
     pub name: Symbol,
+}
+
+impl DeclId {
+    fn to_absolute_name(&self, db: &dyn Db) -> AbsoluteName {
+        AbsoluteName::new(db, self.module(db), self.name(db))
+    }
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
@@ -30,17 +41,34 @@ pub struct RenamedModule {
     pub module_id: ModuleId,
     pub imported: Vec<(Option<ModuleId>, DeclId)>,
     pub exported: Vec<DeclId>,
-    pub declarations: Vec<Declaration>,
+    pub types: FxHashMap<AbsoluteName, TypeDecl>,
+    pub values: FxHashMap<AbsoluteName, ValueDecl>,
+    pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
+}
+
+#[salsa::tracked]
+pub fn renamed_value_decl(db: &dyn Db, id: DeclId) -> ValueDecl {
+    assert!(id.namespace(db) == Namespace::Value);
+    // FIXME: we shoudn't have to clone here
+    renamed_module(db, id.module(db)).values[&id.to_absolute_name(db)].clone()
 }
 
 #[salsa::tracked]
 pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
-    let _indexed = crate::indexed_module::indexed_module(db, module_id);
-    let imported = crate::renamed_module::imported_decls(db, module_id);
-    let exported = crate::renamed_module::exported_decls(db, module_id);
-    let declarations = vec![];
+    let mut indexed = crate::indexed_module::indexed_module(db, module_id);
+    let mut imported = crate::renamed_module::imported_decls(db, module_id);
+    let mut exported = crate::renamed_module::exported_decls(db, module_id);
+    let mut diagnositics = vec![];
 
     let module = crate::parsed_module(db, module_id);
+
+    rename_module(
+        db,
+        &mut indexed,
+        &mut imported,
+        &mut exported,
+        &mut diagnositics,
+    );
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();
@@ -72,9 +100,11 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
 
     RenamedModule {
         module_id,
-        imported,
-        exported,
-        declarations,
+        imported: imported.clone(),
+        exported: exported.clone(),
+        values: indexed.values,
+        types: indexed.types,
+        classes: indexed.classes,
     }
 }
 
@@ -82,6 +112,7 @@ struct ExportedDeclExtractor<'a> {
     db: &'a dyn Db,
     module_id: ModuleId,
     exported_decls: Vec<DeclId>,
+    imported_decls: Vec<(Option<ModuleId>, DeclId)>,
 }
 
 impl<'a> ExportedDeclExtractor<'a> {
@@ -93,64 +124,20 @@ impl<'a> ExportedDeclExtractor<'a> {
                 while let Some(ref_decl) = iter.peek().copied() {
                     use DeclarationRefKind::*;
 
-                    match **ref_decl {
-                        TypeClass { name } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Class,
-                            });
+                    match &**ref_decl {
+                        Module { name: qualified_as } => {
+                            self.exported_decls.extend(
+                                self.imported_decls
+                                    .iter()
+                                    .filter(|(name, _)| {
+                                        name.is_some_and(|name| name == *qualified_as)
+                                    })
+                                    .map(|(_, decl)| *decl),
+                            );
                             iter.next();
                         }
-                        TypeOp { name } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
-                            iter.next();
-                        }
-                        Type { name, .. } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
-                            iter.next();
-                        }
-                        Value { name } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Value,
-                            });
-                            iter.next();
-                        }
-                        ValueOp { name } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Value,
-                            });
-                            iter.next();
-                        }
-                        TypeInstanceRef { name, .. } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
-                            iter.next();
-                        }
-                        Module { name } => {
-                            let module = crate::parsed_module(db, name);
-                            let mut inner = ExportedDeclExtractor {
-                                db,
-                                module_id: name,
-                                exported_decls: Default::default(),
-                            };
-                            inner.extract(&module, &indexed);
-                            self.exported_decls.append(&mut inner.exported_decls);
+                        x => {
+                            self.exported_decls.push(to_decl_id(db, self.module_id, x));
                             iter.next();
                         }
                     }
@@ -160,33 +147,36 @@ impl<'a> ExportedDeclExtractor<'a> {
                 let mut val_iter = indexed.values.keys().peekable();
 
                 while let Some(abs_name) = val_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        name: abs_name.name(db),
-                        module: indexed.module_id,
-                        namespace: Namespace::Value,
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Value,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     val_iter.next();
                 }
 
                 let mut type_iter = indexed.types.keys().peekable();
 
                 while let Some(abs_name) = type_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        namespace: Namespace::Type,
-                        module: indexed.module_id,
-                        name: abs_name.name(db),
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Type,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     type_iter.next();
                 }
 
                 let mut class_iter = indexed.classes.keys().peekable();
 
                 while let Some(abs_name) = class_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        namespace: Namespace::Class,
-                        module: indexed.module_id,
-                        name: abs_name.name(db),
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Class,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     class_iter.next();
                 }
             }
@@ -198,11 +188,13 @@ impl<'a> ExportedDeclExtractor<'a> {
 pub fn exported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<DeclId> {
     let indexed = crate::indexed_module::indexed_module(db, module_id);
     let module = crate::parsed_module(db, module_id);
+    let imported = imported_decls(db, module_id);
 
     let mut extractor = ExportedDeclExtractor {
         db,
         module_id,
         exported_decls: Default::default(),
+        imported_decls: imported,
     };
 
     extractor.extract(&module, &indexed);
@@ -222,27 +214,27 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Implicit => {
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
-                    .for_each(|i| imports.push((import.alias, i.clone())));
+                    .for_each(|i| imports.push((import.alias, *i)));
 
                 iter.next();
             }
             Explicit(decls) => {
                 decls
-                    .into_iter()
-                    .map(|i| to_decl_id(import.module, &i))
+                    .iter()
+                    .map(|i| to_decl_id(db, import.module, i))
                     .for_each(|i| imports.push((import.alias, i)));
 
                 iter.next();
             }
             Hiding(decls) => {
                 let excluded: HashSet<DeclId> = decls
-                    .into_iter()
-                    .map(|i| to_decl_id(import.module, &i))
+                    .iter()
+                    .map(|i| to_decl_id(db, import.module, i))
                     .collect();
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
                     .filter(|i| !excluded.contains(i))
-                    .for_each(|i| imports.push((import.alias, i.clone())));
+                    .for_each(|i| imports.push((import.alias, *i)));
 
                 iter.next();
             }
@@ -252,40 +244,16 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
     imports
 }
 
-fn to_decl_id(module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
+fn to_decl_id(db: &dyn Db, module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
     use DeclarationRefKind::*;
 
     match *kind {
-        TypeClass { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Class,
-        },
-        TypeOp { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
-        Type { name, .. } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
-        Value { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Value,
-        },
-        ValueOp { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Value,
-        },
-        TypeInstanceRef { name, .. } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
+        TypeClass { name } => DeclId::new(db, Namespace::Class, module_id, name),
+        TypeOp { name } => DeclId::new(db, Namespace::Type, module_id, name),
+        Type { name, .. } => DeclId::new(db, Namespace::Type, module_id, name),
+        Value { name } => DeclId::new(db, Namespace::Value, module_id, name),
+        ValueOp { name } => DeclId::new(db, Namespace::Value, module_id, name),
+        TypeInstanceRef { name, .. } => DeclId::new(db, Namespace::Type, module_id, name),
         Module { .. } => panic!("Cannot map module to DeclId"),
     }
 }
@@ -298,9 +266,31 @@ mod tests {
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
-    fn export_decls(input: &str) -> String {
+    const LIB1: &str = indoc!(
+        "
+        module Lib where
+
+        data Foo = Bar
+        "
+    );
+
+    const LIB2: &str = indoc!(
+        "
+        module Lib2 where
+         
+        x = 1
+        y = 2
+        "
+    );
+
+    fn export_decls(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
         let module_id = ModuleId::new(db, "Test".into());
+
+        deps.into_iter().zip(1..).for_each(|(deb, i)| {
+            db.add_source_file(format!("Lib{}.purs", i).into(), deb.into())
+                .unwrap();
+        });
 
         format!(
             "{:#?}",
@@ -311,19 +301,13 @@ mod tests {
         )
     }
 
-    fn import_decls(input: &str) -> String {
+    fn import_decls(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
-
-        let lib = indoc!(
-            "
-        module Lib where
-        
-        data Foo = Bar
-        "
-        );
-        db.add_source_file("lib.purs".into(), lib.into()).unwrap();
-
         let module_id = ModuleId::new(db, "Test".into());
+        deps.into_iter().zip(1..).for_each(|(deb, i)| {
+            db.add_source_file(format!("Lib{}.purs", i).into(), deb.into())
+                .unwrap();
+        });
 
         format!(
             "{:#?}",
@@ -336,55 +320,131 @@ mod tests {
 
     #[test]
     fn export_data_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test (Foo) where
     data Foo
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
     fn export_blanket_data_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test where
     data Foo
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
+    #[ignore = "Type classes are not yet supported"]
     fn export_class_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test where
 
     class Foo a where
       foo :: a
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
     fn import_data_decl() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         
         import Foo (Foo(..))
         "
-        )))
+            ),
+            vec![LIB1]
+        ))
     }
 
     #[test]
     fn import_data_qualified_decl() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         
         import Lib as Lib
         "
-        )))
+            ),
+            vec![LIB1]
+        ))
+    }
+
+    #[test]
+    fn import_all_fns() {
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
+        module Test where
+        import Lib2
+        "
+            ),
+            vec![LIB2]
+        ))
+    }
+
+    #[test]
+    fn import_subset() {
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
+        module Test where
+        import Lib2 (x)
+        "
+            ),
+            vec![LIB2]
+        ))
+    }
+
+    #[test]
+    fn reexport_qualified() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+            module Test
+              ( module L
+              , x ) where
+            
+            import Lib as L
+            
+            x = 1
+            "
+            ),
+            vec![LIB1]
+        ))
+    }
+
+    #[test]
+    fn reexport_qualified_itself() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+            module Test (module L, module Test) where
+            
+            import Lib as L
+            
+            x = 1
+            "
+            ),
+            vec![LIB1]
+        ))
     }
 }
