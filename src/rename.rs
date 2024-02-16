@@ -156,7 +156,7 @@ impl Rename for PatKind {
             Self::Var(v) => {
                 if !r.top_scope().insert(*v) {
                     r.push_diagnostic(
-                        Diagnostic::new(*v, format!("Duplicate viariable '{}' in pattern", v.text(r.db)))
+                        Diagnostic::new(*v, format!("Duplicate variable '{}' in pattern", v.text(r.db)))
                     );
                 }
             }
@@ -173,7 +173,7 @@ impl Rename for ExprKind {
                 let local_vars = r.top_scope();
                 let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
-                    match r.module_scope.get(&v) {
+                    match r.module_scope.get(v) {
                         None => {
                             r.push_diagnostic(
                                 Diagnostic::new(v.name(db), format!("Unknown variable '{}'", v.name(db).text(db)))
@@ -183,7 +183,7 @@ impl Rename for ExprKind {
                         Some(abs) => {
                             *v = abs.to_qualified_name(db);
                             use salsa::DebugWithDb;
-                            eprintln!("replacing with {:?}", v.clone().into_debug_all(db));
+                            eprintln!("replacing with {:?}", v.into_debug_all(db));
                         }
                     }
                 }

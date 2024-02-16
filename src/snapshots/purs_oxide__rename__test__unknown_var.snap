@@ -67,7 +67,7 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                     value: 2,
                 },
             ),
-            error: "Unknown viariable 'x'",
+            error: "Unknown variable 'x'",
         },
     ],
 )

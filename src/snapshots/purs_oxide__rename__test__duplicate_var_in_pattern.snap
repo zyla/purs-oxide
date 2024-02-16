@@ -92,7 +92,7 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
                     value: 2,
                 },
             ),
-            error: "Duplicate viariable 'a' in pattern",
+            error: "Duplicate variable 'a' in pattern",
         },
     ],
 )
