@@ -225,6 +225,7 @@ mod test {
     use indoc::indoc;
     use insta::{self, assert_snapshot};
     use salsa::DebugWithDb;
+    use crate::utils::tests::DropSalsaId;
 
     fn rename_mod(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
@@ -248,7 +249,7 @@ mod test {
             &mut diagnostics,
         );
 
-        format!("{:#?}", (module.into_debug_all(db), diagnostics))
+        format!("{:#?}", (module.into_debug_all(db), diagnostics)).drop_salsa_id()
     }
 
     #[test]
@@ -258,7 +259,7 @@ mod test {
                 "
         module Test where
         
-        f a = a 
+        f a = a
         "
             ),
             vec![]

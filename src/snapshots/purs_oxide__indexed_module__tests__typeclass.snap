@@ -5,31 +5,24 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
 (
     IndexedModule {
         module_id: ModuleId {
-            [salsa id]: 0,
             name: "Test",
         },
         types: {},
         values: {},
         classes: {
             AbsoluteName {
-                [salsa id]: 0,
                 module: ModuleId {
-                    [salsa id]: 0,
                     name: "Test",
                 },
                 name: Symbol {
-                    [salsa id]: 0,
                     text: "Show",
                 },
             }: TypeClassDecl {
                 name: AbsoluteName {
-                    [salsa id]: 0,
                     module: ModuleId {
-                        [salsa id]: 0,
                         name: "Test",
                     },
                     name: Symbol {
-                        [salsa id]: 0,
                         text: "Show",
                     },
                 },
@@ -37,7 +30,6 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                 params: [
                     (
                         Symbol {
-                            [salsa id]: 1,
                             text: "a",
                         },
                         None,
@@ -47,7 +39,6 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                 methods: [
                     TypeDeclarationData {
                         ident: Symbol {
-                            [salsa id]: 2,
                             text: "show",
                         },
                         r#type: Located(
@@ -63,7 +54,6 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                                     },
                                     Var(
                                         Symbol {
-                                            [salsa id]: 1,
                                             text: "a",
                                         },
                                     ),
@@ -75,10 +65,8 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                                     },
                                     TypeConstructor(
                                         QualifiedName {
-                                            [salsa id]: 1,
                                             module: None,
                                             name: Symbol {
-                                                [salsa id]: 3,
                                                 text: "String",
                                             },
                                         },

@@ -265,19 +265,7 @@ mod tests {
     use super::*;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
-
-    trait DropSalsaId {
-        fn drop_salsa_id(&mut self) -> Self;
-    }
-
-    impl DropSalsaId for String {
-        fn drop_salsa_id(&mut self) -> String {
-            self.lines()
-                .filter(|l| !l.contains("[salsa id]"))
-                .collect::<Vec<_>>()
-                .join("\n")
-        }     
-    }
+    use crate::utils::tests::DropSalsaId;
 
     const LIB1: &str = indoc!(
         "

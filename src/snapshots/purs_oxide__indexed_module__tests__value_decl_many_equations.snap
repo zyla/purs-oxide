@@ -5,30 +5,23 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
 (
     IndexedModule {
         module_id: ModuleId {
-            [salsa id]: 0,
             name: "Test",
         },
         types: {},
         values: {
             AbsoluteName {
-                [salsa id]: 0,
                 module: ModuleId {
-                    [salsa id]: 0,
                     name: "Test",
                 },
                 name: Symbol {
-                    [salsa id]: 0,
                     text: "foo",
                 },
             }: ValueDecl {
                 name: AbsoluteName {
-                    [salsa id]: 0,
                     module: ModuleId {
-                        [salsa id]: 0,
                         name: "Test",
                     },
                     name: Symbol {
-                        [salsa id]: 0,
                         text: "foo",
                     },
                 },

@@ -5,7 +5,6 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
 (
     IndexedModule {
         module_id: ModuleId {
-            [salsa id]: 0,
             name: "Test",
         },
         types: {},

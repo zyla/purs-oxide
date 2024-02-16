@@ -357,6 +357,7 @@ mod tests {
     use super::*;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
+    use crate::utils::tests::DropSalsaId;
 
     fn index_module(input: &str) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
@@ -367,7 +368,7 @@ mod tests {
                 indexed_module(db, module_id).into_debug_all(db),
                 indexed_module::accumulated::<Diagnostics>(db, module_id)
             )
-        )
+        ).drop_salsa_id()
     }
 
     #[test]
