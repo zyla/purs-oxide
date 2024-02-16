@@ -266,6 +266,19 @@ mod tests {
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
+    trait DropSalsaId {
+        fn drop_salsa_id(&mut self) -> Self;
+    }
+
+    impl DropSalsaId for String {
+        fn drop_salsa_id(&mut self) -> String {
+            self.lines()
+                .filter(|l| !l.contains("[salsa id]"))
+                .collect::<Vec<_>>()
+                .join("\n")
+        }     
+    }
+
     const LIB1: &str = indoc!(
         "
         module Lib where
@@ -298,7 +311,7 @@ mod tests {
                 exported_decls(db, module_id).into_debug_all(db),
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
-        )
+        ).drop_salsa_id()
     }
 
     fn import_decls(input: &str, deps: Vec<&str>) -> String {
@@ -315,7 +328,7 @@ mod tests {
                 imported_decls(db, module_id).into_debug_all(db),
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
-        )
+        ).drop_salsa_id()
     }
 
     #[test]
