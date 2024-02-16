@@ -1,4 +1,8 @@
-use std::collections::HashSet;
+use crate::ast::AbsoluteName;
+use crate::indexed_module::TypeClassDecl;
+use crate::indexed_module::TypeDecl;
+use fxhash::FxHashMap;
+use std::collections::{HashMap, HashSet};
 
 use salsa::DebugWithDb;
 
@@ -6,19 +10,23 @@ use petgraph::{algo::tarjan_scc, prelude::DiGraph};
 
 use crate::{
     ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
-    indexed_module::IndexedModule,
+    indexed_module::{IndexedModule, ValueDecl},
     rename::rename_module,
     symbol::Symbol,
     Db, ModuleId, ParsedModule,
 };
-
-use std::collections::HashMap;
 
 #[salsa::interned]
 pub struct DeclId {
     pub namespace: Namespace,
     pub module: ModuleId,
     pub name: Symbol,
+}
+
+impl DeclId {
+    fn to_absolute_name(&self, db: &dyn Db) -> AbsoluteName {
+        AbsoluteName::new(db, self.module(db), self.name(db))
+    }
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
@@ -33,7 +41,16 @@ pub struct RenamedModule {
     pub module_id: ModuleId,
     pub imported: Vec<(Option<ModuleId>, DeclId)>,
     pub exported: Vec<DeclId>,
-    pub declarations: Vec<Declaration>,
+    pub types: FxHashMap<AbsoluteName, TypeDecl>,
+    pub values: FxHashMap<AbsoluteName, ValueDecl>,
+    pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
+}
+
+#[salsa::tracked]
+pub fn renamed_value_decl(db: &dyn Db, id: DeclId) -> ValueDecl {
+    assert!(id.namespace(db) == Namespace::Value);
+    // FIXME: we shoudn't have to clone here
+    renamed_module(db, id.module(db)).values[&id.to_absolute_name(db)].clone()
 }
 
 #[salsa::tracked]
@@ -41,7 +58,6 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
     let mut indexed = crate::indexed_module::indexed_module(db, module_id);
     let mut imported = crate::renamed_module::imported_decls(db, module_id);
     let mut exported = crate::renamed_module::exported_decls(db, module_id);
-    let declarations = vec![];
     let mut diagnositics = vec![];
 
     let module = crate::parsed_module(db, module_id);
@@ -86,7 +102,9 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
         module_id,
         imported: imported.clone(),
         exported: exported.clone(),
-        declarations,
+        values: indexed.values,
+        types: indexed.types,
+        classes: indexed.classes,
     }
 }
 
