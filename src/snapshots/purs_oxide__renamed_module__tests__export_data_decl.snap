@@ -1,18 +1,15 @@
 ---
 source: src/renamed_module.rs
-expression: "export_decls(indoc!(\"\n    module Test (Foo) where\n    data Foo\n    \"))"
+expression: "export_decls(indoc!(\"\n    module Test (Foo) where\n    data Foo\n    \"), vec![])"
 ---
 (
     [
         DeclId {
-            [salsa id]: 0,
             namespace: Type,
             module: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             name: Symbol {
-                [salsa id]: 0,
                 text: "Foo",
             },
         },

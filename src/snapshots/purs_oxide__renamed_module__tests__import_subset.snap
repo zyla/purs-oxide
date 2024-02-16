@@ -1,20 +1,17 @@
 ---
 source: src/renamed_module.rs
-expression: "import_decls(indoc!(\"\n        module Test where\n        import Lib2 (x)\n        \"),\n    vec![lib2])"
+expression: "import_decls(indoc!(\"\n        module Test where\n        import Lib2 (x)\n        \"),\n    vec![LIB2])"
 ---
 (
     [
         (
             None,
             DeclId {
-                [salsa id]: 0,
                 namespace: Value,
                 module: ModuleId {
-                    [salsa id]: 1,
                     name: "Lib2",
                 },
                 name: Symbol {
-                    [salsa id]: 0,
                     text: "x",
                 },
             },

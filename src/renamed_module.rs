@@ -263,6 +263,7 @@ mod tests {
     use crate::Diagnostics;
 
     use super::*;
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
@@ -299,6 +300,7 @@ mod tests {
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
         )
+        .drop_salsa_id()
     }
 
     fn import_decls(input: &str, deps: Vec<&str>) -> String {
@@ -316,6 +318,7 @@ mod tests {
                 renamed_module::accumulated::<Diagnostics>(db, module_id)
             )
         )
+        .drop_salsa_id()
     }
 
     #[test]

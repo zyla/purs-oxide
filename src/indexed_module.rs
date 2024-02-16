@@ -355,6 +355,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
@@ -368,6 +369,7 @@ mod tests {
                 indexed_module::accumulated::<Diagnostics>(db, module_id)
             )
         )
+        .drop_salsa_id()
     }
 
     #[test]

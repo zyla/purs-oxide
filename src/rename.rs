@@ -222,6 +222,7 @@ impl Rename for Located<ExprKind> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
     use salsa::DebugWithDb;
@@ -248,7 +249,7 @@ mod test {
             &mut diagnostics,
         );
 
-        format!("{:#?}", (module.into_debug_all(db), diagnostics))
+        format!("{:#?}", (module.into_debug_all(db), diagnostics)).drop_salsa_id()
     }
 
     #[test]
@@ -258,7 +259,7 @@ mod test {
                 "
         module Test where
         
-        f a = a 
+        f a = a
         "
             ),
             vec![]
