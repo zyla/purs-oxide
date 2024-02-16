@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use salsa::DebugWithDb;
 
@@ -11,6 +11,8 @@ use crate::{
     symbol::Symbol,
     Db, ModuleId, ParsedModule,
 };
+
+use std::collections::HashMap;
 
 #[salsa::interned]
 pub struct DeclId {
@@ -92,6 +94,7 @@ struct ExportedDeclExtractor<'a> {
     db: &'a dyn Db,
     module_id: ModuleId,
     exported_decls: Vec<DeclId>,
+    imported_decls: Vec<(Option<ModuleId>, DeclId)>,
 }
 
 impl<'a> ExportedDeclExtractor<'a> {
@@ -105,9 +108,12 @@ impl<'a> ExportedDeclExtractor<'a> {
 
                     match &**ref_decl {
                         Module { name } => {
-                            // FIXME: this is broken, `name` is a module alias, not absolute module
-                            // name
-                            self.exported_decls.append(&mut exported_decls(db, *name));
+                            self.exported_decls.extend(
+                                self.imported_decls
+                                    .iter()
+                                    .filter(|(n, _)| *n == Some(*name))
+                                    .map(|(_, decl)| *decl),
+                            );
                             iter.next();
                         }
                         x => {
@@ -167,6 +173,7 @@ pub fn exported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<DeclId> {
         db,
         module_id,
         exported_decls: Default::default(),
+        imported_decls: crate::renamed_module::imported_decls(db, module_id),
     };
 
     extractor.extract(&module, &indexed);
@@ -355,6 +362,19 @@ mod tests {
         module Test where
         import Lib2 (x)
         "
+        )))
+    }
+
+    #[test]
+    fn reexport_qualified() {
+        assert_snapshot!(export_decls(indoc!(
+            "
+            module Test (module Lib, module Test) where
+            
+            import Lib as Lib
+            
+            x = 1
+            "
         )))
     }
 }
