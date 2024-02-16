@@ -103,68 +103,15 @@ impl<'a> ExportedDeclExtractor<'a> {
                 while let Some(ref_decl) = iter.peek().copied() {
                     use DeclarationRefKind::*;
 
-                    match **ref_decl {
-                        TypeClass { name } => {
-                            self.exported_decls.push(DeclId::new(
-                                db,
-                                name,
-                                self.module_id,
-                                Namespace::Class,
-                            ));
-                            iter.next();
-                        }
-                        TypeOp { name } => {
-                            self.exported_decls.push(DeclId::new(
-                                db,
-                                name,
-                                self.module_id,
-                                Namespace::Type,
-                            ));
-                            iter.next();
-                        }
-                        Type { name, .. } => {
-                            self.exported_decls.push(DeclId::new(
-                                db,
-                                name,
-                                self.module_id,
-                                Namespace::Type,
-                            ));
-                            iter.next();
-                        }
-                        Value { name } => {
-                            self.exported_decls.push(DeclId::new(
-                                db,
-                                name,
-                                self.module_id,
-                                Namespace::Value,
-                            ));
-                            iter.next();
-                        }
-                        ValueOp { name } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Value,
-                            });
-                            iter.next();
-                        }
-                        TypeInstanceRef { name, .. } => {
-                            self.exported_decls.push(DeclId {
-                                name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
-                            iter.next();
-                        }
+                    match &**ref_decl {
                         Module { name } => {
-                            let module = crate::parsed_module(db, name);
-                            let mut inner = ExportedDeclExtractor {
-                                db,
-                                module_id: name,
-                                exported_decls: Default::default(),
-                            };
-                            inner.extract(&module, &indexed);
-                            self.exported_decls.append(&mut inner.exported_decls);
+                            // FIXME: this is broken, `name` is a module alias, not absolute module
+                            // name
+                            self.exported_decls.append(&mut exported_decls(db, *name));
+                            iter.next();
+                        }
+                        x => {
+                            self.exported_decls.push(to_decl_id(db, self.module_id, x));
                             iter.next();
                         }
                     }
@@ -174,33 +121,36 @@ impl<'a> ExportedDeclExtractor<'a> {
                 let mut val_iter = indexed.values.keys().peekable();
 
                 while let Some(abs_name) = val_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        name: abs_name.name(db),
-                        module: indexed.module_id,
-                        namespace: Namespace::Value,
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Value,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     val_iter.next();
                 }
 
                 let mut type_iter = indexed.types.keys().peekable();
 
                 while let Some(abs_name) = type_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        namespace: Namespace::Type,
-                        module: indexed.module_id,
-                        name: abs_name.name(db),
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Type,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     type_iter.next();
                 }
 
                 let mut class_iter = indexed.classes.keys().peekable();
 
                 while let Some(abs_name) = class_iter.peek().copied() {
-                    self.exported_decls.push(DeclId {
-                        namespace: Namespace::Class,
-                        module: indexed.module_id,
-                        name: abs_name.name(db),
-                    });
+                    self.exported_decls.push(DeclId::new(
+                        db,
+                        Namespace::Class,
+                        indexed.module_id,
+                        abs_name.name(db),
+                    ));
                     class_iter.next();
                 }
             }
@@ -243,7 +193,7 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Explicit(decls) => {
                 decls
                     .into_iter()
-                    .map(|i| to_decl_id(import.module, &i))
+                    .map(|i| to_decl_id(db, import.module, &i))
                     .for_each(|i| imports.push((import.alias, i)));
 
                 iter.next();
@@ -251,7 +201,7 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Hiding(decls) => {
                 let excluded: HashSet<DeclId> = decls
                     .into_iter()
-                    .map(|i| to_decl_id(import.module, &i))
+                    .map(|i| to_decl_id(db, import.module, &i))
                     .collect();
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
@@ -266,40 +216,16 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
     imports
 }
 
-fn to_decl_id(module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
+fn to_decl_id(db: &dyn Db, module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
     use DeclarationRefKind::*;
 
     match *kind {
-        TypeClass { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Class,
-        },
-        TypeOp { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
-        Type { name, .. } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
-        Value { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Value,
-        },
-        ValueOp { name } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Value,
-        },
-        TypeInstanceRef { name, .. } => DeclId {
-            name,
-            module: module_id,
-            namespace: Namespace::Type,
-        },
+        TypeClass { name } => DeclId::new(db, Namespace::Class, module_id, name),
+        TypeOp { name } => DeclId::new(db, Namespace::Type, module_id, name),
+        Type { name, .. } => DeclId::new(db, Namespace::Type, module_id, name),
+        Value { name } => DeclId::new(db, Namespace::Value, module_id, name),
+        ValueOp { name } => DeclId::new(db, Namespace::Value, module_id, name),
+        TypeInstanceRef { name, .. } => DeclId::new(db, Namespace::Type, module_id, name),
         Module { .. } => panic!("Cannot map module to DeclId"),
     }
 }

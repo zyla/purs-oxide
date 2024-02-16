@@ -19,8 +19,8 @@ pub fn rename_module(
 ) {
     let exported = exported_decls.iter().map(|decl_id| {
         (
-            QualifiedName::new(db, Option::None, decl_id.name),
-            AbsoluteName::new(db, decl_id.module, decl_id.name),
+            QualifiedName::new(db, Option::None, decl_id.name(db)),
+            AbsoluteName::new(db, decl_id.module(db), decl_id.name(db)),
         )
     });
 
@@ -28,8 +28,8 @@ pub fn rename_module(
         .iter()
         .map(|(qualified_as, id)| {
             (
-                QualifiedName::new(db, *qualified_as, id.name),
-                AbsoluteName::new(db, id.module, id.name),
+                QualifiedName::new(db, *qualified_as, id.name(db)),
+                AbsoluteName::new(db, id.module(db), id.name(db)),
             )
         })
         .chain(exported)
@@ -117,7 +117,7 @@ impl Rename for IndexedModule {
         });
 
         assert!(
-            !self.classes.is_empty(),
+            self.classes.is_empty(),
             "renaming typeclasses not yet supported"
         )
     }
