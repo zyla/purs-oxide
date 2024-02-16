@@ -268,7 +268,7 @@ mod test {
     #[test]
     fn some_modules() {
         assert_snapshot!(rename_mod(
-        indoc!(
+            indoc!(
                 "
         module Test where 
         
@@ -282,7 +282,7 @@ mod test {
         h = g a b
         "
             ),
-        vec![
+            vec![
                 indoc!(
                     "
         module Lib where
