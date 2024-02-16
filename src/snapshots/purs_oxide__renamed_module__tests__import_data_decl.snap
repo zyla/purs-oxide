@@ -1,6 +1,6 @@
 ---
 source: src/renamed_module.rs
-expression: "import_decls(indoc!(\"\n        module Test where\n        \n        import Foo (Foo(..))\n        \"))"
+expression: "import_decls(indoc!(\"\n        module Test where\n        \n        import Foo (Foo(..))\n        \"),\n    vec![lib1])"
 ---
 (
     [
@@ -10,7 +10,7 @@ expression: "import_decls(indoc!(\"\n        module Test where\n        \n      
                 [salsa id]: 0,
                 namespace: Type,
                 module: ModuleId {
-                    [salsa id]: 3,
+                    [salsa id]: 2,
                     name: "Foo",
                 },
                 name: Symbol {

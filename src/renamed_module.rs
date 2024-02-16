@@ -129,9 +129,9 @@ impl<'a> ExportedDeclExtractor<'a> {
                             self.exported_decls.extend(
                                 self.imported_decls
                                     .iter()
-                                    .filter(|(name, _)|
+                                    .filter(|(name, _)| {
                                         name.is_some_and(|name| name == *qualified_as)
-                                    )
+                                    })
                                     .map(|(_, decl)| *decl),
                             );
                             iter.next();
@@ -266,18 +266,31 @@ mod tests {
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
-    fn export_decls(input: &str) -> String {
+    const LIB1: &str = indoc!(
+        "
+        module Lib where
+
+        data Foo = Bar
+        "
+    );
+
+    const LIB2: &str = indoc!(
+        "
+        module Lib2 where
+         
+        x = 1
+        y = 2
+        "
+    );
+
+    fn export_decls(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
         let module_id = ModuleId::new(db, "Test".into());
 
-        let lib = indoc!(
-            "
-        module Lib where
-        
-        data Foo = Bar
-        "
-        );
-        db.add_source_file("Lib.purs".into(), lib.into()).unwrap();
+        deps.into_iter().zip(1..).for_each(|(deb, i)| {
+            db.add_source_file(format!("Lib{}.purs", i).into(), deb.into())
+                .unwrap();
+        });
 
         format!(
             "{:#?}",
@@ -288,29 +301,13 @@ mod tests {
         )
     }
 
-    fn import_decls(input: &str) -> String {
+    fn import_decls(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
-
-        let lib = indoc!(
-            "
-        module Lib where
-        
-        data Foo = Bar
-        "
-        );
-        db.add_source_file("Lib.purs".into(), lib.into()).unwrap();
-
-        let lib2 = indoc!(
-            "
-        module Lib2 where
-        
-        x = 1
-        y = 2
-        "
-        );
-        db.add_source_file("Lib2.purs".into(), lib2.into()).unwrap();
-
         let module_id = ModuleId::new(db, "Test".into());
+        deps.into_iter().zip(1..).for_each(|(deb, i)| {
+            db.add_source_file(format!("Lib{}.purs", i).into(), deb.into())
+                .unwrap();
+        });
 
         format!(
             "{:#?}",
@@ -323,83 +320,105 @@ mod tests {
 
     #[test]
     fn export_data_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test (Foo) where
     data Foo
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
     fn export_blanket_data_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test where
     data Foo
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
     #[ignore = "Type classes are not yet supported"]
     fn export_class_decl() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
     module Test where
 
     class Foo a where
       foo :: a
     "
-        )))
+            ),
+            vec![]
+        ))
     }
 
     #[test]
     fn import_data_decl() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         
         import Foo (Foo(..))
         "
-        )))
+            ),
+            vec![LIB1]
+        ))
     }
 
     #[test]
     fn import_data_qualified_decl() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         
         import Lib as Lib
         "
-        )))
+            ),
+            vec![LIB1]
+        ))
     }
 
     #[test]
     fn import_all_fns() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         import Lib2
         "
-        )))
+            ),
+            vec![LIB2]
+        ))
     }
 
     #[test]
     fn import_subset() {
-        assert_snapshot!(import_decls(indoc!(
-            "
+        assert_snapshot!(import_decls(
+            indoc!(
+                "
         module Test where
         import Lib2 (x)
         "
-        )))
+            ),
+            vec![LIB2]
+        ))
     }
 
     #[test]
     fn reexport_qualified() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
             module Test
               ( module L
               , x ) where
@@ -408,20 +427,24 @@ mod tests {
             
             x = 1
             "
-        )))
+            ),
+            vec![LIB1]
+        ))
     }
-
 
     #[test]
     fn reexport_qualified_itself() {
-        assert_snapshot!(export_decls(indoc!(
-            "
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
             module Test (module L, module Test) where
             
             import Lib as L
             
             x = 1
             "
-        )))
+            ),
+            vec![LIB1]
+        ))
     }
 }
