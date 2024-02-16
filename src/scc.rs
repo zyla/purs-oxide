@@ -1,24 +1,20 @@
-use salsa::DebugWithDb;
+use crate::{renamed_module::DeclId, Db};
 
-use crate::renamed_module::Namespace;
-use crate::symbol::Symbol;
-
-use crate::{renamed_module::DeclId, Db, ModuleId};
-
-#[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
+/// A SCC is identified by its lexicographically smallest DeclId
+#[salsa::interned]
 pub struct SccId {
-    pub namespace: Namespace,
-    pub module: ModuleId,
-    pub name: Symbol,
+    #[return_ref]
+    pub decl: DeclId,
 }
 
+#[salsa::tracked]
+pub fn scc_of(db: &dyn Db, decl: DeclId) -> SccId {
+    // For now we don't handle cycles at all, so we assume every declaration is in its own cycle
+    SccId::new(db, decl)
+}
 
 #[salsa::tracked]
-pub fn scc_of(db: &dyn Db, decl: DeclId) -> Vec<SccId> {
-   let scc = SccId {
-        namespace: decl.namespace,
-        module: decl.module,
-        name: decl.name
-    };
-    vec![scc];
+pub fn decls_in_scc(db: &dyn Db, scc_id: SccId) -> Vec<DeclId> {
+    // For now we don't handle cycles at all, so we assume every declaration is in its own cycle
+    vec![*scc_id.decl(db)]
 }

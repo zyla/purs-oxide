@@ -5,10 +5,14 @@ use salsa::DebugWithDb;
 use petgraph::{algo::tarjan_scc, prelude::DiGraph};
 
 use crate::{
-    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind}, indexed_module::IndexedModule, rename::rename_module, symbol::Symbol, Db, ModuleId, ParsedModule
+    ast::{Declaration, DeclarationRefKind, ImportDeclarationKind},
+    indexed_module::IndexedModule,
+    rename::rename_module,
+    symbol::Symbol,
+    Db, ModuleId, ParsedModule,
 };
 
-#[derive(PartialEq, Eq, Clone, Debug, DebugWithDb, Hash)]
+#[salsa::interned]
 pub struct DeclId {
     pub namespace: Namespace,
     pub module: ModuleId,
@@ -38,10 +42,15 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
     let declarations = vec![];
     let mut diagnositics = vec![];
 
-
     let module = crate::parsed_module(db, module_id);
 
-    rename_module(db, &mut indexed, &mut imported, &mut exported, &mut diagnositics);
+    rename_module(
+        db,
+        &mut indexed,
+        &mut imported,
+        &mut exported,
+        &mut diagnositics,
+    );
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();
@@ -96,35 +105,39 @@ impl<'a> ExportedDeclExtractor<'a> {
 
                     match **ref_decl {
                         TypeClass { name } => {
-                            self.exported_decls.push(DeclId {
+                            self.exported_decls.push(DeclId::new(
+                                db,
                                 name,
-                                module: self.module_id,
-                                namespace: Namespace::Class,
-                            });
+                                self.module_id,
+                                Namespace::Class,
+                            ));
                             iter.next();
                         }
                         TypeOp { name } => {
-                            self.exported_decls.push(DeclId {
+                            self.exported_decls.push(DeclId::new(
+                                db,
                                 name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
+                                self.module_id,
+                                Namespace::Type,
+                            ));
                             iter.next();
                         }
                         Type { name, .. } => {
-                            self.exported_decls.push(DeclId {
+                            self.exported_decls.push(DeclId::new(
+                                db,
                                 name,
-                                module: self.module_id,
-                                namespace: Namespace::Type,
-                            });
+                                self.module_id,
+                                Namespace::Type,
+                            ));
                             iter.next();
                         }
                         Value { name } => {
-                            self.exported_decls.push(DeclId {
+                            self.exported_decls.push(DeclId::new(
+                                db,
                                 name,
-                                module: self.module_id,
-                                namespace: Namespace::Value,
-                            });
+                                self.module_id,
+                                Namespace::Value,
+                            ));
                             iter.next();
                         }
                         ValueOp { name } => {

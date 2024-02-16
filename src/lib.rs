@@ -1,6 +1,7 @@
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
+use scc::scc_of;
 use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -23,6 +24,10 @@ pub struct Jar(
     crate::Diagnostics,
     crate::ast::QualifiedName,
     crate::ast::AbsoluteName,
+    crate::renamed_module::DeclId,
+    crate::scc::scc_of,
+    crate::scc::decls_in_scc,
+    crate::scc::SccId,
 );
 
 #[salsa::input]
