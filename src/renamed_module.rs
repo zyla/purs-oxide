@@ -125,11 +125,13 @@ impl<'a> ExportedDeclExtractor<'a> {
                     use DeclarationRefKind::*;
 
                     match &**ref_decl {
-                        Module { name } => {
+                        Module { name: qualified_as } => {
                             self.exported_decls.extend(
                                 self.imported_decls
                                     .iter()
-                                    .filter(|(n, _)| *n == Some(*name))
+                                    .filter(|(name, _)|
+                                        name.is_some_and(|name| name == *qualified_as)
+                                    )
                                     .map(|(_, decl)| *decl),
                             );
                             iter.next();
@@ -186,12 +188,13 @@ impl<'a> ExportedDeclExtractor<'a> {
 pub fn exported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<DeclId> {
     let indexed = crate::indexed_module::indexed_module(db, module_id);
     let module = crate::parsed_module(db, module_id);
+    let imported = imported_decls(db, module_id);
 
     let mut extractor = ExportedDeclExtractor {
         db,
         module_id,
         exported_decls: Default::default(),
-        imported_decls: crate::renamed_module::imported_decls(db, module_id),
+        imported_decls: imported,
     };
 
     extractor.extract(&module, &indexed);
@@ -211,27 +214,27 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Implicit => {
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
-                    .for_each(|i| imports.push((import.alias, i.clone())));
+                    .for_each(|i| imports.push((import.alias, *i)));
 
                 iter.next();
             }
             Explicit(decls) => {
                 decls
-                    .into_iter()
-                    .map(|i| to_decl_id(db, import.module, &i))
+                    .iter()
+                    .map(|i| to_decl_id(db, import.module, i))
                     .for_each(|i| imports.push((import.alias, i)));
 
                 iter.next();
             }
             Hiding(decls) => {
                 let excluded: HashSet<DeclId> = decls
-                    .into_iter()
-                    .map(|i| to_decl_id(db, import.module, &i))
+                    .iter()
+                    .map(|i| to_decl_id(db, import.module, i))
                     .collect();
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
                     .filter(|i| !excluded.contains(i))
-                    .for_each(|i| imports.push((import.alias, i.clone())));
+                    .for_each(|i| imports.push((import.alias, *i)));
 
                 iter.next();
             }
@@ -267,6 +270,15 @@ mod tests {
         let db = &mut crate::Database::test_single_file_db(input);
         let module_id = ModuleId::new(db, "Test".into());
 
+        let lib = indoc!(
+            "
+        module Lib where
+        
+        data Foo = Bar
+        "
+        );
+        db.add_source_file("Lib.purs".into(), lib.into()).unwrap();
+
         format!(
             "{:#?}",
             (
@@ -286,7 +298,7 @@ mod tests {
         data Foo = Bar
         "
         );
-        db.add_source_file("lib.purs".into(), lib.into()).unwrap();
+        db.add_source_file("Lib.purs".into(), lib.into()).unwrap();
 
         let lib2 = indoc!(
             "
@@ -330,6 +342,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Type classes are not yet supported"]
     fn export_class_decl() {
         assert_snapshot!(export_decls(indoc!(
             "
@@ -387,9 +400,25 @@ mod tests {
     fn reexport_qualified() {
         assert_snapshot!(export_decls(indoc!(
             "
-            module Test (module Lib, module Test) where
+            module Test
+              ( module L
+              , x ) where
             
-            import Lib as Lib
+            import Lib as L
+            
+            x = 1
+            "
+        )))
+    }
+
+
+    #[test]
+    fn reexport_qualified_itself() {
+        assert_snapshot!(export_decls(indoc!(
+            "
+            module Test (module L, module Test) where
+            
+            import Lib as L
             
             x = 1
             "

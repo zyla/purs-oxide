@@ -1,0 +1,21 @@
+---
+source: src/renamed_module.rs
+expression: "export_decls(indoc!(\"\n            module Test (module L, module Test) where\n            \n            import Lib as L\n            \n            x = 1\n            \"))"
+---
+(
+    [
+        DeclId {
+            [salsa id]: 0,
+            namespace: Type,
+            module: ModuleId {
+                [salsa id]: 1,
+                name: "Lib",
+            },
+            name: Symbol {
+                [salsa id]: 1,
+                text: "Foo",
+            },
+        },
+    ],
+    [],
+)

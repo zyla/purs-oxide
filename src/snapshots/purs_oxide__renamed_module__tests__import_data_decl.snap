@@ -7,6 +7,7 @@ expression: "import_decls(indoc!(\"\n        module Test where\n        \n      
         (
             None,
             DeclId {
+                [salsa id]: 0,
                 namespace: Type,
                 module: ModuleId {
                     [salsa id]: 3,

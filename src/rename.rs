@@ -97,15 +97,6 @@ where
     }
 }
 
-// impl<T> Rename for Located<T>
-// where
-//     T: Rename,
-// {
-//     fn rename(&mut self, r: &mut Renamer) {
-//         self.1.rename(r);
-//     }
-// }
-
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
         self.values.iter_mut().for_each(|(_, v)| {
@@ -222,6 +213,7 @@ impl Rename for Located<ExprKind> {
                     expr.rename(r);
                 }
             }
+            ExprKind::Literal(_) => {}
             _ => todo!("renaming ExprKind {:?} not supported", self),
         }
     }

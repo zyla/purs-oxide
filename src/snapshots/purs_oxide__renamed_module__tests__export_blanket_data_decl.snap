@@ -5,6 +5,7 @@ expression: "export_decls(indoc!(\"\n    module Test where\n    data Foo\n    \"
 (
     [
         DeclId {
+            [salsa id]: 0,
             namespace: Type,
             module: ModuleId {
                 [salsa id]: 0,
