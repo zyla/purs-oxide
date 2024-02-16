@@ -1,6 +1,6 @@
 use derive_new::new;
 
-use crate::indexed_module::ValueDecl;
+use crate::indexed_module::{TypeDecl, ValueDecl};
 use crate::symbol::Symbol;
 use crate::Db;
 use std::collections::{HashMap, HashSet};
@@ -108,13 +108,18 @@ where
 
 impl Rename for IndexedModule {
     fn rename(&mut self, r: &mut Renamer) {
-        self.values.iter_mut().for_each(|(_, ref mut v)| {
+        self.values.iter_mut().for_each(|(_, v)| {
             v.rename(r);
         });
 
-        // TODO: self.types
-        // TODO: self.classes
-        // assert!(!self.types.is_empty(), "renaming types not yet supported")
+        self.types.iter_mut().for_each(|(_, v)| {
+            v.rename(r);
+        });
+
+        assert!(
+            !self.classes.is_empty(),
+            "renaming typeclasses not yet supported"
+        )
     }
 }
 
@@ -122,6 +127,12 @@ impl Rename for ValueDecl {
     fn rename(&mut self, r: &mut Renamer) {
         self.type_.rename(r);
         self.equations.iter_mut().for_each(|ref mut x| x.rename(r));
+    }
+}
+
+impl Rename for TypeDecl {
+    fn rename(&mut self, _r: &mut Renamer) {
+        // TODO: rename types
     }
 }
 
@@ -158,9 +169,11 @@ impl Rename for Located<PatKind> {
             PatKind::Var(v) => {
                 if !r.top_scope().insert(*v) {
                     let span = &self.0;
-                    r.push_diagnostic(
-                        Diagnostic::new(*v, *span, format!("Duplicate variable '{}' in pattern", v.text(r.db)))
-                    );
+                    r.push_diagnostic(Diagnostic::new(
+                        *v,
+                        *span,
+                        format!("Duplicate variable '{}' in pattern", v.text(r.db)),
+                    ));
                 }
             }
             _ => todo!("renaming PatKind {:?} not supported", self),
@@ -180,9 +193,11 @@ impl Rename for Located<ExprKind> {
                     match r.module_scope.get(v) {
                         None => {
                             let span = &self.0;
-                            r.push_diagnostic(
-                                Diagnostic::new(v.name(db), *span, format!("Unknown variable '{}'", v.name(db).text(db)))
-                            );
+                            r.push_diagnostic(Diagnostic::new(
+                                v.name(db),
+                                *span,
+                                format!("Unknown variable '{}'", v.name(db).text(db)),
+                            ));
                         }
 
                         Some(abs) => {
@@ -257,7 +272,13 @@ mod test {
         let mut exported = crate::renamed_module::exported_decls(db, module_id);
         let mut diagnostics = vec![];
 
-        rename_module(db, &mut module, &mut imported, &mut exported, &mut diagnostics);
+        rename_module(
+            db,
+            &mut module,
+            &mut imported,
+            &mut exported,
+            &mut diagnostics,
+        );
 
         format!("{:#?}", (module.into_debug_all(db), diagnostics))
     }

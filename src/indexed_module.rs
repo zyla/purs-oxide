@@ -343,6 +343,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         filename: module.filename.clone(),
     };
     indexer.index(&module);
+    // TODO: rewrite spans relative to declaration
     IndexedModule {
         module_id,
         types: indexer.types,
