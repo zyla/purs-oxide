@@ -1,6 +1,6 @@
 use derive_new::new;
 
-use crate::indexed_module::{TypeDecl, ValueDecl};
+use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
 use crate::symbol::Symbol;
 use crate::Db;
 use std::collections::{HashMap, HashSet};
@@ -107,23 +107,52 @@ impl Rename for IndexedModule {
             v.rename(r);
         });
 
-        assert!(
-            self.classes.is_empty(),
-            "renaming typeclasses not yet supported"
-        )
+        self.classes.iter_mut().for_each(|(_, v)| {
+            v.rename(r);
+        });
     }
 }
 
 impl Rename for ValueDecl {
     fn rename(&mut self, r: &mut Renamer) {
         self.type_.rename(r);
-        self.equations.iter_mut().for_each(|ref mut x| x.rename(r));
+        self.equations.iter_mut().for_each(|x| x.rename(r));
     }
 }
 
 impl Rename for TypeDecl {
+    fn rename(&mut self, r: &mut Renamer) {
+        match self {
+            Self::Data(data) => {
+                data.constructors.iter_mut().for_each(|constructor| {
+                    for ref mut field in &mut constructor.1 .1.fields {
+                        field.rename(r);
+
+                        // FIXME: we don't pass span for diagnostics purposes
+                        // so we should rename whole as once?
+                        // Located<Commented<DataConstructorDeclarationData>>
+                        //
+                        // Or by hack like this:
+                        // Located::set_span(
+                        //      field,
+                        //      constructor.span().clone();
+                        // ).rename(r);
+                    }
+                });
+            }
+            Self::Type(alias) => {
+                alias.body.rename(r);
+            }
+            Self::TypeClass(_) => {
+                // TODO: rename types
+            }
+        }
+    }
+}
+
+impl Rename for TypeClassDecl {
     fn rename(&mut self, _r: &mut Renamer) {
-        // TODO: rename types
+        // TODO: rename type classes
     }
 }
 
