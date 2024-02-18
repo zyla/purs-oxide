@@ -243,6 +243,9 @@ impl Rename for Located<ExprKind> {
                 }
             }
             ExprKind::Literal(_) => {}
+            ExprKind::DataConstructor(name) => {
+                // TODO: find data constructors in modules
+            }
             _ => todo!("renaming ExprKind {:?} not supported", self),
         }
     }
@@ -365,6 +368,29 @@ mod test {
         "
             ),
             vec![]
+        ))
+    }
+
+    #[test]
+    #[ignore = "renaming types not implemented"]
+    fn rename_types() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+
+                import Lib 
+
+                a :: A
+                a = MkA
+            "
+            ),
+            vec![indoc!(
+                "
+                module Lib where
+
+                data A = MkA
+                "
+            )]
         ))
     }
 }

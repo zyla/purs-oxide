@@ -1,0 +1,71 @@
+---
+source: src/rename.rs
+assertion_line: 376
+expression: "rename_mod(indoc!(\"module Test where\n\n                import Lib \n\n                a :: A\n                a = MkA\n            \"),\n    vec![indoc!(\"\n                module Lib where\n\n                data A = MkA\n                \")])"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            name: "Test",
+        },
+        types: {},
+        values: {
+            AbsoluteName {
+                module: ModuleId {
+                    name: "Test",
+                },
+                name: Symbol {
+                    text: "a",
+                },
+            }: ValueDecl {
+                name: AbsoluteName {
+                    module: ModuleId {
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        text: "a",
+                    },
+                },
+                type_: Some(
+                    Located(
+                        SourceSpan {
+                            start: 37,
+                            end: 38,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                module: None,
+                                name: Symbol {
+                                    text: "A",
+                                },
+                            },
+                        ),
+                    ),
+                ),
+                equations: [
+                    CaseBranch {
+                        pats: [],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 43,
+                                    end: 46,
+                                },
+                                DataConstructor(
+                                    QualifiedName {
+                                        module: None,
+                                        name: Symbol {
+                                            text: "MkA",
+                                        },
+                                    },
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+        classes: {},
+    },
+    [],
+)
