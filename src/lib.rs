@@ -268,3 +268,4 @@ pub mod symbol;
 pub mod token;
 pub mod typecheck;
 pub mod utils;
+pub mod pretty_printer;

@@ -1,0 +1,6 @@
+---
+source: src/typecheck.rs
+assertion_line: 154
+expression: "test_infer(&[(\"foo\", \"Int\")], \"foo\")"
+---
+"(foo,Int,)"
