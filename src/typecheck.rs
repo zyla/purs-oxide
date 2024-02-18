@@ -119,7 +119,6 @@ mod tests {
     use crate::pretty_printer::*;
     use insta::assert_snapshot;
     use pretty::BoxAllocator;
-    use salsa::DebugWithDb;
 
     fn test_infer(context: &[(&str, &str)], expr_str: &str) -> String {
         let allocator = BoxAllocator;
@@ -136,17 +135,7 @@ mod tests {
         let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
         let mut tc = Typechecker::new(db, local_context);
 
-        let mut out = Vec::new();
-
-        let expr3 = tc.infer(expr)
-            .pretty_print::<BoxAllocator, ()>(db, &allocator)
-            .1
-            .render(120, &mut out)
-            .unwrap();
-
-        let raw_expr = String::from_utf8(out).unwrap();
-
-        format!("{:#?}", raw_expr)
+        format!("{}", tc.infer(expr).pretty_print::<_, ()>(db, &allocator).pretty(80))
     }
 
     #[test]

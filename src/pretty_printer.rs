@@ -78,6 +78,7 @@ impl PrettyPrint for crate::ast::Type {
     }
 }
 
+
 macro_rules! impl_pretty_print_tuple {
     ($($T:ident),*) => {
         impl<$($T),*> PrettyPrint for ($($T),*)
@@ -103,3 +104,4 @@ macro_rules! impl_pretty_print_tuple {
 impl_pretty_print_tuple! { E, F }
 impl_pretty_print_tuple! { E, F, G }
 impl_pretty_print_tuple! { E, F, G, H }
+
