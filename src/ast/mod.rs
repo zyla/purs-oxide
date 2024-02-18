@@ -30,6 +30,11 @@ pub struct QualifiedName {
 }
 
 impl QualifiedName {
+    pub fn to_absolute_name(&self, db: &dyn crate::Db) -> Option<AbsoluteName> {
+        self.module(db)
+            .map(|module| AbsoluteName::new(db, module, self.name(db)))
+    }
+
     pub fn is_actually_qualified(&self, db: &dyn crate::Db) -> bool {
         self.module(db).is_some()
     }

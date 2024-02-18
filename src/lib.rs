@@ -28,6 +28,8 @@ pub struct Jar(
     crate::scc::decls_in_scc,
     crate::scc::SccId,
     crate::renamed_module::renamed_value_decl,
+    crate::typecheck::typechecked_scc,
+    crate::typecheck::type_of_value,
 );
 
 #[salsa::input]
@@ -264,4 +266,5 @@ pub mod scc;
 pub mod string;
 pub mod symbol;
 pub mod token;
+pub mod typecheck;
 pub mod utils;
