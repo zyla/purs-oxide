@@ -348,6 +348,51 @@ mod tests {
     }
 
     #[test]
+    fn reexport_subset() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+    module Test (module X) where
+    import Lib2 (x) as X
+    "
+            ),
+            vec![LIB2]
+        ))
+    }
+
+    #[test]
+    fn reexport_all() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+    module Test (module X) where
+    import Lib2 as X
+    "
+            ),
+            vec![LIB2]
+        ))
+    }
+
+    #[test]
+    fn reexport_export_list() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+    module Test (module X) where
+    import Lib as X
+    "
+            ),
+            vec![indoc!(
+                "
+            module Lib (x) where
+            x = 1
+            y = 2
+            "
+            )]
+        ))
+    }
+
+    #[test]
     #[ignore = "Type classes are not yet supported"]
     fn export_class_decl() {
         assert_snapshot!(export_decls(
