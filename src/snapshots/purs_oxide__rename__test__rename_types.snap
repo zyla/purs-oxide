@@ -1,0 +1,78 @@
+---
+source: src/rename.rs
+expression: "rename_mod(indoc!(\"module Test where\n\n                import Lib (A(MkA))\n\n                a :: A\n                a = MkA\n            \"),\n    vec![indoc!(\"\n                module Lib where\n\n                data A = MkA\n                \")])"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            name: "Test",
+        },
+        types: {},
+        values: {
+            AbsoluteName {
+                module: ModuleId {
+                    name: "Test",
+                },
+                name: Symbol {
+                    text: "a",
+                },
+            }: ValueDecl {
+                name: AbsoluteName {
+                    module: ModuleId {
+                        name: "Test",
+                    },
+                    name: Symbol {
+                        text: "a",
+                    },
+                },
+                type_: Some(
+                    Located(
+                        SourceSpan {
+                            start: 45,
+                            end: 46,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                module: Some(
+                                    ModuleId {
+                                        name: "Lib",
+                                    },
+                                ),
+                                name: Symbol {
+                                    text: "A",
+                                },
+                            },
+                        ),
+                    ),
+                ),
+                equations: [
+                    CaseBranch {
+                        pats: [],
+                        expr: Unconditional(
+                            Located(
+                                SourceSpan {
+                                    start: 51,
+                                    end: 54,
+                                },
+                                DataConstructor(
+                                    QualifiedName {
+                                        module: Some(
+                                            ModuleId {
+                                                name: "Lib",
+                                            },
+                                        ),
+                                        name: Symbol {
+                                            text: "MkA",
+                                        },
+                                    },
+                                ),
+                            ),
+                        ),
+                    },
+                ],
+            },
+        },
+        classes: {},
+    },
+    [],
+)
