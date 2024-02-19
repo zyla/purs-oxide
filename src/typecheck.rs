@@ -189,4 +189,12 @@ mod tests {
         %1 -> %1
         "###);
     }
+
+    #[test]
+    fn lam_multi_arg() {
+        assert_snapshot!(test_infer(&[], "\\x y -> x"), @r###"
+        \x y -> x
+        %1 -> %2 -> %1
+        "###);
+    }
 }
