@@ -1,4 +1,4 @@
-use pretty::{DocAllocator, DocBuilder};
+use pretty::{BoxAllocator, DocAllocator, DocBuilder};
 
 use crate::ast::Located;
 use crate::ast::{Expr, ExprKind, QualifiedName};
@@ -73,35 +73,15 @@ impl PrettyPrint for crate::ast::Type {
         match &**self {
             Var(v) => allocator.text(v.text(db).clone()),
             TypeConstructor(v) => v.pretty_print(db, allocator),
-            a => todo!("Not implemented for {a:?} type"),
+            a => todo!("pretty_print not implemented for {a:?} type"),
         }
     }
 }
 
-
-macro_rules! impl_pretty_print_tuple {
-    ($($T:ident),*) => {
-        impl<$($T),*> PrettyPrint for ($($T),*)
-        where
-            $($T: PrettyPrint),*
-        {
-            fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
-            where
-                D: DocAllocator<'b, A>,
-                D::Doc: Clone,
-                A: Clone,
-            {
-                let ($(ref $T),*) = *self;
-                allocator
-                    .text("(")
-                    $(.append($T.pretty_print(db, allocator).append(","))) *
-                    .append(")")
-            }
-        }
-    };
+pub fn pp<T: PrettyPrint>(db: &dyn crate::Db, x: T) -> String {
+    // TODO: we probably don't have to convert to a string here (instead return `impl
+    // fmt::Display`), but something something borrow checker
+    x.pretty_print::<_, ()>(db, &BoxAllocator)
+        .pretty(80)
+        .to_string()
 }
-
-impl_pretty_print_tuple! { E, F }
-impl_pretty_print_tuple! { E, F, G }
-impl_pretty_print_tuple! { E, F, G, H }
-

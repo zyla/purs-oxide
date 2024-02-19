@@ -118,10 +118,8 @@ mod tests {
     use super::*;
     use crate::pretty_printer::*;
     use insta::assert_snapshot;
-    use pretty::BoxAllocator;
 
     fn test_infer(context: &[(&str, &str)], expr_str: &str) -> String {
-        let allocator = BoxAllocator;
         let db: &dyn crate::Db = &crate::Database::new();
         let local_context = context
             .iter()
@@ -135,11 +133,15 @@ mod tests {
         let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
         let mut tc = Typechecker::new(db, local_context);
 
-        format!("{}", tc.infer(expr).pretty_print::<_, ()>(db, &allocator).pretty(80))
+        let (elaborated, ty) = tc.infer(expr);
+        format!("{}\n{}", pp(db, elaborated), pp(db, ty))
     }
 
     #[test]
     fn var() {
-        assert_snapshot!(test_infer(&[("foo", "Int")], "foo"));
+        assert_snapshot!(test_infer(&[("foo", "Int")], "foo"), @r###"
+        foo
+        Int
+        "###);
     }
 }
