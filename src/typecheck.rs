@@ -126,6 +126,8 @@ impl<'a> Typechecker<'a> {
                     .map(|pat| match **pat {
                         PatKind::Var(v) => {
                             let tv = self.fresh_tv();
+                            // TODO: we're adding to local context, but never removing from it.
+                            // Seems wrong...
                             self.local_context
                                 .insert(QualifiedName::new_unqualified(self.db, v), tv.clone());
                             tv
