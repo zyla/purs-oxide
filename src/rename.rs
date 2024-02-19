@@ -164,6 +164,9 @@ impl Rename for Type {
                     ));
                 }
             },
+            TypeKind::FunctionType(_, _) => {
+                // TODO: Should be renamed?
+            }
             _ => todo!("renaming TypeKind {:?} not supported", self),
         }
     }
