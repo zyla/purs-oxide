@@ -1,0 +1,18 @@
+---
+source: src/renamed_module.rs
+expression: "export_decls(indoc!(\"\n    module Test (module X) where\n    import Lib2 (x) as X\n    \"),\n    vec![LIB2])"
+---
+(
+    [
+        DeclId {
+            namespace: Value,
+            module: ModuleId {
+                name: "Lib2",
+            },
+            name: Symbol {
+                text: "x",
+            },
+        },
+    ],
+    [],
+)
