@@ -6,6 +6,7 @@ pub type Type = Located<TypeKind>;
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub enum TypeKind {
+    /// Only appears during typechecking
     Unknown(u64),
     Var(Symbol),
     /// Standalone operator

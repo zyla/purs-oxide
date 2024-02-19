@@ -1,11 +1,15 @@
 use crate::ast::AbsoluteName;
 use crate::ast::CaseBranch;
+use crate::ast::Located;
+use crate::ast::PatKind;
 use crate::ast::PossiblyGuardedExpr;
 use crate::ast::QualifiedName;
+use crate::ast::TypeKind;
 use crate::indexed_module::ValueDecl;
 use crate::renamed_module::renamed_value_decl;
 use crate::scc::{decls_in_scc, SccId};
 use crate::Db;
+use crate::SourceSpan;
 use crate::{
     ast::{Expr, ExprKind::*, Type},
     renamed_module::DeclId,
@@ -70,11 +74,22 @@ fn to_expr(d: ValueDecl) -> Expr {
 struct Typechecker<'a> {
     db: &'a dyn Db,
     local_context: HashMap<QualifiedName, Type>,
+    next_tv: u64,
 }
 
 impl<'a> Typechecker<'a> {
     fn new(db: &'a dyn Db, local_context: HashMap<QualifiedName, Type>) -> Self {
-        Self { db, local_context }
+        Self {
+            db,
+            local_context,
+            next_tv: 1,
+        }
+    }
+
+    fn fresh_tv(&mut self) -> Type {
+        let idx = self.next_tv;
+        self.next_tv += 1;
+        Located::new(SourceSpan::todo(), TypeKind::Unknown(idx))
     }
 
     fn check(&mut self, expr: Expr, ty: &Type) -> Expr {
@@ -93,7 +108,8 @@ impl<'a> Typechecker<'a> {
     }
 
     fn infer(&mut self, expr: Expr) -> (Expr, Type) {
-        match &*expr {
+        let Located(span, expr_kind) = expr;
+        match expr_kind {
             Var(v) => {
                 let ty = self.local_context.get(&v).cloned().unwrap_or_else(|| {
                     match v.to_absolute_name(self.db) {
@@ -101,12 +117,33 @@ impl<'a> Typechecker<'a> {
                         None => panic!("renamer left unknown local variable"),
                     }
                 });
-                (expr, ty)
+                (Located::new(span, expr_kind), ty)
             }
             Typed(expr, ty) => todo!(),
-            Lam(_, _) => todo!(),
+            Lam(pats, body) => {
+                let tvs = pats
+                    .iter()
+                    .map(|pat| match **pat {
+                        PatKind::Var(v) => {
+                            let tv = self.fresh_tv();
+                            self.local_context
+                                .insert(QualifiedName::new_unqualified(self.db, v), tv.clone());
+                            tv
+                        }
+                        _ => todo!("unsupported pattern {pat:?}"),
+                    })
+                    .collect::<Vec<_>>();
+                let (elaborated, result_ty) = self.infer(*body);
+                let fn_ty = tvs.into_iter().rev().fold(result_ty, |acc, tv| {
+                    Located::new(
+                        SourceSpan::todo(),
+                        TypeKind::FunctionType(Box::new(tv), Box::new(acc)),
+                    )
+                });
+                (Located::new(span, Lam(pats, Box::new(elaborated))), fn_ty)
+            }
             App(_, _) => todo!(),
-            _ => todo!("unsupported expression {expr:?}"),
+            _ => todo!("unsupported expression {expr_kind:?}"),
         }
     }
 }
@@ -142,6 +179,14 @@ mod tests {
         assert_snapshot!(test_infer(&[("foo", "Int")], "foo"), @r###"
         foo
         Int
+        "###);
+    }
+
+    #[test]
+    fn lam() {
+        assert_snapshot!(test_infer(&[], "\\x -> x"), @r###"
+        \x -> x
+        %1 -> %1
         "###);
     }
 }

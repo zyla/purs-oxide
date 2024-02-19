@@ -1,7 +1,7 @@
 use pretty::{BoxAllocator, DocAllocator, DocBuilder};
 
 use crate::ast::Located;
-use crate::ast::{Expr, ExprKind, QualifiedName};
+use crate::ast::{ExprKind, QualifiedName};
 
 pub trait PrettyPrint {
     fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
@@ -11,19 +11,28 @@ pub trait PrettyPrint {
         A: Clone;
 }
 
-impl PrettyPrint for Expr {
+impl PrettyPrint for ExprKind {
     fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        match **self {
+        match self {
             ExprKind::Var(v) => v.pretty_print(db, allocator),
-            ExprKind::Lam(_, _) => {
-                todo!()
+            ExprKind::Lam(pats, body) =>
+            // TODO: add actual prettiness (line breaks etc.)
+            {
+                allocator
+                    .text("\\")
+                    .append(allocator.intersperse(
+                        pats.iter().map(|p| p.pretty_print(db, allocator)),
+                        allocator.text(" "),
+                    ))
+                    .append(allocator.text(" -> "))
+                    .append(body.pretty_print(db, allocator))
             }
-            _ => todo!(),
+            _ => todo!("pretty_print expr {:?}", self),
         }
     }
 }
@@ -61,7 +70,23 @@ where
     }
 }
 
-impl PrettyPrint for crate::ast::Type {
+impl PrettyPrint for crate::ast::PatKind {
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
+    where
+        D: DocAllocator<'b, A>,
+        D::Doc: Clone,
+        A: Clone,
+    {
+        use crate::ast::PatKind::*;
+
+        match self {
+            Var(v) => allocator.text(v.text(db).clone()),
+            a => todo!("pretty_print not implemented for Pat {a:?}"),
+        }
+    }
+}
+
+impl PrettyPrint for crate::ast::TypeKind {
     fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
@@ -70,9 +95,14 @@ impl PrettyPrint for crate::ast::Type {
     {
         use crate::ast::TypeKind::*;
 
-        match &**self {
+        match self {
             Var(v) => allocator.text(v.text(db).clone()),
+            Unknown(x) => allocator.text(format!("%{}", x)), // Special invalid syntax for unknowns
             TypeConstructor(v) => v.pretty_print(db, allocator),
+            FunctionType(a, b) => a
+                .pretty_print(db, allocator)
+                .append(allocator.text(" -> "))
+                .append(b.pretty_print(db, allocator)),
             a => todo!("pretty_print not implemented for {a:?} type"),
         }
     }

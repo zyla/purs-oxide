@@ -10,6 +10,16 @@ impl SourceSpan {
     pub fn new(start: usize, end: usize) -> Self {
         Self { start, end }
     }
+
+    pub fn unknown() -> Self {
+        // TODO: find a better representation?
+        Self { start: 0, end: 0 }
+    }
+
+    /// Alias for `unknown()`, but we can grep for it and gradually add sensible locations
+    pub fn todo() -> Self {
+        Self::unknown()
+    }
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
