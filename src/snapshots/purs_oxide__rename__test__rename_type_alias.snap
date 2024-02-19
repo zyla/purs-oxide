@@ -1,0 +1,54 @@
+---
+source: src/rename.rs
+expression: "rename_mod(indoc!(\"module Test where\n                import Lib\n                \n                type B = A\n            \"),\n    vec![indoc!(\"module Lib where\n                \n                data A\n            \")])"
+---
+(
+    IndexedModule {
+        module_id: ModuleId {
+            name: "Test",
+        },
+        types: {
+            AbsoluteName {
+                module: ModuleId {
+                    name: "Test",
+                },
+                name: Symbol {
+                    text: "B",
+                },
+            }: Type(
+                TypeSynonymDecl {
+                    name: AbsoluteName {
+                        module: ModuleId {
+                            name: "Test",
+                        },
+                        name: Symbol {
+                            text: "B",
+                        },
+                    },
+                    params: [],
+                    body: Located(
+                        SourceSpan {
+                            start: 39,
+                            end: 40,
+                        },
+                        TypeConstructor(
+                            QualifiedName {
+                                module: Some(
+                                    ModuleId {
+                                        name: "Lib",
+                                    },
+                                ),
+                                name: Symbol {
+                                    text: "A",
+                                },
+                            },
+                        ),
+                    ),
+                },
+            ),
+        },
+        values: {},
+        classes: {},
+    },
+    [],
+)

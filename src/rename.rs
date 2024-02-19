@@ -127,24 +127,14 @@ impl Rename for TypeDecl {
                 data.constructors.iter_mut().for_each(|constructor| {
                     for ref mut field in &mut constructor.1 .1.fields {
                         field.rename(r);
-
-                        // FIXME: we don't pass span for diagnostics purposes
-                        // so we should rename whole as once?
-                        // Located<Commented<DataConstructorDeclarationData>>
-                        //
-                        // Or by hack like this:
-                        // Located::set_span(
-                        //      field,
-                        //      constructor.span().clone();
-                        // ).rename(r);
                     }
                 });
             }
             Self::Type(alias) => {
                 alias.body.rename(r);
             }
-            Self::TypeClass(_) => {
-                // TODO: rename types
+            Self::TypeClass(type_class) => {
+                type_class.rename(r);
             }
         }
     }
@@ -157,8 +147,25 @@ impl Rename for TypeClassDecl {
 }
 
 impl Rename for Type {
-    fn rename(&mut self, _r: &mut Renamer) {
-        // TODO
+    fn rename(&mut self, r: &mut Renamer) {
+        let type_ = &mut self.1;
+        let db = r.db;
+        match type_ {
+            TypeKind::TypeConstructor(name) => match r.module_scope.get(name) {
+                Some(abs) => {
+                    *name = abs.to_qualified_name(db);
+                }
+                None => {
+                    let span = &self.0;
+                    r.push_diagnostic(Diagnostic::new(
+                        name.name(db),
+                        *span,
+                        format!("Unknown type '{}'", name.name(db).text(db)),
+                    ));
+                }
+            },
+            _ => todo!("renaming TypeKind {:?} not supported", self),
+        }
     }
 }
 
@@ -243,8 +250,25 @@ impl Rename for Located<ExprKind> {
                 }
             }
             ExprKind::Literal(_) => {}
-            ExprKind::DataConstructor(name) => {
-                // TODO: find data constructors in modules
+            ExprKind::DataConstructor(constructor_name) => {
+                let db = r.db;
+                match r.module_scope.get(constructor_name) {
+                    None => {
+                        let span = &self.0;
+                        r.push_diagnostic(Diagnostic::new(
+                            constructor_name.name(db),
+                            *span,
+                            format!(
+                                "Unknown data constructor variable '{}'",
+                                constructor_name.name(db).text(db)
+                            ),
+                        ));
+                    }
+
+                    Some(abs) => {
+                        *constructor_name = abs.to_qualified_name(db);
+                    }
+                }
             }
             _ => todo!("renaming ExprKind {:?} not supported", self),
         }
@@ -372,13 +396,12 @@ mod test {
     }
 
     #[test]
-    #[ignore = "renaming types not implemented"]
     fn rename_types() {
         assert_snapshot!(rename_mod(
             indoc!(
                 "module Test where
 
-                import Lib 
+                import Lib (A(MkA))
 
                 a :: A
                 a = MkA
@@ -390,6 +413,25 @@ mod test {
 
                 data A = MkA
                 "
+            )]
+        ))
+    }
+
+    #[test]
+    fn rename_type_alias() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+                import Lib
+                
+                type B = A
+            "
+            ),
+            vec![indoc!(
+                "module Lib where
+                
+                data A
+            "
             )]
         ))
     }

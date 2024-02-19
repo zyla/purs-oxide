@@ -1,4 +1,5 @@
 use crate::ast::AbsoluteName;
+use crate::ast::DeclarationRefConstructors;
 use crate::indexed_module::TypeClassDecl;
 use crate::indexed_module::TypeDecl;
 use fxhash::FxHashMap;
@@ -137,7 +138,8 @@ impl<'a> ExportedDeclExtractor<'a> {
                             iter.next();
                         }
                         x => {
-                            self.exported_decls.push(to_decl_id(db, self.module_id, x));
+                            self.exported_decls
+                                .extend(to_decls_id(db, self.module_id, x));
                             iter.next();
                         }
                     }
@@ -221,7 +223,7 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             Explicit(decls) => {
                 decls
                     .iter()
-                    .map(|i| to_decl_id(db, import.module, i))
+                    .flat_map(|i| to_decls_id(db, import.module, i))
                     .for_each(|i| imports.push((import.alias, i)));
 
                 iter.next();
@@ -242,6 +244,34 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
     }
 
     imports
+}
+
+fn to_decls_id(db: &dyn Db, module_id: ModuleId, kind: &DeclarationRefKind) -> Vec<DeclId> {
+    use DeclarationRefKind::*;
+
+    match kind {
+        Type { name, constructors } => {
+            let mut decls = vec![DeclId::new(db, Namespace::Type, module_id, *name)];
+
+            if let Some(constructors) = constructors {
+                match constructors {
+                    DeclarationRefConstructors::Some(constructors) => {
+                        for constructor_name in constructors {
+                            decls.push(DeclId::new(
+                                db,
+                                Namespace::Value,
+                                module_id,
+                                *constructor_name,
+                            ));
+                        }
+                    }
+                    DeclarationRefConstructors::All => {}
+                }
+            }
+            decls
+        }
+        kind => vec![to_decl_id(db, module_id, kind)],
+    }
 }
 
 fn to_decl_id(db: &dyn Db, module_id: ModuleId, kind: &DeclarationRefKind) -> DeclId {
