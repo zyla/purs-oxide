@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Run cargo fmt before allowing a commit
+echo "Running cargo fmt..."
+cargo fmt --all -- --check --color always
+
+# Get the exit code of the previous command
+exit_code=$?
+
+# Check if cargo fmt failed
+if [ $exit_code -ne 0 ]; then
+    echo "cargo fmt check failed. Please run 'cargo fmt' to format your code before committing."
+    exit 1
+fi
+

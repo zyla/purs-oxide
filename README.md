@@ -2,6 +2,22 @@
 
 This little thing someday hopes to become a PureScript compiler. For now it's just a parser, but it is growing steadily.
 
+## Pre-commit Hook
+
+We have provided a pre-commit hook to ensure consistent code formatting using `cargo fmt`. Before committing changes, make sure your code is properly formatted. To set up the pre-commit hook, follow these steps:
+
+1. Navigate to the root directory of the repository.
+
+2. Install the pre-commit hook by running:
+
+    ```bash
+    bash hooks/install-hooks.sh
+    ```
+
+This will copy the pre-commit hook to your `.git/hooks` directory. Now, `cargo fmt` will automatically check your code before each commit.
+
+If you encounter any issues or have questions, please don't hesitate to reach out.
+
 ### Advantages
 
 - Rewritten in `R U S T`
