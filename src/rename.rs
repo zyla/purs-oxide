@@ -281,6 +281,7 @@ impl Rename for Located<ExprKind> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::pretty_printer::*;
     use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
@@ -308,7 +309,20 @@ mod test {
             &mut diagnostics,
         );
 
-        format!("{:#?}", (module.into_debug_all(db), diagnostics)).drop_salsa_id()
+        let types = module
+            .types
+            .iter()
+            .map(|(_, v)| pp(db, v.clone()))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let values = module
+            .values
+            .iter()
+            .map(|(_, v)| pp(db, v.clone()))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        format!("{}\n{}\n{:?}", types, values, diagnostics)
     }
 
     #[test]
