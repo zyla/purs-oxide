@@ -323,7 +323,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "Pretty printing fail (missing parens)"]
     fn lam_app_1() {
         assert_snapshot!(test_infer(&[
         ], "\\f x -> f x"), @r###"
