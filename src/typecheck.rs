@@ -233,10 +233,12 @@ impl<'a> Typechecker<'a> {
 
     fn occurs_check(&self, u: u64, t: &Type) {
         match &**t {
-            TypeKind::Unknown(u2) if u == *u2 => {
-                // Note: we shouldn't trivially continue after this error,
-                // a loop in substitution can cause typechecker nontermination
-                todo!("report occurs check error");
+            TypeKind::Unknown(u2) => {
+                if u == *u2 {
+                    // Note: we shouldn't trivially continue after this error,
+                    // a loop in substitution can cause typechecker nontermination
+                    todo!("report occurs check error");
+                }
             }
             TypeKind::FunctionType(f, x) => {
                 self.occurs_check(u, &f);
@@ -317,6 +319,16 @@ mod tests {
         ], "f x"), @r###"
         f x
         String
+        "###);
+    }
+
+    #[test]
+    #[ignore = "Pretty printing fail (missing parens)"]
+    fn lam_app_1() {
+        assert_snapshot!(test_infer(&[
+        ], "\\f x -> f x"), @r###"
+        \f x -> f x
+        (%3 -> %4) -> %3 -> %4
         "###);
     }
 }
