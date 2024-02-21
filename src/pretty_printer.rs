@@ -135,9 +135,7 @@ impl PrettyPrint for crate::indexed_module::TypeDecl {
                 .append(t.name.name(db).text(db).clone())
                 // TODO: pretty print type params
                 .append(allocator.text(" = "))
-                .append(
-                    t.body.pretty_print(db, allocator)
-                )
+                .append(t.body.pretty_print(db, allocator))
                 .append("\n"),
             TypeClass(c) => allocator
                 .text("class ")
