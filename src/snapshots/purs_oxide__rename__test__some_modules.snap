@@ -2,7 +2,7 @@
 source: src/rename.rs
 expression: "rename_mod(indoc!(\"\n        module Test where \n        \n        import Lib\n        import Lib2 \n\n        g :: A -> B -> A\n        g a b = f a b\n\n        h :: A\n        h = g a b\n        \"),\n    vec![indoc!(\"\n        module Lib where\n        \n        data A = A\n        data B = B\n\n        a :: A\n        a = A\n\n        b :: B\n        b = B\"),\n        indoc!(\"\n        module Lib2 where\n                \n        import Lib        \n\n        f :: A -> B -> A\n        f a _ = a\n        \")])"
 ---
-g :: A -> B -> A
+g :: Lib.A -> Lib.B -> Lib.A
 g a b = Lib2.f a b
 
 h :: Lib.A
