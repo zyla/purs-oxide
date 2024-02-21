@@ -5,7 +5,6 @@ use crate::string::PSChar;
 use crate::string::PSString;
 use crate::symbol::Symbol;
 use ordered_float::OrderedFloat;
-use pretty::{DocAllocator, DocBuilder};
 use salsa::DebugWithDb;
 
 pub type Expr = Located<ExprKind>;

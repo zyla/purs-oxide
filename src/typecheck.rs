@@ -1,3 +1,6 @@
+use crate::pretty_printer::pp;
+use salsa::DebugWithDb;
+
 use crate::ast::AbsoluteName;
 use crate::ast::CaseBranch;
 use crate::ast::Located;
@@ -75,6 +78,7 @@ struct Typechecker<'a> {
     db: &'a dyn Db,
     local_context: HashMap<QualifiedName, Type>,
     next_tv: u64,
+    substitution: HashMap<u64, Type>,
 }
 
 impl<'a> Typechecker<'a> {
@@ -83,6 +87,7 @@ impl<'a> Typechecker<'a> {
             db,
             local_context,
             next_tv: 1,
+            substitution: HashMap::new(),
         }
     }
 
@@ -97,14 +102,22 @@ impl<'a> Typechecker<'a> {
             Lam(_, _) => todo!(),
             _ => {
                 let (elaborated1, inferred_ty) = self.infer(expr);
-                self.check_subsumption(elaborated1, &inferred_ty, &ty)
+                self.check_subsumption(elaborated1, inferred_ty, ty.clone()) // TODO: clone?
             }
         }
     }
 
     /// Checks if `a` is a subtype of `b`, returns elaborated expression
-    fn check_subsumption(&mut self, expr: Expr, a: &Type, b: &Type) -> Expr {
-        todo!()
+    fn check_subsumption(&mut self, expr: Expr, mut a: Type, mut b: Type) -> Expr {
+        log::debug!(
+            "check_subsumption({}, {})",
+            pp(self.db, &a),
+            pp(self.db, &b)
+        );
+        // TODO: this is not really unification, it's a separate relation ("Figure 9. Algorithmic
+        // subtyping" in the "very easy" paper)
+        self.unify(&mut a, &mut b);
+        expr
     }
 
     fn infer(&mut self, expr: Expr) -> (Expr, Type) {
@@ -144,8 +157,104 @@ impl<'a> Typechecker<'a> {
                 });
                 (Located::new(span, Lam(pats, Box::new(elaborated))), fn_ty)
             }
-            App(_, _) => todo!(),
+            App(mut f, mut xs) => {
+                assert!(!xs.is_empty());
+                // Note: maybe Vec of args here isn't the best idea, maybe we should have a
+                // single-arg App.
+                // Converting to single-arg App.
+                if xs.len() > 1 {
+                    f = Box::new(Located::new(span, App(f, vec![xs.remove(0)])));
+                }
+                let x = xs.remove(0);
+                let (elaborated_f, mut f_ty) = self.infer(*f);
+                let arg_ty = self.fresh_tv();
+                let result_ty = self.fresh_tv();
+                self.unify(
+                    &mut f_ty,
+                    &mut Located::new(
+                        SourceSpan::todo(),
+                        TypeKind::FunctionType(
+                            Box::new(arg_ty.clone()),
+                            Box::new(result_ty.clone()),
+                        ),
+                    ),
+                );
+                log::debug!("infer(App) checks arg");
+                let elaborated_x = self.check(x, &arg_ty);
+                log::debug!("infer(App) returns {}", pp(self.db, &result_ty));
+                (
+                    Located::new(span, App(Box::new(elaborated_f), vec![elaborated_x])),
+                    result_ty,
+                )
+            }
             _ => todo!("unsupported expression {expr_kind:?}"),
+        }
+    }
+
+    pub fn apply_subst(&mut self, t: &mut Type) {
+        self.unify(t, &mut t.clone()); // TODO: don't clone...
+    }
+
+    fn unify(&mut self, t1: &mut Type, t2: &mut Type) {
+        log::debug!("unify({}, {})", pp(self.db, &t1), pp(self.db, &t2));
+        self.shallow_apply_subst(t1);
+        self.shallow_apply_subst(t2);
+        match (&mut **t1, &mut **t2) {
+            (TypeKind::Unknown(u1), TypeKind::Unknown(u2)) if *u1 == *u2 => {
+                // Already unified
+            }
+            (TypeKind::Unknown(u), _) => {
+                self.occurs_check(*u, &t2);
+                self.substitution.insert(*u, t2.clone());
+            }
+            (_, TypeKind::Unknown(u)) => {
+                self.occurs_check(*u, &t1);
+                self.substitution.insert(*u, t1.clone());
+            }
+            (
+                TypeKind::FunctionType(ref mut f1, ref mut x1),
+                TypeKind::FunctionType(ref mut f2, ref mut x2),
+            ) => {
+                self.unify(f1, f2);
+                self.unify(x1, x2);
+            }
+            (TypeKind::TypeConstructor(c1), TypeKind::TypeConstructor(c2)) => {
+                if *c1 != *c2 {
+                    todo!(
+                        "report error: can't unify {:?} and {:?}",
+                        c1.into_debug_all(self.db),
+                        c2.into_debug_all(self.db)
+                    );
+                }
+            }
+            _ => todo!(),
+        }
+    }
+
+    fn occurs_check(&self, u: u64, t: &Type) {
+        match &**t {
+            TypeKind::Unknown(u2) if u == *u2 => {
+                // Note: we shouldn't trivially continue after this error,
+                // a loop in substitution can cause typechecker nontermination
+                todo!("report occurs check error");
+            }
+            TypeKind::FunctionType(f, x) => {
+                self.occurs_check(u, &f);
+                self.occurs_check(u, &x);
+            }
+            TypeKind::TypeConstructor(_) => {}
+            _ => todo!("occurs_check: type {t:?}"),
+        }
+    }
+
+    fn shallow_apply_subst(&self, t: &mut Type) {
+        match &**t {
+            TypeKind::Unknown(u) => {
+                if let Some(t2) = self.substitution.get(u) {
+                    *t = t2.clone();
+                }
+            }
+            _ => {}
         }
     }
 }
@@ -155,7 +264,6 @@ mod tests {
     use crate::symbol::Symbol;
 
     use super::*;
-    use crate::pretty_printer::*;
     use insta::assert_snapshot;
 
     fn test_infer(context: &[(&str, &str)], expr_str: &str) -> String {
@@ -172,7 +280,8 @@ mod tests {
         let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
         let mut tc = Typechecker::new(db, local_context);
 
-        let (elaborated, ty) = tc.infer(expr);
+        let (elaborated, mut ty) = tc.infer(expr);
+        tc.apply_subst(&mut ty);
         format!("{}\n{}", pp(db, elaborated), pp(db, ty))
     }
 
@@ -197,6 +306,17 @@ mod tests {
         assert_snapshot!(test_infer(&[], "\\x y -> x"), @r###"
         \x y -> x
         %1 -> %2 -> %1
+        "###);
+    }
+
+    #[test]
+    fn simple_app() {
+        assert_snapshot!(test_infer(&[
+                                    ("f", "Int -> String"),
+                                    ("x", "Int"),
+        ], "f x"), @r###"
+        f x
+        String
         "###);
     }
 }

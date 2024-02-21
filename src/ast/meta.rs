@@ -46,6 +46,12 @@ impl<T> std::ops::Deref for Located<T> {
     }
 }
 
+impl<T> std::ops::DerefMut for Located<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.1
+    }
+}
+
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Comment(pub String);
 
