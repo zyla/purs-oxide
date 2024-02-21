@@ -2,6 +2,6 @@
 source: src/rename.rs
 expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        f a a = a\n        \"),\n    vec![])"
 ---
-
 f a a = a
+
 [Diagnostic { name: Symbol(Id { value: 2 }), span: SourceSpan { start: 23, end: 24 }, error: "Duplicate variable 'a' in pattern" }]

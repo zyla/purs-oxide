@@ -11,6 +11,34 @@ pub trait PrettyPrint {
         A: Clone;
 }
 
+impl<'a, T> PrettyPrint for &'a T
+where
+    T: PrettyPrint,
+{
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
+    where
+        D: DocAllocator<'b, A>,
+        D::Doc: Clone,
+        A: Clone,
+    {
+        (**self).pretty_print(db, allocator)
+    }
+}
+
+impl<'a, T> PrettyPrint for &'a mut T
+where
+    T: PrettyPrint,
+{
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
+    where
+        D: DocAllocator<'b, A>,
+        D::Doc: Clone,
+        A: Clone,
+    {
+        (**self).pretty_print(db, allocator)
+    }
+}
+
 impl PrettyPrint for ExprKind {
     fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
@@ -38,8 +66,7 @@ impl PrettyPrint for ExprKind {
                 .append(allocator.intersperse(
                     args.iter().map(|a| a.pretty_print(db, allocator)),
                     allocator.text(" "),
-                ))
-                .append(allocator.text("\n")),
+                )),
             ExprKind::DataConstructor(name) => name.pretty_print(db, allocator),
             _ => todo!("pretty_print expr {:?}", self),
         }

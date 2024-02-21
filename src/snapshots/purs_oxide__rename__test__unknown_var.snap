@@ -2,6 +2,6 @@
 source: src/rename.rs
 expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        g = x\n        \"),\n    vec![])"
 ---
-
 g = x
+
 [Diagnostic { name: Symbol(Id { value: 2 }), span: SourceSpan { start: 23, end: 24 }, error: "Unknown variable 'x'" }]

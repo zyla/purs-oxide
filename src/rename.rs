@@ -282,10 +282,8 @@ impl Rename for Located<ExprKind> {
 mod test {
     use super::*;
     use crate::pretty_printer::*;
-    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
-    use salsa::DebugWithDb;
 
     fn rename_mod(input: &str, deps: Vec<&str>) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
@@ -313,16 +311,11 @@ mod test {
             .types
             .iter()
             .map(|(_, v)| pp(db, v.clone()))
+            .chain(module.values.iter().map(|(_, v)| pp(db, v.clone())))
             .collect::<Vec<_>>()
-            .join("\n");
-        let values = module
-            .values
-            .iter()
-            .map(|(_, v)| pp(db, v.clone()))
-            .collect::<Vec<_>>()
-            .join("\n");
+            .join("\n\n");
 
-        format!("{}\n{}\n{:?}", types, values, diagnostics)
+        format!("{}\n\n{:?}", types, diagnostics)
     }
 
     #[test]
