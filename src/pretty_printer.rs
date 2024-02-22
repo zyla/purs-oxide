@@ -135,14 +135,18 @@ impl PrettyPrint for crate::ast::TypeKind {
             Var(v) => allocator.text(v.text(db).clone()),
             Unknown(x) => allocator.text(format!("%{}", x)), // Special invalid syntax for unknowns
             TypeConstructor(v) => v.pretty_print(db, allocator),
-            FunctionType(a, b) => allocator
-                .text("(")
-                .append(
-                    a.pretty_print(db, allocator)
-                        .append(allocator.text(" -> "))
-                        .append(b.pretty_print(db, allocator)),
-                )
-                .append(")"),
+            FunctionType(a, b) => {
+                let pp_a = match &***a {
+                    FunctionType(_, _) => allocator
+                        .text("(")
+                        .append(a.pretty_print(db, allocator))
+                        .append(")"),
+                    _ => a.pretty_print(db, allocator),
+                };
+
+                pp_a.append(allocator.text(" -> "))
+                    .append(b.pretty_print(db, allocator))
+            }
             a => todo!("pretty_print not implemented for {a:?} type"),
         }
     }
