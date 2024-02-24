@@ -88,7 +88,6 @@ pub enum RecordLiteralOrUpdate {
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct CaseBranch {
-    /// Note: should be empty after desugaring (transformed into a lambda)
     pub pats: Vec<Pat>,
     pub expr: PossiblyGuardedExpr,
 }
