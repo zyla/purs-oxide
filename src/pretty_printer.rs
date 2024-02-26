@@ -1,7 +1,10 @@
+use crate::ast::Expr;
+use crate::ast::Pat;
+use crate::ast::Type;
 use pretty::{BoxAllocator, DocAllocator, DocBuilder};
 
 use crate::ast::Located;
-use crate::ast::{CaseBranch, ExprKind, QualifiedName};
+use crate::ast::{ExprKind, QualifiedName};
 
 pub type Precedence = usize;
 
@@ -10,21 +13,6 @@ pub const FUNCTION_TYPE_PRECEDENCE: Precedence = 0;
 
 pub trait PrettyPrint {
     fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
-    where
-        D: DocAllocator<'b, A>,
-        D::Doc: Clone,
-        A: Clone,
-    {
-        self.pretty_print_prec(db, allocator, 0)
-    }
-
-    /// Pretty-print `self`, wrapping in parens if its precedence is less than `p`.
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
@@ -50,18 +38,13 @@ impl<'a, T> PrettyPrint for &'a T
 where
     T: PrettyPrint,
 {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        (**self).pretty_print_prec(db, allocator, p)
+        (**self).pretty_print(db, allocator)
     }
 }
 
@@ -69,81 +52,80 @@ impl<'a, T> PrettyPrint for &'a mut T
 where
     T: PrettyPrint,
 {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        (**self).pretty_print_prec(db, allocator, p)
+        (**self).pretty_print(db, allocator)
     }
 }
 
-impl PrettyPrint for ExprKind {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+impl PrettyPrint for Expr {
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        match self {
-            ExprKind::Var(v) => v.pretty_print_prec(db, allocator, 0),
-            ExprKind::Lam(pats, body) =>
-            // TODO: add actual prettiness (line breaks etc.)
-            {
-                parens_when(
-                    allocator,
-                    p > APP_PRECEDENCE,
-                    allocator
-                        .text("\\")
-                        .append(
-                            allocator.intersperse(
-                                pats.iter().map(|p| {
-                                    p.pretty_print_prec(db, allocator, APP_PRECEDENCE + 1)
-                                }),
-                                allocator.text(" "),
-                            ),
-                        )
-                        .append(allocator.text(" -> "))
-                        .append(body.pretty_print_prec(db, allocator, 0)),
-                )
-            }
-            ExprKind::App(f, args) => parens_when(
+        pretty_print_expr(self, db, allocator, 0)
+    }
+}
+
+fn pretty_print_expr<'b, D, A>(
+    e: &Expr,
+    db: &dyn crate::Db,
+    allocator: &'b D,
+    p: Precedence,
+) -> DocBuilder<'b, D, A>
+where
+    D: DocAllocator<'b, A>,
+    D::Doc: Clone,
+    A: Clone,
+{
+    match &**e {
+        ExprKind::Var(v) => v.pretty_print(db, allocator),
+        ExprKind::Lam(pats, body) =>
+        // TODO: add actual prettiness (line breaks etc.)
+        {
+            parens_when(
                 allocator,
                 p > APP_PRECEDENCE,
-                f.pretty_print_prec(db, allocator, APP_PRECEDENCE + 1)
-                    .append(allocator.text(" "))
+                allocator
+                    .text("\\")
                     .append(
                         allocator.intersperse(
-                            args.iter()
-                                .map(|a| a.pretty_print_prec(db, allocator, APP_PRECEDENCE + 1)),
+                            pats.iter().map(|pat| {
+                                pretty_print_pat(pat, db, allocator, APP_PRECEDENCE + 1)
+                            }),
                             allocator.text(" "),
                         ),
-                    ),
-            ),
-            ExprKind::DataConstructor(name) => name.pretty_print_prec(db, allocator, 0),
-            _ => todo!("pretty_print_prec expr {:?}", self),
+                    )
+                    .append(allocator.text(" -> "))
+                    .append(pretty_print_expr(body, db, allocator, 0)),
+            )
         }
+        ExprKind::App(f, args) => parens_when(
+            allocator,
+            p > APP_PRECEDENCE,
+            pretty_print_expr(f, db, allocator, APP_PRECEDENCE + 1)
+                .append(allocator.text(" "))
+                .append(
+                    allocator.intersperse(
+                        args.iter()
+                            .map(|a| pretty_print_expr(a, db, allocator, APP_PRECEDENCE + 1)),
+                        allocator.text(" "),
+                    ),
+                ),
+        ),
+        ExprKind::DataConstructor(name) => name.pretty_print(db, allocator),
+        _ => todo!("pretty_print expr {:?}", e),
     }
 }
 
 impl PrettyPrint for QualifiedName {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
@@ -165,87 +147,100 @@ impl<T> PrettyPrint for Located<T>
 where
     T: PrettyPrint,
 {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        self.1.pretty_print_prec(db, allocator, p)
+        self.1.pretty_print(db, allocator)
     }
 }
 
-impl PrettyPrint for crate::ast::PatKind {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+impl PrettyPrint for Pat {
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        use crate::ast::PatKind::*;
-
-        match self {
-            Var(v) => allocator.text(v.text(db).clone()),
-            a => todo!("pretty_print_prec not implemented for Pat {a:?}"),
-        }
+        pretty_print_pat(self, db, allocator, 0)
     }
 }
 
-impl PrettyPrint for crate::ast::TypeKind {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+fn pretty_print_pat<'b, D, A>(
+    pat: &Pat,
+    db: &dyn crate::Db,
+    allocator: &'b D,
+    _p: Precedence,
+) -> DocBuilder<'b, D, A>
+where
+    D: DocAllocator<'b, A>,
+    D::Doc: Clone,
+    A: Clone,
+{
+    use crate::ast::PatKind::*;
+
+    match &**pat {
+        Var(v) => allocator.text(v.text(db).clone()),
+        a => todo!("pretty_print not implemented for Pat {a:?}"),
+    }
+}
+
+impl PrettyPrint for Type {
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
         A: Clone,
     {
-        use crate::ast::TypeKind::*;
+        pretty_print_type(self, db, allocator, 0)
+    }
+}
 
-        match self {
-            Var(v) => allocator.text(v.text(db).clone()),
-            Unknown(x) => allocator.text(format!("%{}", x)), // Special invalid syntax for unknowns
-            TypeConstructor(v) => v.pretty_print_prec(db, allocator, 0),
-            FunctionType(a, b) => parens_when(
-                allocator,
-                p > FUNCTION_TYPE_PRECEDENCE,
-                a.pretty_print_prec(db, allocator, FUNCTION_TYPE_PRECEDENCE + 1)
-                    .append(allocator.text(" -> "))
-                    .append(b.pretty_print_prec(db, allocator, FUNCTION_TYPE_PRECEDENCE)),
-            ),
-            TypeApp(a, b) => parens_when(
-                allocator,
-                p > APP_PRECEDENCE,
-                a.pretty_print_prec(db, allocator, APP_PRECEDENCE)
-                    .append(allocator.text(" "))
-                    .append(b.pretty_print_prec(db, allocator, APP_PRECEDENCE + 1)),
-            ),
+fn pretty_print_type<'b, D, A>(
+    ty: &Type,
+    db: &dyn crate::Db,
+    allocator: &'b D,
+    p: Precedence,
+) -> DocBuilder<'b, D, A>
+where
+    D: DocAllocator<'b, A>,
+    D::Doc: Clone,
+    A: Clone,
+{
+    use crate::ast::TypeKind::*;
 
-            a => todo!("pretty_print_prec not implemented for {a:?} type"),
-        }
+    match &**ty {
+        Var(v) => allocator.text(v.text(db).clone()),
+        Unknown(x) => allocator.text(format!("%{}", x)), // Special invalid syntax for unknowns
+        TypeConstructor(v) => v.pretty_print(db, allocator),
+        FunctionType(a, b) => parens_when(
+            allocator,
+            p > FUNCTION_TYPE_PRECEDENCE,
+            pretty_print_type(a, db, allocator, FUNCTION_TYPE_PRECEDENCE + 1)
+                .append(allocator.text(" -> "))
+                .append(pretty_print_type(
+                    b,
+                    db,
+                    allocator,
+                    FUNCTION_TYPE_PRECEDENCE,
+                )),
+        ),
+        TypeApp(a, b) => parens_when(
+            allocator,
+            p > APP_PRECEDENCE,
+            pretty_print_type(a, db, allocator, APP_PRECEDENCE)
+                .append(allocator.text(" "))
+                .append(pretty_print_type(b, db, allocator, APP_PRECEDENCE + 1)),
+        ),
+
+        a => todo!("pretty_print not implemented for {a:?} type"),
     }
 }
 
 impl PrettyPrint for crate::indexed_module::TypeDecl {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
@@ -262,7 +257,7 @@ impl PrettyPrint for crate::indexed_module::TypeDecl {
                 .append(t.name.name(db).text(db).clone())
                 // TODO: pretty print type params
                 .append(allocator.text(" = "))
-                .append(t.body.pretty_print_prec(db, allocator, 0))
+                .append(t.body.pretty_print(db, allocator))
                 .append("\n"),
             TypeClass(c) => allocator
                 .text("class ")
@@ -273,12 +268,7 @@ impl PrettyPrint for crate::indexed_module::TypeDecl {
 }
 
 impl PrettyPrint for crate::indexed_module::ValueDecl {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
@@ -290,7 +280,7 @@ impl PrettyPrint for crate::indexed_module::ValueDecl {
                 Some(t) => allocator
                     .text(self.name.name(db).text(db).clone())
                     .append(allocator.text(" :: "))
-                    .append(t.pretty_print_prec(db, allocator, 0))
+                    .append(t.pretty_print(db, allocator))
                     .append("\n"),
                 None => allocator.text(""),
             })
@@ -298,13 +288,13 @@ impl PrettyPrint for crate::indexed_module::ValueDecl {
                 self.equations.iter().map(|e| {
                     allocator.text(self.name.name(db).text(db).clone()).append(
                         allocator
-                            .concat(e.pats.iter().map(|p| {
-                                allocator
-                                    .text(" ")
-                                    .append(p.pretty_print_prec(db, allocator, 0))
-                            }))
+                            .concat(
+                                e.pats.iter().map(|p| {
+                                    allocator.text(" ").append(p.pretty_print(db, allocator))
+                                }),
+                            )
                             .append(allocator.text(" = "))
-                            .append(e.expr.pretty_print_prec(db, allocator, 0)),
+                            .append(e.expr.pretty_print(db, allocator)),
                     )
                 }),
                 allocator.text("\n"),
@@ -312,29 +302,8 @@ impl PrettyPrint for crate::indexed_module::ValueDecl {
     }
 }
 
-impl PrettyPrint for CaseBranch {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        _db: &dyn crate::Db,
-        _allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
-    where
-        D: DocAllocator<'b, A>,
-        D::Doc: Clone,
-        A: Clone,
-    {
-        todo!()
-    }
-}
-
 impl PrettyPrint for crate::ast::expr::PossiblyGuardedExpr {
-    fn pretty_print_prec<'b, D, A>(
-        &self,
-        db: &dyn crate::Db,
-        allocator: &'b D,
-        _p: Precedence,
-    ) -> DocBuilder<'b, D, A>
+    fn pretty_print<'b, D, A>(&self, db: &dyn crate::Db, allocator: &'b D) -> DocBuilder<'b, D, A>
     where
         D: DocAllocator<'b, A>,
         D::Doc: Clone,
@@ -342,8 +311,8 @@ impl PrettyPrint for crate::ast::expr::PossiblyGuardedExpr {
     {
         use crate::ast::expr::PossiblyGuardedExpr::*;
         match self {
-            Unconditional(e) => e.pretty_print_prec(db, allocator, 0),
-            Guarded(g) => todo!("pretty_print_prec not implemented for PossiblyGuardedExpr {g:?}"),
+            Unconditional(e) => e.pretty_print(db, allocator),
+            Guarded(g) => todo!("pretty_print not implemented for PossiblyGuardedExpr {g:?}"),
         }
     }
 }
