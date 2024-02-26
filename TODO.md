@@ -54,3 +54,38 @@ enum SpanDeclRef {
 [ ] clean up pipeline/passes/queries
 [ ] Avoid interning QualifiedName and AbsoluteName
 [ ] performance metrics/tracing
+
+Code generation:
+
+```
+// Foo/index.js
+export const foo = () => 'xd';
+
+// Bar/index.js
+import * as Foo from '../Foo/index.js';
+
+export const bar = Foo.foo;
+```
+
+```
+// bundle.js
+const Foo_foo = () => 'xd';
+
+const Bar_bar = Foo_foo;
+
+Bar_bar();
+```
+
+```
+// bundle.js
+const Foo = {};
+Foo.foo = () => 'xd';
+
+const bar = Foo.foo;
+```
+
+// FunctionType(Vec<Type>, Box<Type>)
+// [a b] -> c
+// a -> b -> c
+
+[ ] incremental-friendly instance resolution

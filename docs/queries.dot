@@ -2,6 +2,14 @@ digraph {
   rankdir=UD
   node [shape=box]
 
+  value_decl_code [label="value_decl_code(id: AbsoluteName) -> JS"]
+  value_decl_code -> typechecked_scc [label="(elaborated expr)"]
+  value_decl_code -> indexed_module [label="(SourceSpan mapping for error msgs)"]
+
+  value_decl_code_acc [label="value_decl_code_acc(id: AbsoluteName)"]
+  value_decl_code_acc -> value_decl_code
+  value_decl_code_acc -> value_decl_code_acc [label="(deps)"]
+
   typecheck_module [label="typecheck_module(module: ModuleId)"]
   typecheck_module -> renamed_module [label="(get SCCs)"]
   typecheck_module -> typechecked_scc [label="(for each SCC)"]
