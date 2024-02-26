@@ -226,6 +226,14 @@ impl PrettyPrint for crate::ast::TypeKind {
                     .append(allocator.text(" -> "))
                     .append(b.pretty_print_prec(db, allocator, FUNCTION_TYPE_PRECEDENCE)),
             ),
+            TypeApp(a, b) => parens_when(
+                allocator,
+                p > APP_PRECEDENCE,
+                a.pretty_print_prec(db, allocator, APP_PRECEDENCE)
+                    .append(allocator.text(" "))
+                    .append(b.pretty_print_prec(db, allocator, APP_PRECEDENCE + 1)),
+            ),
+
             a => todo!("pretty_print_prec not implemented for {a:?} type"),
         }
     }
@@ -346,4 +354,41 @@ pub fn pp<T: PrettyPrint>(db: &dyn crate::Db, x: T) -> String {
     x.pretty_print::<_, ()>(db, &BoxAllocator)
         .pretty(80)
         .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn pp_type(input: &str) -> String {
+        let db = &crate::Database::new();
+        pp(db, crate::parser::parse_type(db, input).1.unwrap())
+    }
+
+    fn test_pp_type_roundtrip(input: &str) {
+        assert_eq!(input, pp_type(input));
+    }
+
+    #[test]
+    fn function_type() {
+        test_pp_type_roundtrip("a -> b -> c");
+        test_pp_type_roundtrip("a -> b -> c -> d");
+        test_pp_type_roundtrip("(a -> b) -> c -> d");
+        test_pp_type_roundtrip("((a -> b) -> c -> d) -> e -> f");
+    }
+
+    #[test]
+    fn app() {
+        test_pp_type_roundtrip("Either a b");
+    }
+
+    #[test]
+    fn function_type_in_app() {
+        test_pp_type_roundtrip("Maybe (a -> b -> c)");
+    }
+
+    #[test]
+    fn app_in_function_type() {
+        test_pp_type_roundtrip("Maybe a -> Maybe b");
+    }
 }
