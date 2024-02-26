@@ -330,4 +330,17 @@ mod tests {
         (%3 -> %4) -> %3 -> %4
         "###);
     }
+
+    #[test]
+    #[ignore = "Error reporting not implemented"]
+    fn arg_type_mismatch() {
+        assert_snapshot!(test_infer(&[
+                                    ("f", "Int -> String"),
+                                    ("x", "Bool"),
+        ], "f x"), @r###"
+        f x
+        String
+        (Error: cannot unify Bool with Int or something)
+        "###);
+    }
 }
