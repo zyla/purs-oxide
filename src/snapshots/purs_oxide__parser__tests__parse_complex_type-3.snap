@@ -29,45 +29,37 @@ Located(
                 start: 6,
                 end: 17,
             },
-            Parens(
+            TypeApp(
                 Located(
                     SourceSpan {
                         start: 7,
+                        end: 12,
+                    },
+                    TypeConstructor(
+                        QualifiedName {
+                            [salsa id]: 1,
+                            module: None,
+                            name: Symbol {
+                                [salsa id]: 1,
+                                text: "Maybe",
+                            },
+                        },
+                    ),
+                ),
+                Located(
+                    SourceSpan {
+                        start: 13,
                         end: 16,
                     },
-                    TypeApp(
-                        Located(
-                            SourceSpan {
-                                start: 7,
-                                end: 12,
+                    TypeConstructor(
+                        QualifiedName {
+                            [salsa id]: 2,
+                            module: None,
+                            name: Symbol {
+                                [salsa id]: 2,
+                                text: "Int",
                             },
-                            TypeConstructor(
-                                QualifiedName {
-                                    [salsa id]: 1,
-                                    module: None,
-                                    name: Symbol {
-                                        [salsa id]: 1,
-                                        text: "Maybe",
-                                    },
-                                },
-                            ),
-                        ),
-                        Located(
-                            SourceSpan {
-                                start: 13,
-                                end: 16,
-                            },
-                            TypeConstructor(
-                                QualifiedName {
-                                    [salsa id]: 2,
-                                    module: None,
-                                    name: Symbol {
-                                        [salsa id]: 2,
-                                        text: "Int",
-                                    },
-                                },
-                            ),
-                        ),
+                        },
                     ),
                 ),
             ),

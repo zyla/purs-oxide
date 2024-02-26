@@ -56,17 +56,29 @@ Located(
                                                     start: 46,
                                                     end: 62,
                                                 },
-                                                Parens(
+                                                FunctionType(
                                                     Located(
                                                         SourceSpan {
                                                             start: 47,
+                                                            end: 48,
+                                                        },
+                                                        Var(
+                                                            Symbol {
+                                                                [salsa id]: 1,
+                                                                text: "k",
+                                                            },
+                                                        ),
+                                                    ),
+                                                    Located(
+                                                        SourceSpan {
+                                                            start: 52,
                                                             end: 61,
                                                         },
                                                         FunctionType(
                                                             Located(
                                                                 SourceSpan {
-                                                                    start: 47,
-                                                                    end: 48,
+                                                                    start: 52,
+                                                                    end: 53,
                                                                 },
                                                                 Var(
                                                                     Symbol {
@@ -77,38 +89,18 @@ Located(
                                                             ),
                                                             Located(
                                                                 SourceSpan {
-                                                                    start: 52,
+                                                                    start: 57,
                                                                     end: 61,
                                                                 },
-                                                                FunctionType(
-                                                                    Located(
-                                                                        SourceSpan {
-                                                                            start: 52,
-                                                                            end: 53,
+                                                                TypeConstructor(
+                                                                    QualifiedName {
+                                                                        [salsa id]: 0,
+                                                                        module: None,
+                                                                        name: Symbol {
+                                                                            [salsa id]: 2,
+                                                                            text: "Type",
                                                                         },
-                                                                        Var(
-                                                                            Symbol {
-                                                                                [salsa id]: 1,
-                                                                                text: "k",
-                                                                            },
-                                                                        ),
-                                                                    ),
-                                                                    Located(
-                                                                        SourceSpan {
-                                                                            start: 57,
-                                                                            end: 61,
-                                                                        },
-                                                                        TypeConstructor(
-                                                                            QualifiedName {
-                                                                                [salsa id]: 0,
-                                                                                module: None,
-                                                                                name: Symbol {
-                                                                                    [salsa id]: 2,
-                                                                                    text: "Type",
-                                                                                },
-                                                                            },
-                                                                        ),
-                                                                    ),
+                                                                    },
                                                                 ),
                                                             ),
                                                         ),

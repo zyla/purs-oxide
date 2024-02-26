@@ -544,7 +544,7 @@ AtomicType: TypeKind = {
         Located(SourceSpan::new(row_start, row_end), 
           TypeKind::Row{fields,rest}))
     ),
-  "(" <v:Type> ")" => TypeKind::Parens(Box::new(v)),
+  "(" <v:Type1> ")" => v,
 };
 
 RowField: (Symbol, Type) = {

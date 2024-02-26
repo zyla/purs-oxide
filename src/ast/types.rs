@@ -45,10 +45,12 @@ pub enum TypeKind {
         r#type: Box<Type>,
         kind: Box<Type>,
     },
-    Parens(Box<Type>),
-
     /// Infix operator sequence with unknown precedence
     Infix(Box<Type>, Vec<(QualifiedName, Type)>),
+    // We used to have this:
+    // Parens(Box<Type>),
+    // taken from original PureScript compiler. But it doesn't seem necessary for us, and makes it
+    // harder to properly test the pretty-printer.
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
