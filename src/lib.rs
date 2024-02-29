@@ -30,6 +30,10 @@ pub struct Jar(
     crate::renamed_module::renamed_value_decl,
     crate::typecheck::typechecked_scc,
     crate::typecheck::type_of_value,
+    crate::codegen::value_decl_code_acc,
+    crate::codegen::scc_code_acc,
+    crate::codegen::scc_code,
+    crate::codegen::CodeAccumulator,
 );
 
 #[salsa::input]
@@ -256,6 +260,7 @@ impl Clone for DbSnapshot {
 }
 
 pub mod ast;
+pub mod codegen;
 pub mod errors;
 pub mod indexed_module;
 pub mod lexer;
