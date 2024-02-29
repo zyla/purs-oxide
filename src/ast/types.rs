@@ -51,6 +51,9 @@ pub enum TypeKind {
     // Parens(Box<Type>),
     // taken from original PureScript compiler. But it doesn't seem necessary for us, and makes it
     // harder to properly test the pretty-printer.
+
+    // Invalid type (but we still proceed around it)
+    Error,
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]

@@ -63,6 +63,9 @@ pub enum ExprKind {
     Ado(Vec<DoItem>, Box<Expr>),
 
     Negate(Box<Expr>),
+
+    /// Invalid expression (but we still proceed around it)
+    Error,
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
@@ -137,6 +140,8 @@ pub enum PatKind {
     Named(Symbol, Box<Pat>),
 
     Typed(Box<Pat>, Box<Type>),
+
+    Error,
 }
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]

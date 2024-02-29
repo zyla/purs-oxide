@@ -142,6 +142,7 @@ pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> 
                 ExprKind::Literal(Literal::Integer(x)) => PatKind::Literal(Literal::Integer(-x)),
                 _ => return Err("Illegal negation in pattern".into()),
             },
+            ExprKind::Error => PatKind::Error,
         },
     ))
 }

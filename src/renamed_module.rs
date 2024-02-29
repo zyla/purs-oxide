@@ -1,5 +1,11 @@
 use crate::ast::AbsoluteName;
+use crate::ast::CaseBranch;
 use crate::ast::DeclarationRefConstructors;
+use crate::ast::ExprKind;
+use crate::ast::Located;
+use crate::ast::PossiblyGuardedExpr;
+use crate::ast::SourceSpan;
+use crate::ast::TypeKind;
 use crate::indexed_module::TypeClassDecl;
 use crate::indexed_module::TypeDecl;
 use fxhash::FxHashMap;
@@ -51,7 +57,23 @@ pub struct RenamedModule {
 pub fn renamed_value_decl(db: &dyn Db, id: DeclId) -> ValueDecl {
     assert!(id.namespace(db) == Namespace::Value);
     // FIXME: we shoudn't have to clone here
-    renamed_module(db, id.module(db)).values[&id.to_absolute_name(db)].clone()
+    let abs_name = id.to_absolute_name(db);
+    renamed_module(db, id.module(db))
+        .values
+        .get(&abs_name)
+        .cloned()
+        // TODO: report the error
+        .unwrap_or_else(|| ValueDecl {
+            name: abs_name,
+            type_: Some(Located::new(SourceSpan::unknown(), TypeKind::Error)),
+            equations: vec![CaseBranch {
+                pats: vec![],
+                expr: PossiblyGuardedExpr::Unconditional(Located::new(
+                    SourceSpan::unknown(),
+                    ExprKind::Error,
+                )),
+            }],
+        })
 }
 
 #[salsa::tracked]

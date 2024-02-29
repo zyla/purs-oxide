@@ -236,6 +236,7 @@ where
                 .append(allocator.text(" "))
                 .append(pretty_print_type(b, db, allocator, APP_PRECEDENCE + 1)),
         ),
+        Error => allocator.text("<error>"),
 
         a => todo!("pretty_print not implemented for {a:?} type"),
     }

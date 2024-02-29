@@ -136,6 +136,15 @@ impl<'d> CodeGenerator<'d> {
                 cg_write!(self, ") => ");
                 self.expr(body);
             }
+            Literal(crate::ast::Literal::Integer(x)) => {
+                cg_write!(self, "{}", x);
+            }
+            Error => {
+                cg_write!(
+                    self,
+                    "((() => {{ throw new Error('Reached broken code') }})())",
+                );
+            }
             _ => todo!("codegen: unsupported expr {:?}", e),
         }
     }
@@ -187,14 +196,39 @@ mod bundle_tests {
     }
 
     #[test]
-    #[ignore = "can't even typecheck this for now"]
-    fn simple() {
+    fn simple1() {
         assert_snapshot!(test_bundle(
             &[indoc!(
                 r"
                 module Test where
+                -- TODO: autoimport Prim
+                import Prim (Int)
                 foo :: Int
                 foo = 1
+                "
+            )],
+            ("Test", "foo")
+        ));
+    }
+
+    #[test]
+    #[ignore = "Something is not right, typechecking generates 'Test.foo = <error>'"]
+    fn simple_dep() {
+        assert_snapshot!(test_bundle(
+            &[indoc!(
+                r"
+                module Test where
+                -- TODO: autoimport Prim
+                import Prim (Int)
+                unused :: Int
+                unused = 1
+                foo :: Int
+                foo = frob answer
+                answer :: Int
+                answer = 42
+                frob :: Int -> Int
+                -- note: explicit lambda because no equations desugaring yet
+                frob = \\x -> x
                 "
             )],
             ("Test", "foo")

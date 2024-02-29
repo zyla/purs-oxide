@@ -1,5 +1,7 @@
 use crate::ast::Literal;
 use crate::pretty_printer::pp;
+use crate::renamed_module::Namespace;
+use crate::scc::scc_of;
 use crate::symbol::Symbol;
 use crate::ModuleId;
 use salsa::DebugWithDb;
@@ -22,9 +24,22 @@ use crate::{
 };
 use std::collections::HashMap;
 
+// TODO: test this!
 #[salsa::tracked]
-pub fn type_of_value(db: &dyn Db, name: AbsoluteName) -> Type {
-    todo!("type_of_value")
+pub fn type_of_value(db: &dyn Db, id: AbsoluteName) -> Type {
+    let decl_id = DeclId::new(db, Namespace::Value, id.module(db), id.name(db));
+    let decl = renamed_value_decl(db, decl_id);
+
+    // Return type signature if provided
+    if let Some(ty) = decl.type_ {
+        return ty;
+    }
+
+    // Otherwise infer the type
+    typechecked_scc(db, scc_of(db, decl_id))
+        .into_iter()
+        .find_map(|(decl_id2, _, ty)| if decl_id == decl_id2 { Some(ty) } else { None })
+        .expect("typechecked_scc should return a type for each of its members!")
 }
 
 #[salsa::tracked]
@@ -205,6 +220,13 @@ impl<'a> Typechecker<'a> {
                     ),
                 ),
             ),
+            expr @ Error => {
+                // Note: assuming the error is already reported elsewhere
+                (
+                    Located::new(span, expr),
+                    Located::new(span, TypeKind::Error),
+                )
+            }
             _ => todo!("unsupported expression {expr_kind:?}"),
         }
     }
@@ -245,7 +267,8 @@ impl<'a> Typechecker<'a> {
                     );
                 }
             }
-            _ => todo!(),
+            (TypeKind::Error, TypeKind::Error) => {}
+            _ => todo!("unify {:?} {:?}", pp(self.db, &t1), pp(self.db, &t2)),
         }
     }
 
