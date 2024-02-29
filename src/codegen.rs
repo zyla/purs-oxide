@@ -177,6 +177,7 @@ mod bundle_tests {
     use insta::*;
 
     fn test_bundle(inputs: &[&str], entrypoint: (&str, &str)) -> String {
+        let _ = env_logger::builder().is_test(true).try_init();
         let db = &mut crate::Database::new();
 
         inputs.into_iter().zip(1..).for_each(|(source, i)| {
@@ -212,7 +213,6 @@ mod bundle_tests {
     }
 
     #[test]
-    #[ignore = "Something is not right, typechecking generates 'Test.foo = <error>'"]
     fn simple_dep() {
         assert_snapshot!(test_bundle(
             &[indoc!(
@@ -223,12 +223,31 @@ mod bundle_tests {
                 unused :: Int
                 unused = 1
                 foo :: Int
+                foo = answer
+                answer :: Int
+                answer = 42
+                "
+            )],
+            ("Test", "foo")
+        ));
+    }
+
+    #[test]
+    #[ignore = "Can't typecheck lambda with type signature yet"]
+    fn function_call() {
+        assert_snapshot!(test_bundle(
+            &[indoc!(
+                r"
+                module Test where
+                -- TODO: autoimport Prim
+                import Prim (Int)
+                foo :: Int
                 foo = frob answer
                 answer :: Int
                 answer = 42
                 frob :: Int -> Int
                 -- note: explicit lambda because no equations desugaring yet
-                frob = \\x -> x
+                frob = \x -> x
                 "
             )],
             ("Test", "foo")

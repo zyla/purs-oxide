@@ -1,0 +1,6 @@
+---
+source: src/codegen.rs
+expression: "test_bundle(&[indoc!(r\"\n                module Test where\n                -- TODO: autoimport Prim\n                import Prim (Int)\n                unused :: Int\n                unused = 1\n                foo :: Int\n                foo = answer\n                answer :: Int\n                answer = 42\n                \")],\n    (\"Test\", \"foo\"))"
+---
+const Test__foo = Test__answer;
+const Test__answer = 42;
