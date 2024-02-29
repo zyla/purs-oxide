@@ -1,11 +1,5 @@
 use crate::ast::AbsoluteName;
-use crate::ast::CaseBranch;
 use crate::ast::DeclarationRefConstructors;
-use crate::ast::ExprKind;
-use crate::ast::Located;
-use crate::ast::PossiblyGuardedExpr;
-use crate::ast::SourceSpan;
-use crate::ast::TypeKind;
 use crate::indexed_module::TypeClassDecl;
 use crate::indexed_module::TypeDecl;
 use fxhash::FxHashMap;
@@ -62,17 +56,11 @@ pub fn renamed_value_decl(db: &dyn Db, id: DeclId) -> ValueDecl {
         .values
         .get(&abs_name)
         .cloned()
-        // TODO: report the error
-        .unwrap_or_else(|| ValueDecl {
-            name: abs_name,
-            type_: Some(Located::new(SourceSpan::unknown(), TypeKind::Error)),
-            equations: vec![CaseBranch {
-                pats: vec![],
-                expr: PossiblyGuardedExpr::Unconditional(Located::new(
-                    SourceSpan::unknown(),
-                    ExprKind::Error,
-                )),
-            }],
+        .unwrap_or_else(|| {
+            panic!(
+                "renamed_value_decl for nonexistent value {:?}",
+                abs_name.into_debug_all(db)
+            )
         })
 }
 
