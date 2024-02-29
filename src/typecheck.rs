@@ -1,4 +1,7 @@
+use crate::ast::Literal;
 use crate::pretty_printer::pp;
+use crate::symbol::Symbol;
+use crate::ModuleId;
 use salsa::DebugWithDb;
 
 use crate::ast::AbsoluteName;
@@ -121,12 +124,13 @@ impl<'a> Typechecker<'a> {
     }
 
     fn infer(&mut self, expr: Expr) -> (Expr, Type) {
+        let db = self.db;
         let Located(span, expr_kind) = expr;
         match expr_kind {
             Var(v) => {
                 let ty = self.local_context.get(&v).cloned().unwrap_or_else(|| {
-                    match v.to_absolute_name(self.db) {
-                        Some(name) => type_of_value(self.db, name),
+                    match v.to_absolute_name(db) {
+                        Some(name) => type_of_value(db, name),
                         None => panic!("renamer left unknown local variable"),
                     }
                 });
@@ -142,7 +146,7 @@ impl<'a> Typechecker<'a> {
                             // TODO: we're adding to local context, but never removing from it.
                             // Seems wrong...
                             self.local_context
-                                .insert(QualifiedName::new_unqualified(self.db, v), tv.clone());
+                                .insert(QualifiedName::new_unqualified(db, v), tv.clone());
                             tv
                         }
                         _ => todo!("unsupported pattern {pat:?}"),
@@ -181,12 +185,26 @@ impl<'a> Typechecker<'a> {
                 );
                 log::debug!("infer(App) checks arg");
                 let elaborated_x = self.check(x, &arg_ty);
-                log::debug!("infer(App) returns {}", pp(self.db, &result_ty));
+                log::debug!("infer(App) returns {}", pp(db, &result_ty));
                 (
                     Located::new(span, App(Box::new(elaborated_f), vec![elaborated_x])),
                     result_ty,
                 )
             }
+            expr @ Literal(Literal::Integer(_)) => (
+                Located::new(span, expr),
+                Located::new(
+                    span,
+                    TypeKind::TypeConstructor(
+                        // TODO: wired-in names should be shared somewhere (in Db perhaps?)
+                        QualifiedName::new_qualified(
+                            db,
+                            ModuleId::new(db, "Prim".to_string()),
+                            Symbol::new(db, "Int".to_string()),
+                        ),
+                    ),
+                ),
+            ),
             _ => todo!("unsupported expression {expr_kind:?}"),
         }
     }
@@ -287,6 +305,25 @@ mod tests {
         format!("{}\n{}", pp(db, elaborated), pp(db, ty))
     }
 
+    fn test_check(context: &[(&str, &str)], expr_str: &str, type_str: &str) -> String {
+        let db: &dyn crate::Db = &crate::Database::new();
+        let local_context = context
+            .iter()
+            .map(|(var_name, type_str)| {
+                (
+                    QualifiedName::new_unqualified(db, Symbol::new(db, var_name.to_string())),
+                    crate::parser::parse_type(db, type_str).1.unwrap(),
+                )
+            })
+            .collect();
+        let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
+        let ty = crate::parser::parse_type(db, type_str).1.unwrap();
+        let mut tc = Typechecker::new(db, local_context);
+
+        let elaborated = tc.check(expr, &ty);
+        pp(db, elaborated)
+    }
+
     #[test]
     fn var() {
         assert_snapshot!(test_infer(&[("foo", "Int")], "foo"), @r###"
@@ -342,5 +379,19 @@ mod tests {
         String
         (Error: cannot unify Bool with Int or something)
         "###);
+    }
+
+    #[test]
+    fn infer_integer_literal() {
+        assert_snapshot!(test_infer(&[
+        ], "1"), @r###"
+        1
+        Prim.Int
+        "###);
+    }
+
+    #[test]
+    fn check_integer_literal() {
+        assert_snapshot!(test_check(&[], "1", "Prim.Int"), @"1");
     }
 }

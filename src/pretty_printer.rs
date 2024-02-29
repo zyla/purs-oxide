@@ -1,4 +1,5 @@
 use crate::ast::Expr;
+use crate::ast::Literal;
 use crate::ast::Pat;
 use crate::ast::Type;
 use pretty::{BoxAllocator, DocAllocator, DocBuilder};
@@ -120,6 +121,7 @@ where
                 ),
         ),
         ExprKind::DataConstructor(name) => name.pretty_print(db, allocator),
+        ExprKind::Literal(Literal::Integer(i)) => allocator.as_string(i),
         _ => todo!("pretty_print expr {:?}", e),
     }
 }
