@@ -253,7 +253,6 @@ mod bundle_tests {
     }
 
     #[test]
-    #[ignore = "Can't typecheck lambda with type signature yet"]
     fn function_call() {
         assert_snapshot!(test_bundle(
             &[indoc!(
