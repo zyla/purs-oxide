@@ -233,6 +233,26 @@ mod bundle_tests {
     }
 
     #[test]
+    fn transitive_dep() {
+        assert_snapshot!(test_bundle(
+            &[indoc!(
+                r"
+                module Test where
+                -- TODO: autoimport Prim
+                import Prim (Int)
+                foo :: Int
+                foo = bar
+                bar :: Int
+                bar = baz
+                baz :: Int
+                baz = 42
+                "
+            )],
+            ("Test", "foo")
+        ));
+    }
+
+    #[test]
     #[ignore = "Can't typecheck lambda with type signature yet"]
     fn function_call() {
         assert_snapshot!(test_bundle(
