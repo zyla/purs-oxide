@@ -89,3 +89,7 @@ const bar = Foo.foo;
 // a -> b -> c
 
 [ ] incremental-friendly instance resolution
+[ ] Prim module (and autoimport it)
+[ ] Bundle CLI command
+[ ] Tests that bundle and run a JS program
+[ ] How to bundle with multiple entrypoints but without duplicates?
