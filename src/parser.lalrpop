@@ -9,7 +9,7 @@ use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 use std::str::FromStr;
 
-grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>);
+grammar<'err>(db: &dyn crate::Db, errors: &'err mut Vec<ErrorRecovery<usize, Token, &'static str>>, module_id: ModuleId);
 
 pub Module: Module = Located<Commented<ModuleInner>>;
 
@@ -74,7 +74,7 @@ UpperQualifiedIdent: QualifiedName = {
 
 
 Located<T>: Located<T> = {
-  <start:@L> <v:T> <end:@R> => Located(SourceSpan::new(start, end), v)
+  <start:@L> <v:T> <end:@R> => Located(SourceSpan::new_in_module(start, end, module_id), v)
 };
 
 MaybeLayoutBlock<T>: Vec<T> = {
@@ -315,7 +315,7 @@ Expr1<Variant>: ExprKind = {
   <first:Box<Located<Expr2<Variant>>>> <rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )+>
     => ExprKind::Infix(first, rest),
   <start:@L> <first:Box<Located<Expr2<Variant>>>> <rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )+> <end:@R> "::" <type_:Box<Type>>
-    if Variant == "full" => ExprKind::Typed(Box::new(Located(SourceSpan::new(start, end), ExprKind::Infix(first, rest))), type_),
+    if Variant == "full" => ExprKind::Typed(Box::new(Located(SourceSpan::new_in_module(start, end, module_id), ExprKind::Infix(first, rest))), type_),
   <first:Box<Located<Expr2<Variant>>>> <mut rest:( <InfixOp<Variant>> <Located<Expr2<"full">>> )*> <last:( <InfixOp<Variant>> <Located<ApplyLambda<Expr2<"full">>>> )>
     if Variant == "full" => {
       rest.push(last);
@@ -438,7 +438,7 @@ RecordShortcutExpr: (Symbol, Expr) = {
     let label = Symbol::new(db, label);
     (
       label.clone(),
-      Located(SourceSpan::new(start, end), ExprKind::Var(QualifiedName::new_unqualified(db, label)))
+      Located(SourceSpan::new_in_module(start, end, module_id), ExprKind::Var(QualifiedName::new_unqualified(db, label)))
     )
   }
 };
@@ -538,10 +538,10 @@ AtomicType: TypeKind = {
   <row_start:@L> <fields:SepBy<RowField, ",">> <rest:RowRest?> <row_end:@R> "}" =>
     TypeKind::TypeApp(
       Box::new(
-        Located(SourceSpan::new(record_start, record_end), 
+        Located(SourceSpan::new_in_module(record_start, record_end, module_id), 
           TypeKind::TypeConstructor(QualifiedName::new_qualified(db, ModuleId::new(db, "Prim".into()), Symbol::new(db, "Record".into()))))),
       Box::new(
-        Located(SourceSpan::new(row_start, row_end), 
+        Located(SourceSpan::new_in_module(row_start, row_end, module_id), 
           TypeKind::Row{fields,rest}))
     ),
   "(" <v:Type1> ")" => v,

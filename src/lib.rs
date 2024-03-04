@@ -1,3 +1,4 @@
+use crate::ast::meta::ToSourceSpan;
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
@@ -5,7 +6,7 @@ use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::ast::{declarations, SourceSpan};
+use crate::ast::{declarations, SourceSpan, SpanDeclRef};
 use crate::errors::Error;
 
 #[macro_use]
@@ -92,29 +93,24 @@ impl Diagnostic {
     }
 }
 
-impl<T, E> From<lalrpop_util::ParseError<usize, T, E>> for SourceSpan {
-    fn from(val: lalrpop_util::ParseError<usize, T, E>) -> Self {
+impl<T, E> ToSourceSpan for lalrpop_util::ParseError<usize, T, E> {
+    fn to_source_span(&self, module_id: ModuleId) -> SourceSpan {
         use lalrpop_util::ParseError::*;
 
-        match val {
-            InvalidToken { location } => SourceSpan {
-                start: location,
-                end: location,
-            },
-
-            UnrecognizedEOF { location, .. } => SourceSpan {
-                start: location,
-                end: location,
-            },
+        match *self {
+            InvalidToken { location } => SourceSpan::new_in_module(location, location, module_id),
+            UnrecognizedEOF { location, .. } => {
+                SourceSpan::new_in_module(location, location, module_id)
+            }
 
             UnrecognizedToken {
                 token: (start, .., end),
                 ..
-            } => SourceSpan { start, end },
+            } => SourceSpan::new_in_module(start, end, module_id),
             ExtraToken {
                 token: (start, .., end),
-            } => SourceSpan { start, end },
-            User { .. } => SourceSpan { start: 0, end: 0 },
+            } => SourceSpan::new_in_module(start, end, module_id),
+            User { .. } => SourceSpan::new_in_module(0, 0, module_id),
         }
     }
 }
@@ -137,7 +133,7 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
         .contents(db)
         .as_ref()
         .unwrap_or_else(|| panic!("module not found: {:?}", module.name(db)));
-    let (errs, result) = crate::parser::parse_module(db, input);
+    let (errs, result) = crate::parser::parse_module(db, input, module);
     if !errs.is_empty() {
         for err in errs.iter().take(1) {
             println!(
@@ -156,7 +152,7 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
                     Diagnostic::from(&err, filename.to_string_lossy().to_string()),
                 );
 
-                declarations::corrupted(db, err.into())
+                declarations::corrupted(db, err.to_source_span(module))
             }
             Ok(module) => module,
         },

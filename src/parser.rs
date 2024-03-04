@@ -192,10 +192,14 @@ type ParseResult<'a, T> = (
     Result<T, ParseError<usize, Token, Error>>,
 );
 
-pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
+pub fn parse_module<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Module> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ModuleParser::new().parse(db, &mut errors, lexer);
+    let result = parser::ModuleParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
@@ -217,17 +221,25 @@ pub fn parse_module_name(input: &str) -> Option<String> {
     }
 }
 
-pub fn parse_type<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Type> {
+pub fn parse_type<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Type> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::TypeParser::new().parse(db, &mut errors, lexer);
+    let result = parser::TypeParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
-pub fn parse_expr<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Expr> {
+pub fn parse_expr<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Expr> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ExprParser::new().parse(db, &mut errors, lexer);
+    let result = parser::ExprParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
