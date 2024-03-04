@@ -206,7 +206,7 @@ impl<'a> Typechecker<'a> {
                 }
                 let x = xs.remove(0);
                 let (elaborated_f, mut f_ty) = self.infer(*f);
-                let arg_ty = self.fresh_tv();
+                let mut arg_ty = self.fresh_tv();
                 let result_ty = self.fresh_tv();
                 self.unify(
                     &mut f_ty,
@@ -218,6 +218,11 @@ impl<'a> Typechecker<'a> {
                         ),
                     ),
                 );
+
+                // HACK: we should do it in a more principled way, but it's necessary here because
+                // `check` expects a concrete type (see test infer_app_lambda_arg)
+                self.shallow_apply_subst(&mut arg_ty);
+
                 log::debug!("infer(App) checks arg");
                 let elaborated_x = self.check(x, &arg_ty);
                 log::debug!("infer(App) returns {}", pp(db, &result_ty));
@@ -399,6 +404,16 @@ mod tests {
                                     ("x", "Int"),
         ], "f x"), @r###"
         f x
+        String
+        "###);
+    }
+
+    #[test]
+    fn infer_app_lambda_arg() {
+        assert_snapshot!(test_infer(&[
+                                    ("f", "(Int -> Int) -> String"),
+        ], r"f (\x -> x)"), @r###"
+        f (\x -> x)
         String
         "###);
     }
