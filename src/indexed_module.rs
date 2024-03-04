@@ -88,6 +88,18 @@ impl<'a> ModuleIndexer<'a> {
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
 
+                    let mut relative_spans_params = params.clone();
+                    relative_spans_params.iter_mut().for_each(|x| {
+                        x.1.iter_mut().for_each(|loc_t| {
+                            loc_t.to_relative_span(abs_name);
+                        });
+                    });
+
+                    let mut rel_constructors = constructors.clone();
+                    rel_constructors
+                        .iter_mut()
+                        .for_each(|c| c.to_relative_span(abs_name));
+
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
                             Diagnostics::push(
@@ -104,9 +116,9 @@ impl<'a> ModuleIndexer<'a> {
                             e.insert(TypeDecl::Data(DataDecl {
                                 type_: *type_,
                                 name: abs_name,
-                                params: params.clone(),
+                                params: relative_spans_params,
                                 kind: kind.clone(),
-                                constructors: constructors.clone(),
+                                constructors: rel_constructors,
                             }));
                         }
                     }

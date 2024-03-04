@@ -15,7 +15,7 @@ pub struct SourceSpan {
 pub enum SpanDeclRef {
     Module(ModuleId),
     Decl(AbsoluteName),
-    Unknown(),
+    Unknown,
 }
 
 impl SourceSpan {
@@ -27,8 +27,16 @@ impl SourceSpan {
         }
     }
 
-    pub fn new(start: usize, end: usize, decl: SpanDeclRef) -> Self {
-        Self { start, end, decl }
+    pub fn new_relative(start: usize, end: usize, name: AbsoluteName) -> Self {
+        Self {
+            start,
+            end,
+            decl: SpanDeclRef::Decl(name),
+        }
+    }
+
+    pub fn to_relative(&mut self, name: AbsoluteName) {
+        self.decl = SpanDeclRef::Decl(name)
     }
 
     pub fn unknown() -> Self {
@@ -36,7 +44,7 @@ impl SourceSpan {
         Self {
             start: 0,
             end: 0,
-            decl: SpanDeclRef::Unknown(),
+            decl: SpanDeclRef::Unknown,
         }
     }
 
@@ -68,6 +76,10 @@ impl<T> Located<T> {
 
     pub fn span(&self) -> SourceSpan {
         self.0
+    }
+
+    pub fn to_relative_span(&mut self, name: AbsoluteName) {
+        self.0.to_relative(name)
     }
 }
 

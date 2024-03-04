@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::ast::{declarations, SourceSpan, SpanDeclRef};
+use crate::ast::{declarations, SourceSpan};
 use crate::errors::Error;
 
 #[macro_use]
