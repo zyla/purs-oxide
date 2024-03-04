@@ -10,6 +10,12 @@ use crate::scc::SccId;
 use crate::typecheck::typechecked_scc;
 use std::fmt::Write;
 
+macro_rules! cg_write {
+    ($cg:expr, $($arg:tt)*) => {
+        write!(HasCodeBuffer::code_buffer($cg), $($arg)*).expect("formatting to a String shouldn't fail")
+    };
+}
+
 /// Different ways to reference `AbsoluteName`s.
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub enum ReferenceMode {
@@ -21,8 +27,40 @@ pub enum ReferenceMode {
     LocalConstant,
 }
 
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+pub enum BundleMode {
+    /// Bundle is a ES module, exports the entrypoint
+    Export,
+    /// Bundle is standalone (except possibly imports in FFI), calls the entrypoint
+    Main,
+    /// Generate code, but don't use it it any way
+    None,
+}
+
 #[salsa::accumulator]
 pub struct CodeAccumulator(pub String);
+
+/// Generate a bundle of code which includes the specified entry point and its dependencies.
+/// Depending on `BundleMode`, it's either exported or called as `main()`.
+///
+/// TODO: support multiple entry points for export mode
+pub fn bundle(db: &dyn crate::Db, bundle_mode: BundleMode, entrypoint: AbsoluteName) -> String {
+    let mut code = value_decl_code_acc::accumulated::<CodeAccumulator>(db, entrypoint).join("");
+
+    match bundle_mode {
+        BundleMode::Export => {
+            cg_write!(&mut code, "export default ");
+            write_mangled_name(db, ReferenceMode::LocalConstant, &mut code, entrypoint);
+            cg_write!(&mut code, ";\n");
+        }
+        BundleMode::Main => {
+            write_mangled_name(db, ReferenceMode::LocalConstant, &mut code, entrypoint);
+            cg_write!(&mut code, "();\n");
+        }
+        BundleMode::None => {}
+    }
+    code
+}
 
 /// Generate code for the given value and its transitive dependencies, collecting it in the
 /// `CodeAccumulator` accumulator.
@@ -37,10 +75,20 @@ pub fn value_decl_code_acc(db: &dyn crate::Db, id: AbsoluteName) {
     )
 }
 
-macro_rules! cg_write {
-    ($cg:expr, $($arg:tt)*) => {
-        write!(&mut $cg.code_buffer, $($arg)*).expect("formatting to a String shouldn't fail")
-    };
+pub trait HasCodeBuffer {
+    fn code_buffer(&mut self) -> &mut String;
+}
+
+impl HasCodeBuffer for String {
+    fn code_buffer(&mut self) -> &mut String {
+        self
+    }
+}
+
+impl<'d> HasCodeBuffer for CodeGenerator<'d> {
+    fn code_buffer(&mut self) -> &mut String {
+        &mut self.code_buffer
+    }
 }
 
 /// Generate code for the given SCC and its transitive dependencies, collecting it in the
@@ -55,13 +103,13 @@ pub fn scc_code_acc(db: &dyn crate::Db, id: SccId) {
     };
     for (id, expr, _) in typechecked_scc(db, id) {
         cg_write!(
-            cg,
+            &mut cg,
             "const {}__{} = ",
             id.module(db).name(db),
             id.name(db).text(db)
         );
         cg.expr(&expr);
-        cg_write!(cg, ";\n");
+        cg_write!(&mut cg, ";\n");
     }
     for dep in cg.dependencies {
         value_decl_code_acc(db, dep);
@@ -85,24 +133,7 @@ impl<'d> CodeGenerator<'d> {
             Var(v) => match v.to_absolute_name(db) {
                 Some(abs) => {
                     self.dependencies.insert(abs);
-                    match self.reference_mode {
-                        ReferenceMode::ModuleImport => {
-                            cg_write!(
-                                self,
-                                "{}.{}",
-                                abs.module(db).name(db),
-                                abs.name(db).text(db)
-                            );
-                        }
-                        ReferenceMode::LocalConstant => {
-                            cg_write!(
-                                self,
-                                "{}__{}",
-                                abs.module(db).name(db),
-                                abs.name(db).text(db)
-                            );
-                        }
-                    }
+                    write_mangled_name(db, self.reference_mode, self, abs);
                 }
                 None => {
                     cg_write!(self, "{}", v.name(db).text(db));
@@ -150,6 +181,27 @@ impl<'d> CodeGenerator<'d> {
     }
 }
 
+fn write_mangled_name<G: HasCodeBuffer>(
+    db: &dyn crate::Db,
+    reference_mode: ReferenceMode,
+    g: &mut G,
+    name: AbsoluteName,
+) {
+    match reference_mode {
+        ReferenceMode::ModuleImport => {
+            cg_write!(g, "{}.{}", name.module(db).name(db), name.name(db).text(db));
+        }
+        ReferenceMode::LocalConstant => {
+            cg_write!(
+                g,
+                "{}__{}",
+                name.module(db).name(db),
+                name.name(db).text(db)
+            );
+        }
+    }
+}
+
 /// Generate code for the given SCC without its dependencies. For use in multi-module code
 /// generation mode.
 #[salsa::tracked]
@@ -161,9 +213,9 @@ pub fn scc_code(db: &dyn crate::Db, id: SccId) -> String {
         dependencies: Default::default(),
     };
     for (id, expr, _) in typechecked_scc(db, id) {
-        cg_write!(cg, "const {} = ", id.name(db).text(db));
+        cg_write!(&mut cg, "const {} = ", id.name(db).text(db));
         cg.expr(&expr);
-        cg_write!(cg, ";\n");
+        cg_write!(&mut cg, ";\n");
     }
     cg.code_buffer
 }
@@ -176,7 +228,11 @@ mod bundle_tests {
     use indoc::indoc;
     use insta::*;
 
-    fn test_bundle(inputs: &[&str], entrypoint: (&str, &str)) -> String {
+    fn test_bundle_mode(
+        inputs: &[&str],
+        entrypoint: (&str, &str),
+        bundle_mode: BundleMode,
+    ) -> String {
         let _ = env_logger::builder().is_test(true).try_init();
         let db = &mut crate::Database::new();
 
@@ -185,15 +241,16 @@ mod bundle_tests {
                 .unwrap();
         });
 
-        value_decl_code_acc::accumulated::<CodeAccumulator>(
+        let entrypoint = AbsoluteName::new(
             db,
-            AbsoluteName::new(
-                db,
-                ModuleId::new(db, entrypoint.0.to_string()),
-                Symbol::new(db, entrypoint.1.to_string()),
-            ),
-        )
-        .join("")
+            ModuleId::new(db, entrypoint.0.to_string()),
+            Symbol::new(db, entrypoint.1.to_string()),
+        );
+        bundle(db, bundle_mode, entrypoint)
+    }
+
+    fn test_bundle(inputs: &[&str], entrypoint: (&str, &str)) -> String {
+        test_bundle_mode(inputs, entrypoint, BundleMode::None)
     }
 
     #[test]
@@ -270,6 +327,36 @@ mod bundle_tests {
                 "
             )],
             ("Test", "foo")
+        ));
+    }
+
+    #[test]
+    fn bundle_main() {
+        assert_snapshot!(test_bundle_mode(
+            &[indoc!(
+                r"
+                module Test where
+                foo :: Int -> Int
+                foo = \x -> x
+                "
+            )],
+            ("Test", "foo"),
+            BundleMode::Main
+        ));
+    }
+
+    #[test]
+    fn bundle_export() {
+        assert_snapshot!(test_bundle_mode(
+            &[indoc!(
+                r"
+                module Test where
+                foo :: Int -> Int
+                foo = \x -> x
+                "
+            )],
+            ("Test", "foo"),
+            BundleMode::Export
         ));
     }
 }
