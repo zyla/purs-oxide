@@ -199,6 +199,16 @@ pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a
     (errors, result)
 }
 
+pub fn parse_lower_qualified_ident<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+) -> ParseResult<'a, QualifiedName> {
+    let mut errors = vec![];
+    let lexer = lexer::lex(input);
+    let result = parser::LowerQualifiedIdentParser::new().parse(db, &mut errors, lexer);
+    (errors, result)
+}
+
 // Recognize `module Some.Module` header,
 // without parsing the rest.
 //
