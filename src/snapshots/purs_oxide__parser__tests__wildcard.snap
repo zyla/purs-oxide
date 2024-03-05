@@ -16,7 +16,6 @@ Located(
             Wildcard,
         ),
         Symbol {
-            [salsa id]: 0,
             text: "foo",
         },
     ),

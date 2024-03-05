@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -26,7 +25,6 @@ Located(
                         [],
                         ForeignValue {
                             name: Symbol {
-                                [salsa id]: 0,
                                 text: "foo",
                             },
                             type_: Located(
@@ -42,10 +40,8 @@ Located(
                                         },
                                         TypeConstructor(
                                             QualifiedName {
-                                                [salsa id]: 0,
                                                 module: None,
                                                 name: Symbol {
-                                                    [salsa id]: 1,
                                                     text: "Int",
                                                 },
                                             },
@@ -58,10 +54,8 @@ Located(
                                         },
                                         TypeConstructor(
                                             QualifiedName {
-                                                [salsa id]: 0,
                                                 module: None,
                                                 name: Symbol {
-                                                    [salsa id]: 1,
                                                     text: "Int",
                                                 },
                                             },

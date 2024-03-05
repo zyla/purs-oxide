@@ -9,15 +9,12 @@ Located(
     },
     TypeConstructor(
         QualifiedName {
-            [salsa id]: 0,
             module: Some(
                 ModuleId {
-                    [salsa id]: 0,
                     name: "Prelude",
                 },
             ),
             name: Symbol {
-                [salsa id]: 0,
                 text: "Int",
             },
         },

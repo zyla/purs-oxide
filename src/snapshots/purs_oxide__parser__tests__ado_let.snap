@@ -21,7 +21,6 @@ Located(
                             ValueDeclaration(
                                 ValueDeclaration {
                                     ident: Symbol {
-                                        [salsa id]: 0,
                                         text: "x",
                                     },
                                     params: [],

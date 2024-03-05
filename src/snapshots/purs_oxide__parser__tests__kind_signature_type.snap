@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -27,7 +26,6 @@ Located(
                         KindSignature {
                             for_type: TypeSynonym,
                             name: Symbol {
-                                [salsa id]: 0,
                                 text: "Qux",
                             },
                             kind: Located(
@@ -43,10 +41,8 @@ Located(
                                         },
                                         TypeConstructor(
                                             QualifiedName {
-                                                [salsa id]: 0,
                                                 module: None,
                                                 name: Symbol {
-                                                    [salsa id]: 1,
                                                     text: "Type",
                                                 },
                                             },
@@ -59,10 +55,8 @@ Located(
                                         },
                                         TypeConstructor(
                                             QualifiedName {
-                                                [salsa id]: 0,
                                                 module: None,
                                                 name: Symbol {
-                                                    [salsa id]: 1,
                                                     text: "Type",
                                                 },
                                             },

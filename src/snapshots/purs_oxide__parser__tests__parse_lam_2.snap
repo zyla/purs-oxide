@@ -23,7 +23,6 @@ Located(
                 },
                 Var(
                     Symbol {
-                        [salsa id]: 0,
                         text: "y",
                     },
                 ),
@@ -36,10 +35,8 @@ Located(
             },
             Var(
                 QualifiedName {
-                    [salsa id]: 0,
                     module: None,
                     name: Symbol {
-                        [salsa id]: 0,
                         text: "y",
                     },
                 },

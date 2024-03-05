@@ -16,10 +16,8 @@ Located(
                 },
                 Var(
                     QualifiedName {
-                        [salsa id]: 0,
                         module: None,
                         name: Symbol {
-                            [salsa id]: 0,
                             text: "x",
                         },
                     },
@@ -36,10 +34,8 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                [salsa id]: 1,
                                 module: None,
                                 name: Symbol {
-                                    [salsa id]: 1,
                                     text: "C",
                                 },
                             },
@@ -51,7 +47,6 @@ Located(
                                     },
                                     Var(
                                         Symbol {
-                                            [salsa id]: 2,
                                             text: "a",
                                         },
                                     ),
@@ -63,7 +58,6 @@ Located(
                                     },
                                     Var(
                                         Symbol {
-                                            [salsa id]: 3,
                                             text: "b",
                                         },
                                     ),
@@ -95,10 +89,8 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                [salsa id]: 4,
                                 module: None,
                                 name: Symbol {
-                                    [salsa id]: 4,
                                     text: "D",
                                 },
                             },
@@ -110,10 +102,8 @@ Located(
                                     },
                                     DataConstructorApp(
                                         QualifiedName {
-                                            [salsa id]: 5,
                                             module: None,
                                             name: Symbol {
-                                                [salsa id]: 5,
                                                 text: "A",
                                             },
                                         },
@@ -125,7 +115,6 @@ Located(
                                                 },
                                                 Var(
                                                     Symbol {
-                                                        [salsa id]: 6,
                                                         text: "c",
                                                     },
                                                 ),
@@ -167,10 +156,8 @@ Located(
                         },
                         DataConstructorApp(
                             QualifiedName {
-                                [salsa id]: 7,
                                 module: None,
                                 name: Symbol {
-                                    [salsa id]: 7,
                                     text: "E",
                                 },
                             },

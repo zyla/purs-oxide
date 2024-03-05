@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Foo",
             },
             exports: None,
@@ -27,7 +26,6 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 0,
                                     text: "x",
                                 },
                                 params: [],

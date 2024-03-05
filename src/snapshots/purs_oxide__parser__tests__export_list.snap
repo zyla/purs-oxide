@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Control.Applicative",
             },
             exports: Some(
@@ -23,7 +22,6 @@ Located(
                         },
                         TypeClass {
                             name: Symbol {
-                                [salsa id]: 0,
                                 text: "Applicative",
                             },
                         },
@@ -35,7 +33,6 @@ Located(
                         },
                         Value {
                             name: Symbol {
-                                [salsa id]: 1,
                                 text: "pure",
                             },
                         },
@@ -47,7 +44,6 @@ Located(
                         },
                         Module {
                             name: ModuleId {
-                                [salsa id]: 1,
                                 name: "Data.Functor",
                             },
                         },
@@ -59,7 +55,6 @@ Located(
                         },
                         Type {
                             name: Symbol {
-                                [salsa id]: 2,
                                 text: "Either",
                             },
                             constructors: None,
@@ -72,7 +67,6 @@ Located(
                         },
                         Type {
                             name: Symbol {
-                                [salsa id]: 3,
                                 text: "Foo",
                             },
                             constructors: Some(
@@ -87,18 +81,15 @@ Located(
                         },
                         Type {
                             name: Symbol {
-                                [salsa id]: 4,
                                 text: "Maybe",
                             },
                             constructors: Some(
                                 Some(
                                     [
                                         Symbol {
-                                            [salsa id]: 5,
                                             text: "Just",
                                         },
                                         Symbol {
-                                            [salsa id]: 6,
                                             text: "Nothing",
                                         },
                                     ],
@@ -113,7 +104,6 @@ Located(
                         },
                         ValueOp {
                             name: Symbol {
-                                [salsa id]: 7,
                                 text: "+~",
                             },
                         },
@@ -125,7 +115,6 @@ Located(
                         },
                         TypeOp {
                             name: Symbol {
-                                [salsa id]: 8,
                                 text: "<>",
                             },
                         },

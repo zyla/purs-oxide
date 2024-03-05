@@ -243,6 +243,7 @@ pub fn parse_expr<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, 
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_debug_snapshot, assert_snapshot};
 
@@ -253,7 +254,7 @@ mod tests {
         let (errors, result) = output;
         assert_eq!(errors, &[]);
         let x = result.unwrap();
-        format!("{:#?}", x.into_debug_all(db))
+        format!("{:#?}", x.into_debug_all(db)).drop_salsa_id()
     }
 
     fn parse_module(input: &str) -> String {
