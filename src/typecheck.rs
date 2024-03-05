@@ -245,6 +245,20 @@ impl<'a> Typechecker<'a> {
                     ),
                 ),
             ),
+            expr @ Literal(Literal::String(_)) => (
+                Located::new(span, expr),
+                Located::new(
+                    span,
+                    TypeKind::TypeConstructor(
+                        // TODO: wired-in names should be shared somewhere (in Db perhaps?)
+                        QualifiedName::new_qualified(
+                            db,
+                            ModuleId::new(db, "Prim".to_string()),
+                            Symbol::new(db, "String".to_string()),
+                        ),
+                    ),
+                ),
+            ),
             expr @ Error => {
                 // Note: assuming the error is already reported elsewhere
                 (
@@ -452,6 +466,20 @@ mod tests {
     #[test]
     fn check_integer_literal() {
         assert_snapshot!(test_check(&[], "1", "Prim.Int"), @"1");
+    }
+
+    #[test]
+    fn infer_string_literal() {
+        assert_snapshot!(test_infer(&[
+        ], "\"foo\""), @r###"
+        "foo"
+        Prim.String
+        "###);
+    }
+
+    #[test]
+    fn check_string_literal() {
+        assert_snapshot!(test_check(&[], "\"foo\"", "Prim.String"), @r###""foo""###);
     }
 
     #[test]

@@ -95,12 +95,7 @@ impl<'d> HasCodeBuffer for CodeGenerator<'d> {
 /// `CodeAccumulator` accumulator.
 #[salsa::tracked]
 pub fn scc_code_acc(db: &dyn crate::Db, id: SccId) {
-    let mut cg = CodeGenerator {
-        db,
-        reference_mode: ReferenceMode::LocalConstant,
-        code_buffer: String::new(),
-        dependencies: Default::default(),
-    };
+    let mut cg = CodeGenerator::new(db, ReferenceMode::LocalConstant);
     for (id, expr, _) in typechecked_scc(db, id) {
         cg_write!(
             &mut cg,
@@ -125,6 +120,15 @@ struct CodeGenerator<'d> {
 }
 
 impl<'d> CodeGenerator<'d> {
+    fn new(db: &'d dyn crate::Db, reference_mode: ReferenceMode) -> Self {
+        Self {
+            db,
+            reference_mode,
+            code_buffer: String::new(),
+            dependencies: Default::default(),
+        }
+    }
+
     fn expr(&mut self, e: &Expr) {
         let db = self.db;
         use ExprKind::*;
@@ -170,6 +174,9 @@ impl<'d> CodeGenerator<'d> {
             Literal(crate::ast::Literal::Integer(x)) => {
                 cg_write!(self, "{}", x);
             }
+            Literal(crate::ast::Literal::String(x)) => {
+                cg_write!(self, "{:?}", x.to_string_lossy());
+            }
             Error => {
                 cg_write!(
                     self,
@@ -206,12 +213,7 @@ fn write_mangled_name<G: HasCodeBuffer>(
 /// generation mode.
 #[salsa::tracked]
 pub fn scc_code(db: &dyn crate::Db, id: SccId) -> String {
-    let mut cg = CodeGenerator {
-        db,
-        reference_mode: ReferenceMode::ModuleImport,
-        code_buffer: String::new(),
-        dependencies: Default::default(),
-    };
+    let mut cg = CodeGenerator::new(db, ReferenceMode::ModuleImport);
     for (id, expr, _) in typechecked_scc(db, id) {
         cg_write!(&mut cg, "const {} = ", id.name(db).text(db));
         cg.expr(&expr);
@@ -251,6 +253,15 @@ mod bundle_tests {
 
     fn test_bundle(inputs: &[&str], entrypoint: (&str, &str)) -> String {
         test_bundle_mode(inputs, entrypoint, BundleMode::None)
+    }
+
+    fn codegen_expr(expr_str: &str) -> String {
+        let _ = env_logger::builder().is_test(true).try_init();
+        let db = &mut crate::Database::new();
+        let mut g = CodeGenerator::new(db, ReferenceMode::LocalConstant);
+        let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
+        g.expr(&expr);
+        g.code_buffer
     }
 
     #[test]
@@ -358,5 +369,20 @@ mod bundle_tests {
             ("Test", "foo"),
             BundleMode::Export
         ));
+    }
+
+    #[test]
+    fn string_literal() {
+        assert_snapshot!(codegen_expr(
+            "\"foo\""
+        ), @r###""foo""###);
+    }
+
+    #[test]
+    #[ignore = "codegen currently loses data for invalid unicode characters; also we seem to parse it wrong"]
+    fn string_literal_invalid_unicode() {
+        assert_snapshot!(codegen_expr(
+            r###""\u110000""###
+        ), @r###""\u110000""###);
     }
 }
