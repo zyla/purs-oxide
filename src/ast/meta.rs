@@ -35,8 +35,10 @@ impl SourceSpan {
         }
     }
 
-    pub fn to_relative(&mut self, name: AbsoluteName) {
-        self.decl = SpanDeclRef::Decl(name)
+    pub fn to_relative(&mut self, name: AbsoluteName, reference_loc: usize) {
+        self.decl = SpanDeclRef::Decl(name);
+        self.start = self.start - reference_loc;
+        self.end = self.end - reference_loc;
     }
 
     pub fn unknown() -> Self {
@@ -78,8 +80,8 @@ impl<T> Located<T> {
         self.0
     }
 
-    pub fn to_relative_span(&mut self, name: AbsoluteName) {
-        self.0.to_relative(name)
+    pub fn to_relative_span(&mut self, name: AbsoluteName, reference_loc: usize) {
+        self.0.to_relative(name, reference_loc)
     }
 }
 

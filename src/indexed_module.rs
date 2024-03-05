@@ -7,6 +7,7 @@ use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
 use crate::ast::SourceSpan;
+use crate::ast::TypeKind;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 use std::path::PathBuf;
@@ -79,7 +80,7 @@ impl<'a> ModuleIndexer<'a> {
         while let Some(src_decl) = iter.peek().copied() {
             use DeclarationKind::*;
 
-            let decl_span = src_decl.0;
+            let reference_loc = src_decl.0.start;
 
             match &***src_decl {
                 Data {
@@ -90,27 +91,13 @@ impl<'a> ModuleIndexer<'a> {
                     constructors,
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let mut relative_params = params.clone();
+                    to_relative_params(abs_name, reference_loc, &mut relative_params);
 
-                    let relative_params = params
-                        .iter()
-                        .map(|(symbol, type_opt)| {
-                            if let Some(typ) = type_opt {
-                                return (
-                                    *symbol,
-                                    Option::Some(Located::new(
-                                        SourceSpan::new_relative(1, 1, abs_name),
-                                        typ.1.clone(),
-                                    )),
-                                );
-                            }
-                            (*symbol, Option::None)
-                        })
-                        .collect::<Vec<_>>();
-
-                    let mut rel_constructors = constructors.clone();
-                    rel_constructors
+                    let mut relative_constructors = constructors.clone();
+                    relative_constructors
                         .iter_mut()
-                        .for_each(|c| c.to_relative_span(abs_name));
+                        .for_each(|c| c.to_relative_span(abs_name, reference_loc));
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -130,7 +117,7 @@ impl<'a> ModuleIndexer<'a> {
                                 name: abs_name,
                                 params: relative_params,
                                 kind: kind.clone(),
-                                constructors: rel_constructors,
+                                constructors: relative_constructors,
                             }));
                         }
                     }
@@ -153,10 +140,16 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut relative_params = params.clone();
+                            to_relative_params(abs_name, reference_loc, &mut relative_params);
+
+                            let mut relative_body = body.clone();
+                            relative_body.to_relative_span(abs_name, reference_loc);
+
                             e.insert(TypeDecl::Type(TypeSynonymDecl {
                                 name: abs_name,
-                                params: params.clone(),
-                                body: body.clone(),
+                                params: relative_params,
+                                body: relative_body
                             }));
                         }
                     }
@@ -346,6 +339,15 @@ impl<'a> ModuleIndexer<'a> {
         }
     }
 }
+
+fn to_relative_params(abs_name: AbsoluteName, reference_loc: usize, params: &mut Vec<(crate::symbol::Symbol, Option<Type>)>) {
+        params.iter_mut().for_each(|(_, type_opt)| {
+            if let Some(typ) = type_opt {
+                typ.to_relative_span(abs_name, reference_loc)
+            }
+        })
+}
+
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub struct IndexedModule {
