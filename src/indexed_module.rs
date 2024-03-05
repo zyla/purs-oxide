@@ -6,6 +6,7 @@ use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
+use crate::ast::SourceSpan;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 use std::path::PathBuf;
@@ -78,6 +79,8 @@ impl<'a> ModuleIndexer<'a> {
         while let Some(src_decl) = iter.peek().copied() {
             use DeclarationKind::*;
 
+            let decl_span = src_decl.0;
+
             match &***src_decl {
                 Data {
                     type_,
@@ -88,12 +91,21 @@ impl<'a> ModuleIndexer<'a> {
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
 
-                    let mut relative_spans_params = params.clone();
-                    relative_spans_params.iter_mut().for_each(|x| {
-                        x.1.iter_mut().for_each(|loc_t| {
-                            loc_t.to_relative_span(abs_name);
-                        });
-                    });
+                    let relative_params = params
+                        .iter()
+                        .map(|(symbol, type_opt)| {
+                            if let Some(typ) = type_opt {
+                                return (
+                                    *symbol,
+                                    Option::Some(Located::new(
+                                        SourceSpan::new_relative(1, 1, abs_name),
+                                        typ.1.clone(),
+                                    )),
+                                );
+                            }
+                            (*symbol, Option::None)
+                        })
+                        .collect::<Vec<_>>();
 
                     let mut rel_constructors = constructors.clone();
                     rel_constructors
@@ -116,7 +128,7 @@ impl<'a> ModuleIndexer<'a> {
                             e.insert(TypeDecl::Data(DataDecl {
                                 type_: *type_,
                                 name: abs_name,
-                                params: relative_spans_params,
+                                params: relative_params,
                                 kind: kind.clone(),
                                 constructors: rel_constructors,
                             }));
@@ -367,13 +379,13 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::tests::DropSalsaId;
+    use crate::utils::tests::*;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
     fn index_module(input: &str) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
-        let module_id = ModuleId::new(db, "Test".into());
+        let module_id = parse_module_id(input, db);
         format!(
             "{:#?}",
             (

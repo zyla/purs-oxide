@@ -53,7 +53,7 @@ impl SourceSpan {
         Self::unknown()
     }
 
-    pub fn to_file_location(&self, db: &dyn crate::Db) -> (String, usize, usize) {
+    pub fn to_file_location(&self, _db: &dyn crate::Db) -> (String, usize, usize) {
         todo!()
     }
 }
