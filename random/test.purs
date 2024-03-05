@@ -1,6 +1,7 @@
 module Main where
 
-import Prim (Int, String)
+x :: Int
+x = 42
 
 main :: String
 main = "📋🤗"

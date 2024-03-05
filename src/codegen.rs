@@ -270,8 +270,6 @@ mod bundle_tests {
             &[indoc!(
                 r"
                 module Test where
-                -- TODO: autoimport Prim
-                import Prim (Int)
                 foo :: Int
                 foo = 1
                 "
@@ -286,8 +284,6 @@ mod bundle_tests {
             &[indoc!(
                 r"
                 module Test where
-                -- TODO: autoimport Prim
-                import Prim (Int)
                 unused :: Int
                 unused = 1
                 foo :: Int
@@ -306,8 +302,6 @@ mod bundle_tests {
             &[indoc!(
                 r"
                 module Test where
-                -- TODO: autoimport Prim
-                import Prim (Int)
                 foo :: Int
                 foo = bar
                 bar :: Int
@@ -326,8 +320,6 @@ mod bundle_tests {
             &[indoc!(
                 r"
                 module Test where
-                -- TODO: autoimport Prim
-                import Prim (Int)
                 foo :: Int
                 foo = frob answer
                 answer :: Int
