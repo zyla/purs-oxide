@@ -44,9 +44,8 @@ enum SpanDeclRef {
 [ ] desugaring
 [ ] operator precedence parsing
 [ ] SCC for real
-[ ] kind checking
 
-[ ] codegen
+[x] codegen
 [ ] salsa persistence
 [ ] `type_of`
 [ ] handle shadowing in local context (removing stuff from local context when it goes out of scope)
@@ -54,6 +53,7 @@ enum SpanDeclRef {
 [ ] clean up pipeline/passes/queries
 [ ] Avoid interning QualifiedName and AbsoluteName
 [ ] performance metrics/tracing
+[ ] kind checking
 
 Code generation:
 
@@ -89,3 +89,7 @@ const bar = Foo.foo;
 // a -> b -> c
 
 [ ] incremental-friendly instance resolution
+[x] Prim module (and autoimport it)
+[ ] Bundle CLI command
+[ ] Tests that bundle and run a JS program
+[ ] How to bundle with multiple entrypoints but without duplicates?

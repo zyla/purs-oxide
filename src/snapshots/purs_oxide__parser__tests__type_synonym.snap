@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -26,7 +25,6 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol {
-                                [salsa id]: 0,
                                 text: "Foo",
                             },
                             params: [],
@@ -37,10 +35,8 @@ Located(
                                 },
                                 TypeConstructor(
                                     QualifiedName {
-                                        [salsa id]: 0,
                                         module: None,
                                         name: Symbol {
-                                            [salsa id]: 1,
                                             text: "Int",
                                         },
                                     },
@@ -58,13 +54,11 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol {
-                                [salsa id]: 2,
                                 text: "Bar",
                             },
                             params: [
                                 (
                                     Symbol {
-                                        [salsa id]: 3,
                                         text: "a",
                                     },
                                     None,
@@ -77,7 +71,6 @@ Located(
                                 },
                                 Var(
                                     Symbol {
-                                        [salsa id]: 3,
                                         text: "a",
                                     },
                                 ),
@@ -94,20 +87,17 @@ Located(
                         [],
                         TypeSynonym {
                             name: Symbol {
-                                [salsa id]: 4,
                                 text: "Baz",
                             },
                             params: [
                                 (
                                     Symbol {
-                                        [salsa id]: 3,
                                         text: "a",
                                     },
                                     None,
                                 ),
                                 (
                                     Symbol {
-                                        [salsa id]: 5,
                                         text: "b",
                                     },
                                     None,
@@ -120,7 +110,6 @@ Located(
                                 },
                                 Var(
                                     Symbol {
-                                        [salsa id]: 3,
                                         text: "a",
                                     },
                                 ),

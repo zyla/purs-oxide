@@ -58,7 +58,7 @@ LowerIdent: Symbol = {
   "phantom" => Symbol::new(db, "phantom".into()),
 };
 
-LowerQualifiedIdent: QualifiedName = {
+pub LowerQualifiedIdent: QualifiedName = {
   LowerIdent => QualifiedName::new_unqualified(db, <>),
   lower_qualified_ident => QualifiedName::new_qualified(db, ModuleId::new(db, <>.0), Symbol::new(db, <>.1)),
 };

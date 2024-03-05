@@ -1,0 +1,8 @@
+---
+source: src/rename.rs
+expression: "rename_mod(indoc!(\"module Test where\n                import Prim (Int)\n                type X = Int\n            \"),\n    vec![])"
+---
+type X = Prim.Int
+
+
+[]

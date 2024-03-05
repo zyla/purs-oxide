@@ -21,10 +21,8 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            [salsa id]: 0,
                             module: None,
                             name: Symbol {
-                                [salsa id]: 0,
                                 text: "Eq",
                             },
                         },
@@ -37,7 +35,6 @@ Located(
                     },
                     Var(
                         Symbol {
-                            [salsa id]: 1,
                             text: "a",
                         },
                     ),
@@ -63,10 +60,8 @@ Located(
                             },
                             TypeConstructor(
                                 QualifiedName {
-                                    [salsa id]: 1,
                                     module: None,
                                     name: Symbol {
-                                        [salsa id]: 2,
                                         text: "Show",
                                     },
                                 },
@@ -79,7 +74,6 @@ Located(
                             },
                             Var(
                                 Symbol {
-                                    [salsa id]: 1,
                                     text: "a",
                                 },
                             ),
@@ -93,7 +87,6 @@ Located(
                     },
                     Var(
                         Symbol {
-                            [salsa id]: 1,
                             text: "a",
                         },
                     ),

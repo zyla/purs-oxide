@@ -16,10 +16,8 @@ Located(
                 },
                 Var(
                     QualifiedName {
-                        [salsa id]: 0,
                         module: None,
                         name: Symbol {
-                            [salsa id]: 0,
                             text: "x",
                         },
                     },
@@ -55,7 +53,6 @@ Located(
                                         ValueDeclaration(
                                             ValueDeclaration {
                                                 ident: Symbol {
-                                                    [salsa id]: 1,
                                                     text: "y",
                                                 },
                                                 params: [],
@@ -84,10 +81,8 @@ Located(
                                 },
                                 Var(
                                     QualifiedName {
-                                        [salsa id]: 1,
                                         module: None,
                                         name: Symbol {
-                                            [salsa id]: 1,
                                             text: "y",
                                         },
                                     },

@@ -219,6 +219,20 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
 
     let mut imports: Vec<(Option<ModuleId>, DeclId)> = Vec::new();
 
+    let prim_module_id = ModuleId::new(db, "Prim".into());
+
+    let has_prim = module
+        .ast
+        .imports
+        .iter()
+        .any(|i| i.module == prim_module_id);
+
+    if module_id != prim_module_id && !has_prim {
+        crate::renamed_module::exported_decls(db, prim_module_id)
+            .iter()
+            .for_each(|i| imports.push((None, *i)));
+    }
+
     let mut iter = module.ast.imports.iter().peekable();
     while let Some(import) = iter.peek().copied() {
         use ImportDeclarationKind::*;
@@ -454,7 +468,7 @@ mod tests {
             indoc!(
                 "
         module Test where
-        
+        import Prim ()    
         import Foo (Foo(..))
         "
             ),
@@ -468,7 +482,7 @@ mod tests {
             indoc!(
                 "
         module Test where
-        
+        import Prim ()    
         import Lib as Lib
         "
             ),
@@ -482,6 +496,7 @@ mod tests {
             indoc!(
                 "
         module Test where
+        import Prim ()    
         import Lib2
         "
             ),
@@ -495,6 +510,7 @@ mod tests {
             indoc!(
                 "
         module Test where
+        import Prim ()    
         import Lib2 (x)
         "
             ),
@@ -533,6 +549,21 @@ mod tests {
             "
             ),
             vec![LIB1]
+        ))
+    }
+
+    #[test]
+    #[ignore = "how should we handle this?"]
+    fn import_self() {
+        assert_snapshot!(export_decls(
+            indoc!(
+                "
+            module Test where
+            import Test
+            x = 1
+            "
+            ),
+            vec![]
         ))
     }
 }

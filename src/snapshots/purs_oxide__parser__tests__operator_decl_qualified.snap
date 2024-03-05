@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -29,21 +28,17 @@ Located(
                             precedence: 1,
                             name: Value(
                                 QualifiedName {
-                                    [salsa id]: 0,
                                     module: Some(
                                         ModuleId {
-                                            [salsa id]: 1,
                                             name: "Foo",
                                         },
                                     ),
                                     name: Symbol {
-                                        [salsa id]: 0,
                                         text: "f",
                                     },
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 1,
                                 text: "!#",
                             },
                         },
@@ -61,21 +56,17 @@ Located(
                             precedence: 2,
                             name: DataConstructor(
                                 QualifiedName {
-                                    [salsa id]: 1,
                                     module: Some(
                                         ModuleId {
-                                            [salsa id]: 2,
                                             name: "Bar",
                                         },
                                     ),
                                     name: Symbol {
-                                        [salsa id]: 2,
                                         text: "X",
                                     },
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 3,
                                 text: "^%",
                             },
                         },
@@ -93,21 +84,17 @@ Located(
                             precedence: 3,
                             name: Type(
                                 QualifiedName {
-                                    [salsa id]: 1,
                                     module: Some(
                                         ModuleId {
-                                            [salsa id]: 2,
                                             name: "Bar",
                                         },
                                     ),
                                     name: Symbol {
-                                        [salsa id]: 2,
                                         text: "X",
                                     },
                                 },
                             ),
                             operator: Symbol {
-                                [salsa id]: 4,
                                 text: "$^%",
                             },
                         },

@@ -1,0 +1,7 @@
+---
+source: src/codegen.rs
+expression: "test_bundle(&[indoc!(r\"\n                module Test where\n                -- TODO: autoimport Prim\n                import Prim (Int)\n                foo :: Int\n                foo = frob answer\n                answer :: Int\n                answer = 42\n                frob :: Int -> Int\n                -- note: explicit lambda because no equations desugaring yet\n                frob = \\x -> x\n                \")],\n    (\"Test\", \"foo\"))"
+---
+const Test__foo = (Test__frob)(Test__answer);
+const Test__frob = (x) => x;
+const Test__answer = 42;

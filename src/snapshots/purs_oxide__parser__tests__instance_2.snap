@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -41,10 +40,8 @@ Located(
                                                     },
                                                     TypeConstructor(
                                                         QualifiedName {
-                                                            [salsa id]: 0,
                                                             module: None,
                                                             name: Symbol {
-                                                                [salsa id]: 0,
                                                                 text: "Bar",
                                                             },
                                                         },
@@ -57,7 +54,6 @@ Located(
                                                     },
                                                     Var(
                                                         Symbol {
-                                                            [salsa id]: 1,
                                                             text: "a",
                                                         },
                                                     ),
@@ -68,10 +64,8 @@ Located(
                                     instance_type: Plain,
                                     instance_name: None,
                                     class: QualifiedName {
-                                        [salsa id]: 1,
                                         module: None,
                                         name: Symbol {
-                                            [salsa id]: 2,
                                             text: "Foo",
                                         },
                                     },
@@ -83,7 +77,6 @@ Located(
                                             },
                                             Var(
                                                 Symbol {
-                                                    [salsa id]: 1,
                                                     text: "a",
                                                 },
                                             ),
@@ -100,7 +93,6 @@ Located(
                                                 ValueDeclaration(
                                                     ValueDeclaration {
                                                         ident: Symbol {
-                                                            [salsa id]: 3,
                                                             text: "bar",
                                                         },
                                                         params: [],

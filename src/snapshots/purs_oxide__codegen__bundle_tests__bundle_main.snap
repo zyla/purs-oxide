@@ -1,0 +1,6 @@
+---
+source: src/codegen.rs
+expression: "test_bundle_mode(&[indoc!(r\"\n                module Test where\n                foo :: Int -> Int\n                foo = \\x -> x\n                \")],\n    (\"Test\", \"foo\"), BundleMode::Main)"
+---
+const Test__foo = (x) => x;
+Test__foo();

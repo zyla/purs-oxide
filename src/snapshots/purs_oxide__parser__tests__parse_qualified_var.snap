@@ -9,15 +9,12 @@ Located(
     },
     Var(
         QualifiedName {
-            [salsa id]: 0,
             module: Some(
                 ModuleId {
-                    [salsa id]: 0,
                     name: "Data.Maybe",
                 },
             ),
             name: Symbol {
-                [salsa id]: 0,
                 text: "fromJust",
             },
         },

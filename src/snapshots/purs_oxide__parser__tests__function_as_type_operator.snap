@@ -9,10 +9,8 @@ Located(
     },
     Operator(
         QualifiedName {
-            [salsa id]: 0,
             module: None,
             name: Symbol {
-                [salsa id]: 0,
                 text: "->",
             },
         },

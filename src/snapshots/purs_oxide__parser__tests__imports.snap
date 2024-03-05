@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -23,7 +22,6 @@ Located(
                     },
                     ImportInner {
                         module: ModuleId {
-                            [salsa id]: 1,
                             name: "Foo.Asd",
                         },
                         kind: Implicit,
@@ -37,13 +35,11 @@ Located(
                     },
                     ImportInner {
                         module: ModuleId {
-                            [salsa id]: 2,
                             name: "Bar.Asd",
                         },
                         kind: Implicit,
                         alias: Some(
                             ModuleId {
-                                [salsa id]: 3,
                                 name: "Baz",
                             },
                         ),
@@ -56,7 +52,6 @@ Located(
                     },
                     ImportInner {
                         module: ModuleId {
-                            [salsa id]: 4,
                             name: "Qux.Asd",
                         },
                         kind: Explicit(
@@ -68,7 +63,6 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 0,
                                             text: "x",
                                         },
                                     },
@@ -85,7 +79,6 @@ Located(
                     },
                     ImportInner {
                         module: ModuleId {
-                            [salsa id]: 5,
                             name: "Zzz.Asd",
                         },
                         kind: Explicit(
@@ -97,7 +90,6 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 1,
                                             text: "y",
                                         },
                                     },
@@ -109,7 +101,6 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 2,
                                             text: "z",
                                         },
                                     },
@@ -118,7 +109,6 @@ Located(
                         ),
                         alias: Some(
                             ModuleId {
-                                [salsa id]: 6,
                                 name: "Yyy",
                             },
                         ),
@@ -131,7 +121,6 @@ Located(
                     },
                     ImportInner {
                         module: ModuleId {
-                            [salsa id]: 7,
                             name: "Aaa.Asd",
                         },
                         kind: Hiding(
@@ -143,7 +132,6 @@ Located(
                                     },
                                     Value {
                                         name: Symbol {
-                                            [salsa id]: 3,
                                             text: "q",
                                         },
                                     },
@@ -165,7 +153,6 @@ Located(
                         ValueDeclaration(
                             ValueDeclaration {
                                 ident: Symbol {
-                                    [salsa id]: 0,
                                     text: "x",
                                 },
                                 params: [],

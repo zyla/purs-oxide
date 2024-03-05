@@ -116,10 +116,30 @@ impl<'a> Typechecker<'a> {
     }
 
     fn check(&mut self, expr: Expr, ty: &Type) -> Expr {
-        match *expr {
-            Lam(_, _) => todo!(),
+        let db = self.db;
+        let Located(span, expr_kind) = expr;
+        match expr_kind {
+            Lam(pats, body) => {
+                assert!(pats.len() == 1, "only single-arg lambdas supported for now");
+                match &**ty {
+                    TypeKind::FunctionType(ty_a, ty_b) => {
+                        let PatKind::Var(v) = *pats[0] else {
+                            todo!("only Var patterns supported");
+                        };
+
+                        // TODO: removing from local context
+                        self.local_context
+                            .insert(QualifiedName::new_unqualified(db, v), (&**ty_a).clone());
+                        let elaborated = self.check(*body, ty_b);
+                        Located::new(span, Lam(pats, Box::new(elaborated)))
+                    }
+                    _ => {
+                        todo!("report error: unexpected type for lambda {:?}", ty);
+                    }
+                }
+            }
             _ => {
-                let (elaborated1, inferred_ty) = self.infer(expr);
+                let (elaborated1, inferred_ty) = self.infer(Located(span, expr_kind));
                 self.check_subsumption(elaborated1, inferred_ty, ty.clone()) // TODO: clone?
             }
         }
@@ -151,7 +171,7 @@ impl<'a> Typechecker<'a> {
                 });
                 (Located::new(span, expr_kind), ty)
             }
-            Typed(expr, ty) => todo!(),
+            Typed(_expr, _ty) => todo!(),
             Lam(pats, body) => {
                 let tvs = pats
                     .iter()
@@ -186,7 +206,7 @@ impl<'a> Typechecker<'a> {
                 }
                 let x = xs.remove(0);
                 let (elaborated_f, mut f_ty) = self.infer(*f);
-                let arg_ty = self.fresh_tv();
+                let mut arg_ty = self.fresh_tv();
                 let result_ty = self.fresh_tv();
                 self.unify(
                     &mut f_ty,
@@ -198,6 +218,11 @@ impl<'a> Typechecker<'a> {
                         ),
                     ),
                 );
+
+                // HACK: we should do it in a more principled way, but it's necessary here because
+                // `check` expects a concrete type (see test infer_app_lambda_arg)
+                self.shallow_apply_subst(&mut arg_ty);
+
                 log::debug!("infer(App) checks arg");
                 let elaborated_x = self.check(x, &arg_ty);
                 log::debug!("infer(App) returns {}", pp(db, &result_ty));
@@ -220,6 +245,20 @@ impl<'a> Typechecker<'a> {
                     ),
                 ),
             ),
+            expr @ Literal(Literal::String(_)) => (
+                Located::new(span, expr),
+                Located::new(
+                    span,
+                    TypeKind::TypeConstructor(
+                        // TODO: wired-in names should be shared somewhere (in Db perhaps?)
+                        QualifiedName::new_qualified(
+                            db,
+                            ModuleId::new(db, "Prim".to_string()),
+                            Symbol::new(db, "String".to_string()),
+                        ),
+                    ),
+                ),
+            ),
             expr @ Error => {
                 // Note: assuming the error is already reported elsewhere
                 (
@@ -231,6 +270,7 @@ impl<'a> Typechecker<'a> {
         }
     }
 
+    #[allow(dead_code)] // TODO
     pub fn apply_subst(&mut self, t: &mut Type) {
         self.unify(t, &mut t.clone()); // TODO: don't clone...
     }
@@ -348,7 +388,7 @@ mod tests {
     }
 
     #[test]
-    fn var() {
+    fn infer_var() {
         assert_snapshot!(test_infer(&[("foo", "Int")], "foo"), @r###"
         foo
         Int
@@ -356,7 +396,7 @@ mod tests {
     }
 
     #[test]
-    fn lam() {
+    fn infer_lam() {
         assert_snapshot!(test_infer(&[], "\\x -> x"), @r###"
         \x -> x
         %1 -> %1
@@ -364,7 +404,7 @@ mod tests {
     }
 
     #[test]
-    fn lam_multi_arg() {
+    fn infer_lam_multi_arg() {
         assert_snapshot!(test_infer(&[], "\\x y -> x"), @r###"
         \x y -> x
         %1 -> %2 -> %1
@@ -372,7 +412,7 @@ mod tests {
     }
 
     #[test]
-    fn simple_app() {
+    fn infer_simple_app() {
         assert_snapshot!(test_infer(&[
                                     ("f", "Int -> String"),
                                     ("x", "Int"),
@@ -383,7 +423,17 @@ mod tests {
     }
 
     #[test]
-    fn lam_app_1() {
+    fn infer_app_lambda_arg() {
+        assert_snapshot!(test_infer(&[
+                                    ("f", "(Int -> Int) -> String"),
+        ], r"f (\x -> x)"), @r###"
+        f (\x -> x)
+        String
+        "###);
+    }
+
+    #[test]
+    fn infer_lam_app_1() {
         assert_snapshot!(test_infer(&[
         ], "\\f x -> f x"), @r###"
         \f x -> f x
@@ -416,5 +466,29 @@ mod tests {
     #[test]
     fn check_integer_literal() {
         assert_snapshot!(test_check(&[], "1", "Prim.Int"), @"1");
+    }
+
+    #[test]
+    fn infer_string_literal() {
+        assert_snapshot!(test_infer(&[
+        ], "\"foo\""), @r###"
+        "foo"
+        Prim.String
+        "###);
+    }
+
+    #[test]
+    fn check_string_literal() {
+        assert_snapshot!(test_check(&[], "\"foo\"", "Prim.String"), @r###""foo""###);
+    }
+
+    #[test]
+    fn check_lam_monotype() {
+        assert_snapshot!(test_check(&[], "\\x -> x", "String -> String"), @"\\x -> x");
+    }
+
+    #[test]
+    fn check_lam_monotype_2() {
+        assert_snapshot!(test_check(&[], "\\x -> 1", "String -> Prim.Int"), @r###"\x -> 1"###);
     }
 }

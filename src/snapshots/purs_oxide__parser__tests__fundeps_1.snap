@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -28,20 +27,17 @@ Located(
                             TypeClassDeclaration {
                                 constraints: [],
                                 name: Symbol {
-                                    [salsa id]: 0,
                                     text: "Foo",
                                 },
                                 params: [
                                     (
                                         Symbol {
-                                            [salsa id]: 1,
                                             text: "a",
                                         },
                                         None,
                                     ),
                                     (
                                         Symbol {
-                                            [salsa id]: 2,
                                             text: "b",
                                         },
                                         None,
@@ -51,13 +47,11 @@ Located(
                                     Fundep {
                                         from: [
                                             Symbol {
-                                                [salsa id]: 1,
                                                 text: "a",
                                             },
                                         ],
                                         to: [
                                             Symbol {
-                                                [salsa id]: 2,
                                                 text: "b",
                                             },
                                         ],

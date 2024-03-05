@@ -1,4 +1,5 @@
 use crate::ast::meta::ToSourceSpan;
+use crate::prim::PRIM_SOURCE;
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
@@ -188,10 +189,13 @@ pub struct ModuleNameNotSpecified;
 impl Database {
     pub fn new() -> Self {
         let storage = Default::default();
-        Self {
+        let mut db = Self {
             storage,
             module_sources: Arc::new(DashMap::new()),
-        }
+        };
+        db.add_source_file("<builtin>/Prim.purs".into(), PRIM_SOURCE.into())
+            .expect("Prim should have a module name");
+        db
     }
 
     pub fn add_source_file(
@@ -262,6 +266,7 @@ pub mod indexed_module;
 pub mod lexer;
 pub mod parser;
 pub mod pretty_printer;
+pub mod prim;
 pub mod rename;
 pub mod renamed_module;
 pub mod scc;

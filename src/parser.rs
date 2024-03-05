@@ -203,6 +203,16 @@ pub fn parse_module<'a>(
     (errors, result)
 }
 
+pub fn parse_lower_qualified_ident<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+) -> ParseResult<'a, QualifiedName> {
+    let mut errors = vec![];
+    let lexer = lexer::lex(input);
+    let result = parser::LowerQualifiedIdentParser::new().parse(db, &mut errors, lexer);
+    (errors, result)
+}
+
 // Recognize `module Some.Module` header,
 // without parsing the rest.
 //
@@ -245,6 +255,7 @@ pub fn parse_expr<'a>(
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::tests::DropSalsaId;
     use indoc::indoc;
     use insta::{self, assert_debug_snapshot, assert_snapshot};
 
@@ -255,7 +266,7 @@ mod tests {
         let (errors, result) = output;
         assert_eq!(errors, &[]);
         let x = result.unwrap();
-        format!("{:#?}", x.into_debug_all(db))
+        format!("{:#?}", x.into_debug_all(db)).drop_salsa_id()
     }
 
     fn parse_module(input: &str) -> String {

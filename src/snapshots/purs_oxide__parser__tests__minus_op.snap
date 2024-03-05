@@ -15,10 +15,8 @@ Located(
             },
             Var(
                 QualifiedName {
-                    [salsa id]: 0,
                     module: None,
                     name: Symbol {
-                        [salsa id]: 0,
                         text: "x",
                     },
                 },
@@ -28,10 +26,8 @@ Located(
             (
                 Symbol(
                     QualifiedName {
-                        [salsa id]: 1,
                         module: None,
                         name: Symbol {
-                            [salsa id]: 1,
                             text: "-",
                         },
                     },
@@ -43,10 +39,8 @@ Located(
                     },
                     Var(
                         QualifiedName {
-                            [salsa id]: 2,
                             module: None,
                             name: Symbol {
-                                [salsa id]: 2,
                                 text: "y",
                             },
                         },

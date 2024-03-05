@@ -22,3 +22,15 @@ impl TryInto<String> for PSString {
             .collect()
     }
 }
+
+impl PSString {
+    pub fn to_string_lossy(&self) -> String {
+        self.0
+            .iter()
+            .map(|x| {
+                char::from_u32(*x)
+                    .unwrap_or_else(|| todo!("replace this with Unicode replacement character"))
+            })
+            .collect()
+    }
+}

@@ -446,4 +446,61 @@ mod test {
             )]
         ))
     }
+
+    #[test]
+    fn prim_explicit_blanket() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+                import Prim
+                type X = Int
+            "
+            ),
+            vec![]
+        ))
+    }
+
+    #[test]
+    fn prim_explicit() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+                import Prim (Int)
+                type X = Int
+            "
+            ),
+            vec![]
+        ))
+    }
+
+    #[test]
+    fn prim_implicit() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+                type X = Int
+            "
+            ),
+            vec![]
+        ))
+    }
+
+    #[test]
+    #[ignore = "How should this even work?"]
+    fn prim_shadowed() {
+        assert_snapshot!(rename_mod(
+            indoc!(
+                "module Test where
+                import Lib (Int)
+                type X = Int
+            "
+            ),
+            vec![indoc!(
+                "module Lib where
+            import Prim (String)
+            type Int = String
+            "
+            )]
+        ))
+    }
 }

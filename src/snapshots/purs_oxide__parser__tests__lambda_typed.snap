@@ -16,7 +16,6 @@ Located(
                 },
                 Var(
                     Symbol {
-                        [salsa id]: 0,
                         text: "x",
                     },
                 ),
@@ -46,10 +45,8 @@ Located(
                     },
                     TypeConstructor(
                         QualifiedName {
-                            [salsa id]: 1,
                             module: None,
                             name: Symbol {
-                                [salsa id]: 1,
                                 text: "Int",
                             },
                         },

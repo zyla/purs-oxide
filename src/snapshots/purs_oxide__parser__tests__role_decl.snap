@@ -11,7 +11,6 @@ Located(
         [],
         ModuleInner {
             name: ModuleId {
-                [salsa id]: 0,
                 name: "Test",
             },
             exports: None,
@@ -27,7 +26,6 @@ Located(
                         Role(
                             RoleDeclarationData {
                                 ident: Symbol {
-                                    [salsa id]: 0,
                                     text: "Foo",
                                 },
                                 role: [

@@ -121,7 +121,10 @@ where
                 ),
         ),
         ExprKind::DataConstructor(name) => name.pretty_print(db, allocator),
-        ExprKind::Literal(Literal::Integer(i)) => allocator.as_string(i),
+        ExprKind::Literal(Literal::Integer(x)) => allocator.as_string(x),
+        ExprKind::Literal(Literal::String(x)) => {
+            allocator.as_string(format_args!("{:?}", x.to_string_lossy()))
+        }
         _ => todo!("pretty_print expr {:?}", e),
     }
 }
