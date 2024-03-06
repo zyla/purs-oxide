@@ -238,10 +238,10 @@ mod bundle_tests {
         let _ = env_logger::builder().is_test(true).try_init();
         let db = &mut crate::Database::new();
 
-        inputs.into_iter().zip(1..).for_each(|(source, i)| {
+        for (source, i) in inputs.iter().zip(1..) {
             db.add_source_file(format!("Lib{}.purs", i).into(), source.to_string())
                 .unwrap();
-        });
+        }
 
         let entrypoint = AbsoluteName::new(
             db,

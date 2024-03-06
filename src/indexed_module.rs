@@ -146,12 +146,7 @@ impl<'a> ModuleIndexer<'a> {
                 TypeSignature(sig) => {
                     iter.next();
                     match iter.peek() {
-                        Some(x)
-                            if match &****x {
-                                ValueDeclaration(_) => true,
-                                _ => false,
-                            } =>
-                        {
+                        Some(x) if matches!(&****x, ValueDeclaration(_)) => {
                             self.parse_value_decl(
                                 &mut iter,
                                 Some(Located::new(src_decl.span(), sig.clone())),
@@ -182,7 +177,7 @@ impl<'a> ModuleIndexer<'a> {
                         Diagnostic::new(
                             src_decl.span().start,
                             src_decl.span().end,
-                            format!("Invalid top-level destructuring"),
+                            "Invalid top-level destructuring".to_string(),
                             module.filename.to_string_lossy().into(),
                         ),
                     );

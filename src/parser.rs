@@ -18,7 +18,7 @@ lalrpop_mod!(
     pub parser
 );
 
-pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<Type>)> {
+fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<Type>)> {
     let mut t = c;
     let mut args = vec![];
     loop {
@@ -36,10 +36,7 @@ pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<
     }
 }
 
-pub(self) fn constraint_to_class_head(
-    db: &dyn crate::Db,
-    c: Type,
-) -> Option<(Symbol, Vec<TypeParameter>)> {
+fn constraint_to_class_head(db: &dyn crate::Db, c: Type) -> Option<(Symbol, Vec<TypeParameter>)> {
     let mut t = c;
     let mut params = vec![];
     loop {
@@ -74,7 +71,7 @@ pub(self) fn constraint_to_class_head(
     }
 }
 
-pub(self) fn apply_record_updates(f: Expr, args: Vec<Expr>) -> ExprKind {
+fn apply_record_updates(f: Expr, args: Vec<Expr>) -> ExprKind {
     let mut result = vec![f];
     for expr in args {
         match expr {
@@ -92,7 +89,7 @@ pub(self) fn apply_record_updates(f: Expr, args: Vec<Expr>) -> ExprKind {
     ExprKind::App(Box::new(f), result)
 }
 
-pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> {
+fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> {
     let Located(span, kind) = expr;
     Ok(Located(
         span,
@@ -109,9 +106,8 @@ pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> 
             ExprKind::Var(name) => {
                 if name.is_actually_qualified(db) {
                     return Err("Illegal qualified name in pattern".into());
-                } else {
-                    PatKind::Var(name.name(db))
                 }
+                PatKind::Var(name.name(db))
             }
             ExprKind::DataConstructor(name) => PatKind::DataConstructorApp(name, vec![]),
             ExprKind::App(f, args) => match f.into_inner() {
@@ -150,17 +146,14 @@ pub(self) fn expr_to_pat(db: &dyn crate::Db, expr: Expr) -> Result<Pat, String> 
     ))
 }
 
-pub(self) fn infix_op_to_pat(op: InfixOp) -> Result<QualifiedName, String> {
+fn infix_op_to_pat(op: InfixOp) -> Result<QualifiedName, String> {
     match op {
         InfixOp::Symbol(s) => Ok(s),
         InfixOp::Backtick(_) => Err("Illegal backtick operator in pattern".into()),
     }
 }
 
-pub(self) fn lit_expr_to_pat(
-    db: &dyn crate::Db,
-    lit: Literal<Expr>,
-) -> Result<Literal<Pat>, String> {
+fn lit_expr_to_pat(db: &dyn crate::Db, lit: Literal<Expr>) -> Result<Literal<Pat>, String> {
     Ok(match lit {
         Literal::Integer(x) => Literal::Integer(x),
         Literal::Float(x) => Literal::Float(x),
@@ -180,7 +173,7 @@ pub(self) fn lit_expr_to_pat(
     })
 }
 
-pub(self) fn normalize_app(f: Expr, x: Expr) -> ExprKind {
+fn normalize_app(f: Expr, x: Expr) -> ExprKind {
     match f {
         Located(_, ExprKind::App(f0, mut args)) => {
             args.push(x);

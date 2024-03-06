@@ -25,7 +25,7 @@ pub struct DeclId {
 }
 
 impl DeclId {
-    fn to_absolute_name(&self, db: &dyn Db) -> AbsoluteName {
+    fn to_absolute_name(self, db: &dyn Db) -> AbsoluteName {
         AbsoluteName::new(db, self.module(db), self.name(db))
     }
 }

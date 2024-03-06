@@ -1,4 +1,4 @@
-pub const PRIM_SOURCE: &'static str = r"module Prim where
+pub const PRIM_SOURCE: &str = r"module Prim where
 data Function :: Type -> Type -> Type
 data Array :: Type -> Type
 data Record :: Row Type -> Type
