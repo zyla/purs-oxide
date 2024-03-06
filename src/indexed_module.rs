@@ -319,6 +319,8 @@ impl<'a> ModuleIndexer<'a> {
             }
         };
         let mut equations = vec![first.clone().into()];
+
+        //TODO: Make spans relative in equations SourceSpan
         while let Some(src_decl) = iter.peek() {
             let DeclarationKind::ValueDeclaration(decl) = &****src_decl else {
                 break;
