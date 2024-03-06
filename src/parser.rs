@@ -13,7 +13,10 @@ use crate::token::Token;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 
-lalrpop_mod!(pub parser);
+lalrpop_mod!(
+    #[allow(clippy::all)]
+    pub parser
+);
 
 pub(self) fn constraint_to_instance_head(c: Type) -> Option<(QualifiedName, Vec<Type>)> {
     let mut t = c;
