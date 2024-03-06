@@ -90,6 +90,6 @@ const bar = Foo.foo;
 
 - [ ] incremental-friendly instance resolution
 - [x] Prim module (and autoimport it)
-- [ ] Bundle CLI command
+- [x] Bundle CLI command
 - [ ] Tests that bundle and run a JS program
 - [ ] How to bundle with multiple entrypoints but without duplicates?
