@@ -4,12 +4,22 @@ expression: "parse_expr(r#\" x List.: xs \"#)"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 1,
         end: 12,
     },
     Infix(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 1,
                 end: 2,
             },
@@ -38,6 +48,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 10,
                         end: 12,
                     },

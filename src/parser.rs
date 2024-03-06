@@ -278,12 +278,12 @@ mod tests {
     }
     fn parse_type(input: &str) -> String {
         let db = crate::Database::new();
-        let module = parse_module_id(input, &db);
+        let module = dummy_module(&db);
         expect_success(&db, super::parse_type(&db, input, module))
     }
     fn parse_expr(input: &str) -> String {
         let db = crate::Database::new();
-        let module = parse_module_id(input, &db);
+        let module = dummy_module(&db);
         expect_success(&db, super::parse_expr(&db, input, module))
     }
 

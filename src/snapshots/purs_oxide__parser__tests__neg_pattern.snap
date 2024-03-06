@@ -4,6 +4,11 @@ expression: "parse_expr(\"case x of -1 -> 1\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 17,
     },
@@ -11,6 +16,11 @@ Located(
         exprs: [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 5,
                     end: 6,
                 },
@@ -29,6 +39,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 10,
                             end: 12,
                         },
@@ -42,6 +57,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 16,
                             end: 17,
                         },

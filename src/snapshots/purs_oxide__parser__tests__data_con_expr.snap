@@ -4,12 +4,22 @@ expression: "parse_expr(\"Just 1\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 6,
     },
     App(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 0,
                 end: 4,
             },
@@ -25,6 +35,11 @@ Located(
         [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 5,
                     end: 6,
                 },

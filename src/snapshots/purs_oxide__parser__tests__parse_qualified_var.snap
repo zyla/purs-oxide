@@ -4,6 +4,11 @@ expression: "parse_expr(r#\"Data.Maybe.fromJust\"#)"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 19,
     },

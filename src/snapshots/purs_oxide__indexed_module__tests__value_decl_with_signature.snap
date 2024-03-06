@@ -28,8 +28,18 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
                 type_: Some(
                     Located(
                         SourceSpan {
-                            start: 25,
-                            end: 28,
+                            decl: Decl(
+                                AbsoluteName {
+                                    module: ModuleId {
+                                        name: "Test",
+                                    },
+                                    name: Symbol {
+                                        text: "foo",
+                                    },
+                                },
+                            ),
+                            start: 7,
+                            end: 10,
                         },
                         TypeConstructor(
                             QualifiedName {
@@ -47,6 +57,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 35,
                                     end: 36,
                                 },

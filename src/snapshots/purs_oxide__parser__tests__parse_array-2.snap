@@ -4,6 +4,11 @@ expression: "parse_expr(r#\" [1] \"#)"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 1,
         end: 4,
     },
@@ -12,6 +17,11 @@ Located(
             [
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 2,
                         end: 3,
                     },

@@ -4,4 +4,4 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
 ---
 f a a = a
 
-[Diagnostic { name: Symbol(Id { value: 2 }), span: SourceSpan { start: 23, end: 24 }, error: "Duplicate variable 'a' in pattern" }]
+[Diagnostic { name: Symbol(Id { value: 2 }), span: SourceSpan { decl: Module(ModuleId(Id { value: 2 })), start: 23, end: 24 }, error: "Duplicate variable 'a' in pattern" }]

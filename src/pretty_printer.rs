@@ -338,7 +338,7 @@ mod tests {
 
     fn pp_type(input: &str) -> String {
         let db = &crate::Database::new();
-        let module = parse_module_id(input, db);
+        let module = dummy_module(db);
         pp(db, crate::parser::parse_type(db, input, module).1.unwrap())
     }
 

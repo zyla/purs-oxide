@@ -81,7 +81,7 @@ impl<T> Located<T> {
     }
 
     pub fn to_relative_span(&mut self, name: AbsoluteName, reference_loc: usize) {
-        self.0.to_relative(name, reference_loc)
+        self.0.to_relative(name, reference_loc);
     }
 }
 

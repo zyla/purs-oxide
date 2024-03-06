@@ -4,12 +4,22 @@ expression: "parse_type(\"Maybe Int\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 9,
     },
     TypeApp(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 0,
                 end: 5,
             },
@@ -24,6 +34,11 @@ Located(
         ),
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 6,
                 end: 9,
             },

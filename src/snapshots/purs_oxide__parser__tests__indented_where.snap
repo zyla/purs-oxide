@@ -4,6 +4,11 @@ expression: "parse_module(indoc!(\"\n            module Control.Applicative\n   
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Control.Applicative",
+            },
+        ),
         start: 0,
         end: 56,
     },
@@ -17,6 +22,11 @@ Located(
             imports: [
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Control.Applicative",
+                            },
+                        ),
                         start: 35,
                         end: 56,
                     },

@@ -4,12 +4,22 @@ expression: "parse_expr(r#\" 1 %+ 2 <$> 3 \"#)"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 1,
         end: 13,
     },
     Infix(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 1,
                 end: 2,
             },
@@ -31,6 +41,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 6,
                         end: 7,
                     },
@@ -52,6 +67,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 12,
                         end: 13,
                     },

@@ -4,6 +4,11 @@ expression: "parse_expr(indoc!(\"\n          case x, y of\n            C, D -> 1
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 25,
     },
@@ -11,6 +16,11 @@ Located(
         exprs: [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 5,
                     end: 6,
                 },
@@ -25,6 +35,11 @@ Located(
             ),
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 8,
                     end: 9,
                 },
@@ -43,6 +58,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 15,
                             end: 16,
                         },
@@ -58,6 +78,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 18,
                             end: 19,
                         },
@@ -75,6 +100,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 23,
                             end: 24,
                         },

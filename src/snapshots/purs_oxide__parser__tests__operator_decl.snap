@@ -4,6 +4,11 @@ expression: "parse_module(indoc!(\"\n        module Test where\n        infix 1 
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 89,
     },
@@ -18,6 +23,11 @@ Located(
             declarations: [
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 18,
                         end: 33,
                     },
@@ -42,6 +52,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 34,
                         end: 51,
                     },
@@ -66,6 +81,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 52,
                         end: 70,
                     },
@@ -90,6 +110,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 71,
                         end: 88,
                     },

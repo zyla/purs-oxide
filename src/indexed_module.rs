@@ -6,8 +6,6 @@ use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
-use crate::ast::SourceSpan;
-use crate::ast::TypeKind;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 use std::path::PathBuf;
@@ -71,16 +69,17 @@ struct ModuleIndexer<'a> {
     classes: FxHashMap<AbsoluteName, TypeClassDecl>,
     module_id: ModuleId,
     filename: PathBuf,
+    // TODO: Add map with Decl to SourceSpan
 }
 
 impl<'a> ModuleIndexer<'a> {
-    fn index(&mut self, module: &ParsedModule) {
+    fn index(&mut self, module: ParsedModule) {
         let db = self.db;
         let mut iter = module.ast.declarations.iter().peekable();
         while let Some(src_decl) = iter.peek().copied() {
             use DeclarationKind::*;
 
-            let reference_loc = src_decl.0.start;
+            let ref_loc = src_decl.0.start;
 
             match &***src_decl {
                 Data {
@@ -91,13 +90,13 @@ impl<'a> ModuleIndexer<'a> {
                     constructors,
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
-                    let mut relative_params = params.clone();
-                    to_relative_params(abs_name, reference_loc, &mut relative_params);
+                    let mut params = params.clone();
+                    to_relative_params(abs_name, ref_loc, &mut params);
 
-                    let mut relative_constructors = constructors.clone();
-                    relative_constructors
+                    let mut constructors = constructors.clone();
+                    constructors
                         .iter_mut()
-                        .for_each(|c| c.to_relative_span(abs_name, reference_loc));
+                        .for_each(|c| c.to_relative_span(abs_name, ref_loc));
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -115,9 +114,9 @@ impl<'a> ModuleIndexer<'a> {
                             e.insert(TypeDecl::Data(DataDecl {
                                 type_: *type_,
                                 name: abs_name,
-                                params: relative_params,
+                                params,
                                 kind: kind.clone(),
-                                constructors: relative_constructors,
+                                constructors,
                             }));
                         }
                     }
@@ -140,16 +139,16 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
-                            let mut relative_params = params.clone();
-                            to_relative_params(abs_name, reference_loc, &mut relative_params);
+                            let mut params = params.clone();
+                            to_relative_params(abs_name, ref_loc, &mut params);
 
-                            let mut relative_body = body.clone();
-                            relative_body.to_relative_span(abs_name, reference_loc);
+                            let mut body = body.clone();
+                            body.to_relative_span(abs_name, ref_loc);
 
                             e.insert(TypeDecl::Type(TypeSynonymDecl {
                                 name: abs_name,
-                                params: relative_params,
-                                body: relative_body
+                                params,
+                                body,
                             }));
                         }
                     }
@@ -163,15 +162,11 @@ impl<'a> ModuleIndexer<'a> {
                 TypeSignature(sig) => {
                     iter.next();
                     match iter.peek() {
-                        Some(x)
-                            if match &****x {
-                                ValueDeclaration(_) => true,
-                                _ => false,
-                            } =>
-                        {
+                        Some(x) if matches!(&****x, ValueDeclaration(_)) => {
                             self.parse_value_decl(
                                 &mut iter,
                                 Some(Located::new(src_decl.span(), sig.clone())),
+                                ref_loc,
                             );
                         }
                         _ => {
@@ -191,7 +186,7 @@ impl<'a> ModuleIndexer<'a> {
                     }
                 }
                 ValueDeclaration(_) => {
-                    self.parse_value_decl(&mut iter, None);
+                    self.parse_value_decl(&mut iter, None, ref_loc);
                 }
                 Destructuring { .. } => {
                     Diagnostics::push(
@@ -199,7 +194,7 @@ impl<'a> ModuleIndexer<'a> {
                         Diagnostic::new(
                             src_decl.span().start,
                             src_decl.span().end,
-                            format!("Invalid top-level destructuring"),
+                            "Invalid top-level destructuring".into(),
                             module.filename.to_string_lossy().into(),
                         ),
                     );
@@ -221,9 +216,12 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut type_ = type_.clone();
+                            type_.to_relative_span(abs_name, ref_loc);
+
                             e.insert(ValueDecl {
                                 name: abs_name,
-                                type_: Some(type_.clone()),
+                                type_: Some(type_),
                                 equations: vec![],
                             });
                         }
@@ -249,12 +247,25 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut constraints = type_class_decl.constraints.clone();
+                            constraints
+                                .iter_mut()
+                                .for_each(|c| c.to_relative_span(abs_name, ref_loc));
+
+                            let mut params = type_class_decl.params.clone();
+                            to_relative_params(abs_name, ref_loc, &mut params);
+
+                            let mut methods = type_class_decl.methods.clone();
+                            methods
+                                .iter_mut()
+                                .for_each(|decl| decl.r#type.to_relative_span(abs_name, ref_loc));
+
                             e.insert(TypeClassDecl {
                                 name: abs_name,
-                                constraints: type_class_decl.constraints.clone(),
-                                params: type_class_decl.params.clone(),
+                                constraints,
+                                params,
                                 fundeps: type_class_decl.fundeps.clone(),
-                                methods: type_class_decl.methods.clone(),
+                                methods,
                             });
                         }
                     }
@@ -271,6 +282,7 @@ impl<'a> ModuleIndexer<'a> {
         &mut self,
         iter: &mut Peekable<impl Iterator<Item = &'m Declaration>>,
         sig: Option<Located<TypeDeclarationData>>,
+        reference_loc: usize,
     ) {
         let db = self.db;
         let Some(first_decl) = iter.next() else {
@@ -286,7 +298,9 @@ impl<'a> ModuleIndexer<'a> {
             None => None,
             Some(sig) => {
                 if sig.ident == first.ident {
-                    Some(sig.into_inner().r#type)
+                    let mut sig_ty = sig.into_inner().r#type;
+                    sig_ty.to_relative_span(abs_name, reference_loc);
+                    Some(sig_ty)
                 } else {
                     Diagnostics::push(
                         db,
@@ -340,14 +354,17 @@ impl<'a> ModuleIndexer<'a> {
     }
 }
 
-fn to_relative_params(abs_name: AbsoluteName, reference_loc: usize, params: &mut Vec<(crate::symbol::Symbol, Option<Type>)>) {
-        params.iter_mut().for_each(|(_, type_opt)| {
-            if let Some(typ) = type_opt {
-                typ.to_relative_span(abs_name, reference_loc)
-            }
-        })
+fn to_relative_params(
+    abs_name: AbsoluteName,
+    reference_loc: usize,
+    params: &mut [(crate::symbol::Symbol, Option<Type>)],
+) {
+    params.iter_mut().for_each(|(_, type_opt)| {
+        if let Some(typ) = type_opt {
+            typ.to_relative_span(abs_name, reference_loc)
+        }
+    })
 }
-
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]
 pub struct IndexedModule {
@@ -368,8 +385,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         module_id,
         filename: module.filename.clone(),
     };
-    indexer.index(&module);
-    // TODO: rewrite spans relative to declaration
+    indexer.index(module);
     IndexedModule {
         module_id,
         types: indexer.types,

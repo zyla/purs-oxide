@@ -4,12 +4,22 @@ expression: "parse_type(\"Array (Maybe Int)\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 17,
     },
     TypeApp(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 0,
                 end: 5,
             },
@@ -24,12 +34,22 @@ Located(
         ),
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 6,
                 end: 17,
             },
             TypeApp(
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 7,
                         end: 12,
                     },
@@ -44,6 +64,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 13,
                         end: 16,
                     },

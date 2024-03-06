@@ -4,6 +4,11 @@ expression: "parse_expr(r#\" \"hello\" \"#)"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 1,
         end: 8,
     },
