@@ -6,6 +6,7 @@ use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
+use crate::source_span::ToRelativeSourceSpan;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 use std::path::PathBuf;
@@ -91,12 +92,10 @@ impl<'a> ModuleIndexer<'a> {
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
                     let mut params = params.clone();
-                    to_relative_params(abs_name, ref_loc, &mut params);
+                    params.to_relative_span(abs_name, ref_loc);
 
                     let mut constructors = constructors.clone();
-                    constructors
-                        .iter_mut()
-                        .for_each(|c| c.to_relative_span(abs_name, ref_loc));
+                    constructors.to_relative_span(abs_name, ref_loc);
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -116,7 +115,7 @@ impl<'a> ModuleIndexer<'a> {
                                 name: abs_name,
                                 params,
                                 kind: kind.clone(),
-                                constructors,
+                                constructors: constructors,
                             }));
                         }
                     }
@@ -140,7 +139,7 @@ impl<'a> ModuleIndexer<'a> {
                         }
                         Entry::Vacant(e) => {
                             let mut params = params.clone();
-                            to_relative_params(abs_name, ref_loc, &mut params);
+                            params.to_relative_span(abs_name, ref_loc);
 
                             let mut body = body.clone();
                             body.to_relative_span(abs_name, ref_loc);
@@ -248,21 +247,17 @@ impl<'a> ModuleIndexer<'a> {
                         }
                         Entry::Vacant(e) => {
                             let mut constraints = type_class_decl.constraints.clone();
-                            constraints
-                                .iter_mut()
-                                .for_each(|c| c.to_relative_span(abs_name, ref_loc));
+                            constraints.to_relative_span(abs_name, ref_loc);
 
                             let mut params = type_class_decl.params.clone();
-                            to_relative_params(abs_name, ref_loc, &mut params);
+                            params.to_relative_span(abs_name, ref_loc);
 
                             let mut methods = type_class_decl.methods.clone();
-                            methods
-                                .iter_mut()
-                                .for_each(|decl| decl.r#type.to_relative_span(abs_name, ref_loc));
+                            methods.to_relative_span(abs_name, ref_loc);
 
                             e.insert(TypeClassDecl {
                                 name: abs_name,
-                                constraints,
+                                constraints: constraints,
                                 params,
                                 fundeps: type_class_decl.fundeps.clone(),
                                 methods,
@@ -329,7 +324,11 @@ impl<'a> ModuleIndexer<'a> {
                 // Start of another chain of equations
                 break;
             }
-            equations.push(decl.clone().into());
+
+            let mut branch: CaseBranch = decl.clone().into();
+            branch.to_relative_span(abs_name, reference_loc);
+
+            equations.push(branch);
             iter.next();
         }
 
@@ -354,18 +353,6 @@ impl<'a> ModuleIndexer<'a> {
             }
         }
     }
-}
-
-fn to_relative_params(
-    abs_name: AbsoluteName,
-    reference_loc: usize,
-    params: &mut [(crate::symbol::Symbol, Option<Type>)],
-) {
-    params.iter_mut().for_each(|(_, type_opt)| {
-        if let Some(typ) = type_opt {
-            typ.to_relative_span(abs_name, reference_loc)
-        }
-    })
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, DebugWithDb)]

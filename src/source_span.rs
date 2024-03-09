@@ -1,6 +1,10 @@
 use salsa::DebugWithDb;
 
-use crate::{ast::AbsoluteName, ModuleId};
+use crate::{
+    ast::{AbsoluteName, CaseBranch, Type, TypeDeclarationData},
+    symbol::Symbol,
+    ModuleId,
+};
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
 pub struct SourceSpan {
@@ -33,12 +37,6 @@ impl SourceSpan {
         }
     }
 
-    pub fn to_relative(&mut self, name: AbsoluteName, reference_loc: usize) {
-        self.decl = SpanDeclRef::Decl(name);
-        self.start = self.start - reference_loc;
-        self.end = self.end - reference_loc;
-    }
-
     pub fn unknown() -> Self {
         // TODO: find a better representation?
         Self {
@@ -60,4 +58,49 @@ impl SourceSpan {
 
 pub trait ToSourceSpan {
     fn to_source_span(&self, module_id: ModuleId) -> SourceSpan;
+}
+
+pub trait ToRelativeSourceSpan {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self;
+}
+
+impl ToRelativeSourceSpan for SourceSpan {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &SourceSpan {
+        self.decl = SpanDeclRef::Decl(abs_name);
+        self.start = self.start - reference_loc;
+        self.end = self.end - reference_loc;
+        self
+    }
+}
+
+impl ToRelativeSourceSpan for (Symbol, Option<Type>) {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+        if let Some(typ) = &mut self.1 {
+            typ.to_relative_span(abs_name, reference_loc);
+        };
+        self
+    }
+}
+
+impl<A: ToRelativeSourceSpan> ToRelativeSourceSpan for Vec<A> {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+        for item in self.iter_mut() {
+            item.to_relative_span(abs_name, reference_loc);
+        }
+        self
+    }
+}
+
+impl ToRelativeSourceSpan for TypeDeclarationData {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+        self.r#type.to_relative_span(abs_name, reference_loc);
+        self
+    }
+}
+
+impl ToRelativeSourceSpan for CaseBranch {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+        self.pats.to_relative_span(abs_name, reference_loc);
+        self
+    }
 }

@@ -69,13 +69,18 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
                         pats: [
                             Located(
                                 SourceSpan {
-                                    decl: Module(
-                                        ModuleId {
-                                            name: "Test",
+                                    decl: Decl(
+                                        AbsoluteName {
+                                            module: ModuleId {
+                                                name: "Test",
+                                            },
+                                            name: Symbol {
+                                                text: "foo",
+                                            },
                                         },
                                     ),
-                                    start: 32,
-                                    end: 33,
+                                    start: 14,
+                                    end: 15,
                                 },
                                 Literal(
                                     Integer(

@@ -1,6 +1,6 @@
 use salsa::DebugWithDb;
 
-use crate::source_span::SourceSpan;
+use crate::source_span::*;
 
 use super::AbsoluteName;
 
@@ -19,9 +19,12 @@ impl<T> Located<T> {
     pub fn span(&self) -> SourceSpan {
         self.0
     }
+}
 
-    pub fn to_relative_span(&mut self, name: AbsoluteName, reference_loc: usize) {
-        self.0.to_relative(name, reference_loc);
+impl<T> ToRelativeSourceSpan for Located<T> {
+    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+        self.0.to_relative_span(abs_name, reference_loc);
+        self
     }
 }
 
