@@ -1,5 +1,6 @@
-use super::{Commented, Located, Pat, PossiblyGuardedExpr, SourceSpan, Type};
+use super::{Commented, Located, Pat, PossiblyGuardedExpr, Type};
 use crate::ast::QualifiedName;
+use crate::source_span::SourceSpan;
 use crate::symbol::Symbol;
 use crate::Db;
 use crate::ModuleId;

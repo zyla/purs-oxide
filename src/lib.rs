@@ -1,13 +1,13 @@
-use crate::ast::meta::ToSourceSpan;
 use crate::prim::PRIM_SOURCE;
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
+use source_span::{SourceSpan, ToSourceSpan};
 use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::ast::{declarations, SourceSpan};
+use crate::ast::declarations;
 use crate::errors::Error;
 
 #[macro_use]
@@ -270,6 +270,7 @@ pub mod prim;
 pub mod rename;
 pub mod renamed_module;
 pub mod scc;
+pub mod source_span;
 pub mod string;
 pub mod symbol;
 pub mod token;
