@@ -93,15 +93,15 @@ impl<'a> ModuleIndexer<'a> {
                     constructors,
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Type);
 
-                    self.decls_ref_loc
-                        .insert(abs_name.to_decl_id(db, Namespace::Type), ref_loc);
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
 
                     let mut params = params.clone();
-                    params.to_relative_span(abs_name, ref_loc);
+                    params.to_relative_span(decl_id, ref_loc);
 
                     let mut constructors = constructors.clone();
-                    constructors.to_relative_span(abs_name, ref_loc);
+                    constructors.to_relative_span(decl_id, ref_loc);
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -130,6 +130,7 @@ impl<'a> ModuleIndexer<'a> {
 
                 TypeSynonym { name, params, body } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Type);
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -145,10 +146,10 @@ impl<'a> ModuleIndexer<'a> {
                         }
                         Entry::Vacant(e) => {
                             let mut params = params.clone();
-                            params.to_relative_span(abs_name, ref_loc);
+                            params.to_relative_span(decl_id, ref_loc);
 
                             let mut body = body.clone();
-                            body.to_relative_span(abs_name, ref_loc);
+                            body.to_relative_span(decl_id, ref_loc);
 
                             e.insert(TypeDecl::Type(TypeSynonymDecl {
                                 name: abs_name,
@@ -207,9 +208,9 @@ impl<'a> ModuleIndexer<'a> {
                 }
                 ForeignValue { name, type_ } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Value);
 
-                    self.decls_ref_loc
-                        .insert(abs_name.to_decl_id(db, Namespace::Value), ref_loc);
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
 
                     match self.values.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -225,7 +226,7 @@ impl<'a> ModuleIndexer<'a> {
                         }
                         Entry::Vacant(e) => {
                             let mut type_ = type_.clone();
-                            type_.to_relative_span(abs_name, ref_loc);
+                            type_.to_relative_span(decl_id, ref_loc);
 
                             e.insert(ValueDecl {
                                 name: abs_name,
@@ -238,8 +239,8 @@ impl<'a> ModuleIndexer<'a> {
                 }
                 Class(type_class_decl) => {
                     let abs_name = AbsoluteName::new(db, self.module_id, type_class_decl.name);
-                    self.decls_ref_loc
-                        .insert(abs_name.to_decl_id(db, Namespace::Class), ref_loc);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Class);
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
 
                     match self.classes.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -258,17 +259,17 @@ impl<'a> ModuleIndexer<'a> {
                         }
                         Entry::Vacant(e) => {
                             let mut constraints = type_class_decl.constraints.clone();
-                            constraints.to_relative_span(abs_name, ref_loc);
+                            constraints.to_relative_span(decl_id, ref_loc);
 
                             let mut params = type_class_decl.params.clone();
-                            params.to_relative_span(abs_name, ref_loc);
+                            params.to_relative_span(decl_id, ref_loc);
 
                             let mut methods = type_class_decl.methods.clone();
-                            methods.to_relative_span(abs_name, ref_loc);
+                            methods.to_relative_span(decl_id, ref_loc);
 
                             e.insert(TypeClassDecl {
                                 name: abs_name,
-                                constraints: constraints,
+                                constraints,
                                 params,
                                 fundeps: type_class_decl.fundeps.clone(),
                                 methods,
@@ -299,16 +300,16 @@ impl<'a> ModuleIndexer<'a> {
         };
 
         let abs_name = AbsoluteName::new(db, self.module_id, first.ident);
+        let decl_id = abs_name.to_decl_id(db, Namespace::Value);
 
-        self.decls_ref_loc
-            .insert(abs_name.to_decl_id(db, Namespace::Value), reference_loc);
+        self.decls_ref_loc.insert(decl_id, reference_loc);
 
         let ty = match sig {
             None => None,
             Some(sig) => {
                 if sig.ident == first.ident {
                     let mut sig_ty = sig.into_inner().r#type;
-                    sig_ty.to_relative_span(abs_name, reference_loc);
+                    sig_ty.to_relative_span(decl_id, reference_loc);
                     Some(sig_ty)
                 } else {
                     Diagnostics::push(
@@ -329,7 +330,6 @@ impl<'a> ModuleIndexer<'a> {
         };
         let mut equations = vec![first.clone().into()];
 
-        //TODO: Make spans relative in equations SourceSpan
         while let Some(src_decl) = iter.peek() {
             let DeclarationKind::ValueDeclaration(decl) = &****src_decl else {
                 break;
@@ -340,7 +340,7 @@ impl<'a> ModuleIndexer<'a> {
             }
 
             let mut branch: CaseBranch = decl.clone().into();
-            branch.to_relative_span(abs_name, reference_loc);
+            branch.to_relative_span(decl_id, reference_loc);
 
             equations.push(branch);
             iter.next();
@@ -375,19 +375,22 @@ pub struct IndexedModule {
     pub types: FxHashMap<AbsoluteName, TypeDecl>,
     pub values: FxHashMap<AbsoluteName, ValueDecl>,
     pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
-    decls_ref_loc: FxHashMap<DeclId, usize>,
+    pub decls_ref_loc: FxHashMap<DeclId, usize>,
+    pub filename: String,
 }
 
 #[salsa::tracked]
 pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
     let module = crate::parsed_module(db, module_id);
+    let filename = module.filename.clone();
+    let raw_filename = filename.to_string_lossy().to_string();
     let mut indexer = ModuleIndexer {
         db,
         types: Default::default(),
         values: Default::default(),
         classes: Default::default(),
         module_id,
-        filename: module.filename.clone(),
+        filename,
         decls_ref_loc: Default::default(),
     };
     indexer.index(module);
@@ -397,6 +400,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         values: indexer.values,
         classes: indexer.classes,
         decls_ref_loc: indexer.decls_ref_loc,
+        filename: raw_filename,
     }
 }
 

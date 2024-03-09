@@ -1,4 +1,4 @@
-[ ] SourceSpans relative to declaration
+[x] SourceSpans relative to declaration
  
 ```
  #[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]

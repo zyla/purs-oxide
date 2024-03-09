@@ -41,6 +41,7 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
                 },
             ): 29,
         },
+        filename: "test.purs",
     },
     [
         Diagnostic {

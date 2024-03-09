@@ -29,7 +29,8 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
                     body: Located(
                         SourceSpan {
                             decl: Decl(
-                                AbsoluteName {
+                                DeclId {
+                                    namespace: Type,
                                     module: ModuleId {
                                         name: "Test",
                                     },
@@ -62,6 +63,7 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
                 },
             ): 33,
         },
+        filename: "test.purs",
     },
     [
         Diagnostic {

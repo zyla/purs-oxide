@@ -44,7 +44,8 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                         r#type: Located(
                             SourceSpan {
                                 decl: Decl(
-                                    AbsoluteName {
+                                    DeclId {
+                                        namespace: Class,
                                         module: ModuleId {
                                             name: "Test",
                                         },
@@ -105,6 +106,7 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                 },
             ): 19,
         },
+        filename: "test.purs",
     },
     [],
 )

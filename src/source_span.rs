@@ -1,7 +1,8 @@
 use salsa::DebugWithDb;
 
 use crate::{
-    ast::{AbsoluteName, CaseBranch, Type, TypeDeclarationData},
+    ast::{CaseBranch, Type, TypeDeclarationData},
+    renamed_module::DeclId,
     symbol::Symbol,
     ModuleId,
 };
@@ -16,7 +17,7 @@ pub struct SourceSpan {
 #[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
 pub enum SpanDeclRef {
     Module(ModuleId),
-    Decl(AbsoluteName),
+    Decl(DeclId),
     Unknown,
 }
 
@@ -29,11 +30,11 @@ impl SourceSpan {
         }
     }
 
-    pub fn new_relative(start: usize, end: usize, name: AbsoluteName) -> Self {
+    pub fn new_relative(start: usize, end: usize, decl_id: DeclId) -> Self {
         Self {
             start,
             end,
-            decl: SpanDeclRef::Decl(name),
+            decl: SpanDeclRef::Decl(decl_id),
         }
     }
 
@@ -51,8 +52,21 @@ impl SourceSpan {
         Self::unknown()
     }
 
-    pub fn to_file_location(&self, _db: &dyn crate::Db) -> (String, usize, usize) {
-        todo!()
+    pub fn to_file_location(&self, db: &dyn crate::Db) -> (String, usize, usize) {
+        match self.decl {
+            SpanDeclRef::Module(module) => {
+                let indexed = crate::indexed_module::indexed_module(db, module);
+                (indexed.filename, self.start, self.end)
+            }
+            SpanDeclRef::Decl(ref decl_id) => {
+                let indexed = crate::indexed_module::indexed_module(db, decl_id.module(db));
+                match indexed.decls_ref_loc.get(decl_id) {
+                    Some(loc_ref) => (indexed.filename, loc_ref + self.start, loc_ref + self.end),
+                    None => panic!("unknown decl id: {:?}", decl_id),
+                }
+            }
+            SpanDeclRef::Unknown => ("Unknown".into(), 0, 0),
+        }
     }
 }
 
@@ -61,12 +75,12 @@ pub trait ToSourceSpan {
 }
 
 pub trait ToRelativeSourceSpan {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self;
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self;
 }
 
 impl ToRelativeSourceSpan for SourceSpan {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &SourceSpan {
-        self.decl = SpanDeclRef::Decl(abs_name);
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &SourceSpan {
+        self.decl = SpanDeclRef::Decl(decl_id);
         self.start = self.start - reference_loc;
         self.end = self.end - reference_loc;
         self
@@ -74,33 +88,43 @@ impl ToRelativeSourceSpan for SourceSpan {
 }
 
 impl ToRelativeSourceSpan for (Symbol, Option<Type>) {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         if let Some(typ) = &mut self.1 {
-            typ.to_relative_span(abs_name, reference_loc);
+            typ.to_relative_span(decl_id, reference_loc);
         };
         self
     }
 }
 
 impl<A: ToRelativeSourceSpan> ToRelativeSourceSpan for Vec<A> {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         for item in self.iter_mut() {
-            item.to_relative_span(abs_name, reference_loc);
+            item.to_relative_span(decl_id, reference_loc);
         }
         self
     }
 }
 
 impl ToRelativeSourceSpan for TypeDeclarationData {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
-        self.r#type.to_relative_span(abs_name, reference_loc);
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
+        self.r#type.to_relative_span(decl_id, reference_loc);
         self
     }
 }
 
 impl ToRelativeSourceSpan for CaseBranch {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
-        self.pats.to_relative_span(abs_name, reference_loc);
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
+        self.pats.to_relative_span(decl_id, reference_loc);
         self
     }
 }
+
+// #[salsa::tracked]
+// pub fn fetch_absolute_source_span(db: &dyn Db, decl_id: DeclId) -> SourceSpan {
+//     let module_id = decl_id.modele(db);
+//     let indexed = crate::indexed_module::indexed_module(db, module_id);
+//     match indexed.decls_ref_loc.get(&decl_id) {
+//         Some(loc_ref) => SourceSpan::new_in_module(loc_ref + start, end, module_id);
+//         None => panic!("unknown decl id: {:?}", decl_id),
+//     }
+// }

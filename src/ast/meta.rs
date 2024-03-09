@@ -1,8 +1,6 @@
 use salsa::DebugWithDb;
 
-use crate::source_span::*;
-
-use super::AbsoluteName;
+use crate::{renamed_module::DeclId, source_span::*};
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Located<T>(pub SourceSpan, pub T);
@@ -22,8 +20,8 @@ impl<T> Located<T> {
 }
 
 impl<T> ToRelativeSourceSpan for Located<T> {
-    fn to_relative_span(&mut self, abs_name: AbsoluteName, reference_loc: usize) -> &Self {
-        self.0.to_relative_span(abs_name, reference_loc);
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
+        self.0.to_relative_span(decl_id, reference_loc);
         self
     }
 }

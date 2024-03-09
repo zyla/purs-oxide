@@ -105,6 +105,7 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
                 },
             ): 26,
         },
+        filename: "test.purs",
     },
     [
         Diagnostic {
