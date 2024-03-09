@@ -6,6 +6,8 @@ use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
+use crate::renamed_module::DeclId;
+use crate::renamed_module::Namespace;
 use crate::source_span::ToRelativeSourceSpan;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
@@ -70,7 +72,7 @@ struct ModuleIndexer<'a> {
     classes: FxHashMap<AbsoluteName, TypeClassDecl>,
     module_id: ModuleId,
     filename: PathBuf,
-    // TODO: Add map with Decl to SourceSpan
+    decls_ref_loc: FxHashMap<DeclId, usize>,
 }
 
 impl<'a> ModuleIndexer<'a> {
@@ -91,6 +93,10 @@ impl<'a> ModuleIndexer<'a> {
                     constructors,
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+
+                    self.decls_ref_loc
+                        .insert(abs_name.to_decl_id(db, Namespace::Type), ref_loc);
+
                     let mut params = params.clone();
                     params.to_relative_span(abs_name, ref_loc);
 
@@ -202,6 +208,9 @@ impl<'a> ModuleIndexer<'a> {
                 ForeignValue { name, type_ } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
 
+                    self.decls_ref_loc
+                        .insert(abs_name.to_decl_id(db, Namespace::Value), ref_loc);
+
                     match self.values.entry(abs_name) {
                         Entry::Occupied(_) => {
                             Diagnostics::push(
@@ -229,6 +238,8 @@ impl<'a> ModuleIndexer<'a> {
                 }
                 Class(type_class_decl) => {
                     let abs_name = AbsoluteName::new(db, self.module_id, type_class_decl.name);
+                    self.decls_ref_loc
+                        .insert(abs_name.to_decl_id(db, Namespace::Class), ref_loc);
 
                     match self.classes.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -288,6 +299,9 @@ impl<'a> ModuleIndexer<'a> {
         };
 
         let abs_name = AbsoluteName::new(db, self.module_id, first.ident);
+
+        self.decls_ref_loc
+            .insert(abs_name.to_decl_id(db, Namespace::Value), reference_loc);
 
         let ty = match sig {
             None => None,
@@ -361,6 +375,7 @@ pub struct IndexedModule {
     pub types: FxHashMap<AbsoluteName, TypeDecl>,
     pub values: FxHashMap<AbsoluteName, ValueDecl>,
     pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
+    decls_ref_loc: FxHashMap<DeclId, usize>,
 }
 
 #[salsa::tracked]
@@ -373,6 +388,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         classes: Default::default(),
         module_id,
         filename: module.filename.clone(),
+        decls_ref_loc: Default::default(),
     };
     indexer.index(module);
     IndexedModule {
@@ -380,6 +396,7 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         types: indexer.types,
         values: indexer.values,
         classes: indexer.classes,
+        decls_ref_loc: indexer.decls_ref_loc,
     }
 }
 

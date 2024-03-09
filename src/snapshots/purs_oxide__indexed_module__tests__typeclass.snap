@@ -98,6 +98,13 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                 ],
             },
         },
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 19,
+        },
     },
     [],
 )

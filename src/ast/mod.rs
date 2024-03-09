@@ -3,7 +3,7 @@ pub mod expr;
 pub mod meta;
 pub mod types;
 
-use crate::ModuleId;
+use crate::{renamed_module::DeclId, ModuleId};
 pub use declarations::*;
 pub use expr::*;
 pub use meta::*;
@@ -20,6 +20,14 @@ pub struct AbsoluteName {
 impl AbsoluteName {
     pub fn to_qualified_name(&self, db: &dyn crate::Db) -> QualifiedName {
         QualifiedName::new_qualified(db, self.module(db), self.name(db))
+    }
+
+    pub fn to_decl_id(
+        &self,
+        db: &dyn crate::Db,
+        namespace: crate::renamed_module::Namespace,
+    ) -> DeclId {
+        DeclId::new(db, namespace, self.module(db), self.name(db))
     }
 }
 

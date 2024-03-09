@@ -55,6 +55,13 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foreign 
             },
         },
         classes: {},
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 18,
+        },
     },
     [],
 )
