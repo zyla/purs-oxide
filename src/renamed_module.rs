@@ -25,7 +25,7 @@ pub struct DeclId {
 }
 
 impl DeclId {
-    fn to_absolute_name(&self, db: &dyn Db) -> AbsoluteName {
+    fn to_absolute_name(self, db: &dyn Db) -> AbsoluteName {
         AbsoluteName::new(db, self.module(db), self.name(db))
     }
 }
@@ -131,8 +131,7 @@ impl<'a> ExportedDeclExtractor<'a> {
         let db = self.db;
         match &module.ast.exports {
             Some(decl_ref_kind) => {
-                let mut iter = decl_ref_kind.iter().peekable();
-                while let Some(ref_decl) = iter.peek().copied() {
+                for ref_decl in decl_ref_kind {
                     use DeclarationRefKind::*;
 
                     match &**ref_decl {
@@ -145,51 +144,40 @@ impl<'a> ExportedDeclExtractor<'a> {
                                     })
                                     .map(|(_, decl)| *decl),
                             );
-                            iter.next();
                         }
                         x => {
                             self.exported_decls
                                 .extend(to_decls_id(db, self.module_id, x));
-                            iter.next();
                         }
                     }
                 }
             }
             None => {
-                let mut val_iter = indexed.values.keys().peekable();
-
-                while let Some(abs_name) = val_iter.peek().copied() {
+                for abs_name in indexed.values.keys() {
                     self.exported_decls.push(DeclId::new(
                         db,
                         Namespace::Value,
                         indexed.module_id,
                         abs_name.name(db),
                     ));
-                    val_iter.next();
                 }
 
-                let mut type_iter = indexed.types.keys().peekable();
-
-                while let Some(abs_name) = type_iter.peek().copied() {
+                for abs_name in indexed.types.keys() {
                     self.exported_decls.push(DeclId::new(
                         db,
                         Namespace::Type,
                         indexed.module_id,
                         abs_name.name(db),
                     ));
-                    type_iter.next();
                 }
 
-                let mut class_iter = indexed.classes.keys().peekable();
-
-                while let Some(abs_name) = class_iter.peek().copied() {
+                for abs_name in indexed.classes.keys() {
                     self.exported_decls.push(DeclId::new(
                         db,
                         Namespace::Class,
                         indexed.module_id,
                         abs_name.name(db),
                     ));
-                    class_iter.next();
                 }
             }
         }
@@ -233,24 +221,19 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
             .for_each(|i| imports.push((None, *i)));
     }
 
-    let mut iter = module.ast.imports.iter().peekable();
-    while let Some(import) = iter.peek().copied() {
+    for import in &module.ast.imports {
         use ImportDeclarationKind::*;
         match &import.kind {
             Implicit => {
                 crate::renamed_module::exported_decls(db, import.module)
                     .iter()
                     .for_each(|i| imports.push((import.alias, *i)));
-
-                iter.next();
             }
             Explicit(decls) => {
                 decls
                     .iter()
                     .flat_map(|i| to_decls_id(db, import.module, i))
                     .for_each(|i| imports.push((import.alias, i)));
-
-                iter.next();
             }
             Hiding(decls) => {
                 let excluded: HashSet<DeclId> = decls
@@ -261,8 +244,6 @@ pub fn imported_decls(db: &dyn Db, module_id: ModuleId) -> Vec<(Option<ModuleId>
                     .iter()
                     .filter(|i| !excluded.contains(i))
                     .for_each(|i| imports.push((import.alias, *i)));
-
-                iter.next();
             }
         }
     }

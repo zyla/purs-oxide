@@ -18,8 +18,4 @@ jobs:
     - uses: Swatinem/rust-cache@v1
     - run: cargo test
     - run: cargo fmt -- --check
-
-    # The generated parser generates tons of warnings,
-    # so clippy is disabled for now.
-    # TODO: figure out how to allow the parser warnings
-    # - run: cargo clippy -- -Dwarnings
+    - run: cargo clippy -- -Dwarnings

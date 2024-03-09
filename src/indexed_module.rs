@@ -194,7 +194,7 @@ impl<'a> ModuleIndexer<'a> {
                         Diagnostic::new(
                             src_decl.span().start,
                             src_decl.span().end,
-                            "Invalid top-level destructuring".into(),
+                            "Invalid top-level destructuring".to_string(),
                             module.filename.to_string_lossy().into(),
                         ),
                     );

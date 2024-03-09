@@ -129,7 +129,7 @@ impl<'a> Typechecker<'a> {
 
                         // TODO: removing from local context
                         self.local_context
-                            .insert(QualifiedName::new_unqualified(db, v), (&**ty_a).clone());
+                            .insert(QualifiedName::new_unqualified(db, v), (**ty_a).clone());
                         let elaborated = self.check(*body, ty_b);
                         Located::new(span, Lam(pats, Box::new(elaborated)))
                     }
@@ -284,11 +284,11 @@ impl<'a> Typechecker<'a> {
                 // Already unified
             }
             (TypeKind::Unknown(u), _) => {
-                self.occurs_check(*u, &t2);
+                self.occurs_check(*u, t2);
                 self.substitution.insert(*u, t2.clone());
             }
             (_, TypeKind::Unknown(u)) => {
-                self.occurs_check(*u, &t1);
+                self.occurs_check(*u, t1);
                 self.substitution.insert(*u, t1.clone());
             }
             (
@@ -312,6 +312,7 @@ impl<'a> Typechecker<'a> {
         }
     }
 
+    #[allow(clippy::only_used_in_recursion)] // Note: clippy warns here, but we will be using `self` later to report errors
     fn occurs_check(&self, u: u64, t: &Type) {
         match &**t {
             TypeKind::Unknown(u2) => {
@@ -322,8 +323,8 @@ impl<'a> Typechecker<'a> {
                 }
             }
             TypeKind::FunctionType(f, x) => {
-                self.occurs_check(u, &f);
-                self.occurs_check(u, &x);
+                self.occurs_check(u, f);
+                self.occurs_check(u, x);
             }
             TypeKind::TypeConstructor(_) => {}
             _ => todo!("occurs_check: type {t:?}"),
@@ -331,13 +332,10 @@ impl<'a> Typechecker<'a> {
     }
 
     fn shallow_apply_subst(&self, t: &mut Type) {
-        match &**t {
-            TypeKind::Unknown(u) => {
-                if let Some(t2) = self.substitution.get(u) {
-                    *t = t2.clone();
-                }
+        if let TypeKind::Unknown(u) = &**t {
+            if let Some(t2) = self.substitution.get(u) {
+                *t = t2.clone();
             }
-            _ => {}
         }
     }
 }

@@ -96,6 +96,7 @@ impl<'a> Iterator for Lexer<'a> {
                 }
                 // Multi-line comment
                 '{' if self.can_peek2() && self.peek2() == '-' => {
+                    #[allow(clippy::nonminimal_bool)]
                     while !self.eof()
                         && !(self.peek() == '-' && self.can_peek2() && self.peek2() == '}')
                     {
@@ -321,20 +322,19 @@ impl<'a> Iterator for Lexer<'a> {
                 Some(prev_token) => !is_matching_paren_pair(&prev_token.token, &next_token.token),
                 None => false,
             }) {
-                match find_parent_matching_paren(&self.layout_stack, &next_token.token) {
-                    Some(num_blocks_to_drop) => {
-                        for _ in 0..num_blocks_to_drop {
-                            trace!("ending block via closing paren");
-                            self.layout_pop();
-                            let token = self.make_token_info(Token::LayoutEnd);
-                            self.enqueue(token);
-                        }
-                        // Pop the backtick entry
-                        trace!("ending paren block");
+                if let Some(num_blocks_to_drop) =
+                    find_parent_matching_paren(&self.layout_stack, &next_token.token)
+                {
+                    for _ in 0..num_blocks_to_drop {
+                        trace!("ending block via closing paren");
                         self.layout_pop();
-                        break;
+                        let token = self.make_token_info(Token::LayoutEnd);
+                        self.enqueue(token);
                     }
-                    None => {}
+                    // Pop the backtick entry
+                    trace!("ending paren block");
+                    self.layout_pop();
+                    break;
                 }
             }
 
@@ -484,12 +484,14 @@ impl<'a> Lexer<'a> {
                         prev = self.peek();
                         self.next_char();
                         continue;
-                    } else if current_segment_is_upper && self.peek() == '.' {
+                    }
+                    if current_segment_is_upper && self.peek() == '.' {
                         prev = self.peek();
                         self.next_char();
                         current_segment_is_upper = !self.eof() && self.peek().is_uppercase();
                         continue;
-                    } else if prev == '.' && is_operator_char(self.peek()) {
+                    }
+                    if prev == '.' && is_operator_char(self.peek()) {
                         let dot = self.pos;
                         // Qualified operator
                         while !self.eof() && is_operator_char(self.peek()) {
@@ -499,9 +501,8 @@ impl<'a> Lexer<'a> {
                             self.input[self.token_start..dot - 1].into(),
                             self.input[dot..self.pos].into(),
                         )));
-                    } else {
-                        break;
                     }
+                    break;
                 }
                 self.make_token(ident_to_token(
                     &self.input[self.token_start..self.pos],
@@ -640,9 +641,8 @@ impl<'a> Lexer<'a> {
                             state = Raw;
                             num_quotes = 0;
                             continue;
-                        } else {
-                            break;
                         }
+                        break;
                     }
                     Normal => {
                         break;
@@ -651,9 +651,8 @@ impl<'a> Lexer<'a> {
                         num_quotes += 1;
                         if num_quotes == 3 {
                             break;
-                        } else {
-                            continue;
                         }
+                        continue;
                     }
                 }
             }
@@ -817,9 +816,9 @@ fn digit_value(c: char) -> usize {
 
 fn hex_value(c: char) -> u8 {
     if is_digit(c) {
-        c as u8 - '0' as u8
+        c as u8 - b'0'
     } else {
-        c.to_ascii_lowercase() as u8 - 'a' as u8 + 10
+        c.to_ascii_lowercase() as u8 - b'a' + 10
     }
 }
 
@@ -839,7 +838,7 @@ fn is_operator_char(c: char) -> bool {
 }
 
 fn is_digit(c: char) -> bool {
-    ('0'..='9').contains(&c)
+    c.is_ascii_digit()
 }
 
 fn is_integer_literal_char(c: char) -> bool {

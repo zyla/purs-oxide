@@ -4,6 +4,7 @@ use purs_oxide::codegen::BundleMode;
 use purs_oxide::{Diagnostic, Diagnostics};
 use rayon::prelude::*;
 use salsa::ParallelDatabase;
+use std::fmt::Write;
 use std::path::PathBuf;
 use std::{fs::File, io::Read};
 
@@ -42,8 +43,10 @@ fn main() -> std::io::Result<()> {
                         parsed_module.ast.declarations.len(),
                         accumulated
                             .into_iter()
-                            .map(|d| format!("\n - {:?}", d))
-                            .collect::<String>()
+                            .fold(String::new(), |mut output, d| {
+                                write!(output, "\n - {:?}", d).expect("write to String");
+                                output
+                            })
                     );
                 },
             );

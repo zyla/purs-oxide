@@ -186,6 +186,12 @@ pub struct Database {
 #[derive(Debug)]
 pub struct ModuleNameNotSpecified;
 
+impl Default for Database {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Database {
     pub fn new() -> Self {
         let storage = Default::default();
