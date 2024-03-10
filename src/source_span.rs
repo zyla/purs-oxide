@@ -81,8 +81,8 @@ pub trait ToRelativeSourceSpan {
 impl ToRelativeSourceSpan for SourceSpan {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &SourceSpan {
         self.decl = SpanDeclRef::Decl(decl_id);
-        self.start = self.start - reference_loc;
-        self.end = self.end - reference_loc;
+        self.start -= reference_loc;
+        self.end -= reference_loc;
         self
     }
 }
