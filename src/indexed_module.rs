@@ -121,7 +121,7 @@ impl<'a> ModuleIndexer<'a> {
                                 name: abs_name,
                                 params,
                                 kind: kind.clone(),
-                                constructors: constructors,
+                                constructors,
                             }));
                         }
                     }
