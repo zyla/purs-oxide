@@ -11,7 +11,6 @@ use crate::renamed_module::Namespace;
 use crate::source_span::ToRelativeSourceSpan;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
-use std::path::PathBuf;
 
 use crate::ast::Type;
 use crate::ast::TypeDeclarationData;
@@ -71,7 +70,6 @@ struct ModuleIndexer<'a> {
     values: FxHashMap<AbsoluteName, ValueDecl>,
     classes: FxHashMap<AbsoluteName, TypeClassDecl>,
     module_id: ModuleId,
-    filename: PathBuf,
     decls_ref_loc: FxHashMap<DeclId, usize>,
 }
 
@@ -108,10 +106,8 @@ impl<'a> ModuleIndexer<'a> {
                             Diagnostics::push(
                                 db,
                                 Diagnostic::new(
-                                    src_decl.span().start,
-                                    src_decl.span().end,
+                                    src_decl.span(),
                                     format!("Duplicate type declaration {}", name.text(db)),
-                                    module.filename.to_string_lossy().into(),
                                 ),
                             );
                         }
@@ -137,10 +133,8 @@ impl<'a> ModuleIndexer<'a> {
                             Diagnostics::push(
                                 db,
                                 Diagnostic::new(
-                                    src_decl.span().start,
-                                    src_decl.span().end,
+                                    src_decl.span(),
                                     format!("Duplicate type declaration {}", name.text(db)),
-                                    module.filename.to_string_lossy().into(),
                                 ),
                             );
                         }
@@ -179,13 +173,11 @@ impl<'a> ModuleIndexer<'a> {
                             Diagnostics::push(
                                 db,
                                 Diagnostic::new(
-                                    src_decl.span().start,
-                                    src_decl.span().end,
+                                    src_decl.span(),
                                     format!(
                                         "Type signature of {} should be followed by its definition",
                                         sig.ident.text(db)
                                     ),
-                                    module.filename.to_string_lossy().into(),
                                 ),
                             );
                         }
@@ -197,12 +189,7 @@ impl<'a> ModuleIndexer<'a> {
                 Destructuring { .. } => {
                     Diagnostics::push(
                         db,
-                        Diagnostic::new(
-                            src_decl.span().start,
-                            src_decl.span().end,
-                            "Invalid top-level destructuring".to_string(),
-                            module.filename.to_string_lossy().into(),
-                        ),
+                        Diagnostic::new(src_decl.span(), "Invalid top-level destructuring".into()),
                     );
                     iter.next();
                 }
@@ -217,10 +204,8 @@ impl<'a> ModuleIndexer<'a> {
                             Diagnostics::push(
                                 db,
                                 Diagnostic::new(
-                                    src_decl.span().start,
-                                    src_decl.span().end,
+                                    src_decl.span(),
                                     format!("Duplicate value declaration {}", name.text(db)),
-                                    self.filename.to_string_lossy().into(),
                                 ),
                             );
                         }
@@ -247,13 +232,11 @@ impl<'a> ModuleIndexer<'a> {
                             Diagnostics::push(
                                 db,
                                 Diagnostic::new(
-                                    src_decl.span().start,
-                                    src_decl.span().end,
+                                    src_decl.span(),
                                     format!(
                                         "Duplicate typeclass declaration {}",
                                         type_class_decl.name.text(db)
                                     ),
-                                    self.filename.to_string_lossy().into(),
                                 ),
                             );
                         }
@@ -315,13 +298,11 @@ impl<'a> ModuleIndexer<'a> {
                     Diagnostics::push(
                         db,
                         Diagnostic::new(
-                            sig.span().start,
-                            sig.span().end,
+                            sig.span(),
                             format!(
                                 "Type signature of {} should be followed by its definition",
                                 sig.ident.text(db)
                             ),
-                            self.filename.to_string_lossy().into(),
                         ),
                     );
                     None
@@ -351,10 +332,8 @@ impl<'a> ModuleIndexer<'a> {
                 Diagnostics::push(
                     db,
                     Diagnostic::new(
-                        first_decl.span().start,
-                        first_decl.span().end,
+                        first_decl.span(),
                         format!("Duplicate value declaration {}", first.ident.text(db)),
-                        self.filename.to_string_lossy().into(),
                     ),
                 );
             }
@@ -390,7 +369,6 @@ pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
         values: Default::default(),
         classes: Default::default(),
         module_id,
-        filename,
         decls_ref_loc: Default::default(),
     };
     indexer.index(module);

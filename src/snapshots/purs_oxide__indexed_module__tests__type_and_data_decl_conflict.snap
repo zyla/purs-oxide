@@ -67,10 +67,18 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
     },
     [
         Diagnostic {
-            start: 33,
-            end: 41,
+            span: SourceSpan {
+                decl: Module(
+                    ModuleId(
+                        Id {
+                            value: 2,
+                        },
+                    ),
+                ),
+                start: 33,
+                end: 41,
+            },
             message: "Duplicate type declaration Foo",
-            file: "test.purs",
         },
     ],
 )

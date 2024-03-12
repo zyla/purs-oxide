@@ -1,22 +1,17 @@
-use derive_new::new;
-
-use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
-use crate::source_span::SourceSpan;
-use crate::symbol::Symbol;
-use crate::Db;
-use std::collections::{HashMap, HashSet};
-
 use crate::ast::*;
 use crate::indexed_module::IndexedModule;
+use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
 use crate::renamed_module::DeclId;
+use crate::symbol::Symbol;
 use crate::ModuleId;
+use crate::{Db, Diagnostic, Diagnostics};
+use std::collections::{HashMap, HashSet};
 
 pub fn rename_module(
     db: &dyn Db,
     module: &mut IndexedModule,
     imported_decls: &mut [(Option<ModuleId>, DeclId)],
     exported_decls: &mut [DeclId],
-    diagnostics: &mut Vec<Diagnostic>,
 ) {
     let exported = exported_decls.iter().map(|decl_id| {
         (
@@ -39,18 +34,8 @@ pub fn rename_module(
         db,
         module_scope,
         local_scopes: vec![HashSet::new()],
-        diagnostics: vec![],
     };
     module.rename(&mut r);
-
-    *diagnostics = r.diagnostics;
-}
-
-#[derive(Clone, Debug, new)]
-pub struct Diagnostic {
-    pub name: Symbol,
-    pub span: SourceSpan,
-    pub error: String,
 }
 
 struct Renamer<'db> {
@@ -58,7 +43,6 @@ struct Renamer<'db> {
     /// Maps from names as appear in source code to actual absolute names
     module_scope: HashMap<QualifiedName, AbsoluteName>,
     local_scopes: Vec<HashSet<Symbol>>,
-    diagnostics: Vec<Diagnostic>,
 }
 
 impl<'db> Renamer<'db> {
@@ -75,10 +59,6 @@ impl<'db> Renamer<'db> {
         self.local_scopes
             .last_mut()
             .expect("top_scope called when there are no scopes")
-    }
-
-    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push(diagnostic)
     }
 }
 
@@ -157,12 +137,13 @@ impl Rename for Type {
                     *name = abs.to_qualified_name(db);
                 }
                 None => {
-                    let span = &self.0;
-                    r.push_diagnostic(Diagnostic::new(
-                        name.name(db),
-                        *span,
-                        format!("Unknown type '{}'", name.name(db).text(db)),
-                    ));
+                    Diagnostics::push(
+                        db,
+                        Diagnostic::new(
+                            self.0,
+                            format!("Unknown type '{}'", name.name(db).text(db)),
+                        ),
+                    );
                 }
             },
             TypeKind::FunctionType(ref mut a, ref mut b) => {
@@ -200,12 +181,13 @@ impl Rename for Located<PatKind> {
         match pat {
             PatKind::Var(v) => {
                 if !r.top_scope().insert(*v) {
-                    let span = &self.0;
-                    r.push_diagnostic(Diagnostic::new(
-                        *v,
-                        *span,
-                        format!("Duplicate variable '{}' in pattern", v.text(r.db)),
-                    ));
+                    Diagnostics::push(
+                        r.db,
+                        Diagnostic::new(
+                            self.0,
+                            format!("Duplicate variable '{}' in pattern", v.text(r.db)),
+                        ),
+                    );
                 }
             }
             _ => todo!("renaming PatKind {:?} not supported", self),
@@ -223,15 +205,13 @@ impl Rename for Located<ExprKind> {
                 let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
                     match r.module_scope.get(v) {
-                        None => {
-                            let span = &self.0;
-                            r.push_diagnostic(Diagnostic::new(
-                                v.name(db),
-                                *span,
+                        None => Diagnostics::push(
+                            db,
+                            Diagnostic::new(
+                                self.0,
                                 format!("Unknown variable '{}'", v.name(db).text(db)),
-                            ));
-                        }
-
+                            ),
+                        ),
                         Some(abs) => {
                             *v = abs.to_qualified_name(db);
                             use salsa::DebugWithDb;
@@ -258,17 +238,16 @@ impl Rename for Located<ExprKind> {
             ExprKind::DataConstructor(constructor_name) => {
                 let db = r.db;
                 match r.module_scope.get(constructor_name) {
-                    None => {
-                        let span = &self.0;
-                        r.push_diagnostic(Diagnostic::new(
-                            constructor_name.name(db),
-                            *span,
+                    None => Diagnostics::push(
+                        db,
+                        Diagnostic::new(
+                            self.0,
                             format!(
                                 "Unknown data constructor variable '{}'",
                                 constructor_name.name(db).text(db)
                             ),
-                        ));
-                    }
+                        ),
+                    ),
 
                     Some(abs) => {
                         *constructor_name = abs.to_qualified_name(db);
@@ -283,7 +262,7 @@ impl Rename for Located<ExprKind> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::pretty_printer::*;
+    use crate::{pretty_printer::*, renamed_module::renamed_module};
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
@@ -299,15 +278,8 @@ mod test {
         let mut module = crate::indexed_module::indexed_module(db, module_id);
         let mut imported = crate::renamed_module::imported_decls(db, module_id);
         let mut exported = crate::renamed_module::exported_decls(db, module_id);
-        let mut diagnostics = vec![];
 
-        rename_module(
-            db,
-            &mut module,
-            &mut imported,
-            &mut exported,
-            &mut diagnostics,
-        );
+        rename_module(db, &mut module, &mut imported, &mut exported);
 
         let types = module
             .types
@@ -317,6 +289,7 @@ mod test {
             .collect::<Vec<_>>()
             .join("\n\n");
 
+        let diagnostics = renamed_module::accumulated::<Diagnostics>(db, module_id);
         format!("{}\n\n{:?}", types, diagnostics)
     }
 

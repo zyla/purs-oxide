@@ -69,17 +69,10 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
     let mut indexed = crate::indexed_module::indexed_module(db, module_id);
     let mut imported = crate::renamed_module::imported_decls(db, module_id);
     let mut exported = crate::renamed_module::exported_decls(db, module_id);
-    let mut diagnositics = vec![];
 
     let module = crate::parsed_module(db, module_id);
 
-    rename_module(
-        db,
-        &mut indexed,
-        &mut imported,
-        &mut exported,
-        &mut diagnositics,
-    );
+    rename_module(db, &mut indexed, &mut imported, &mut exported);
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();

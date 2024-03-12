@@ -1,3 +1,4 @@
+use derive_new::new;
 use salsa::DebugWithDb;
 
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
     ModuleId,
 };
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
+#[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb, new)]
 pub struct SourceSpan {
     pub decl: SpanDeclRef,
     pub start: usize,
