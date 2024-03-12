@@ -118,13 +118,3 @@ impl ToRelativeSourceSpan for CaseBranch {
         self
     }
 }
-
-// #[salsa::tracked]
-// pub fn fetch_absolute_source_span(db: &dyn Db, decl_id: DeclId) -> SourceSpan {
-//     let module_id = decl_id.modele(db);
-//     let indexed = crate::indexed_module::indexed_module(db, module_id);
-//     match indexed.decls_ref_loc.get(&decl_id) {
-//         Some(loc_ref) => SourceSpan::new_in_module(loc_ref + start, end, module_id);
-//         None => panic!("unknown decl id: {:?}", decl_id),
-//     }
-// }
