@@ -1,6 +1,7 @@
 use derive_new::new;
 
 use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
+use crate::source_span::SourceSpan;
 use crate::symbol::Symbol;
 use crate::Db;
 use std::collections::{HashMap, HashSet};

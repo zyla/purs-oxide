@@ -4,6 +4,11 @@ expression: "parse_module(indoc!(\"\n        module Foo where\n        x :: Int\
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Foo",
+            },
+        ),
         start: 0,
         end: 32,
     },
@@ -18,6 +23,11 @@ Located(
             declarations: [
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Foo",
+                            },
+                        ),
                         start: 17,
                         end: 25,
                     },
@@ -30,6 +40,11 @@ Located(
                                 },
                                 r#type: Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Foo",
+                                            },
+                                        ),
                                         start: 22,
                                         end: 25,
                                     },
@@ -48,6 +63,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Foo",
+                            },
+                        ),
                         start: 26,
                         end: 31,
                     },
@@ -62,6 +82,11 @@ Located(
                                 expr: Unconditional(
                                     Located(
                                         SourceSpan {
+                                            decl: Module(
+                                                ModuleId {
+                                                    name: "Foo",
+                                                },
+                                            ),
                                             start: 30,
                                             end: 31,
                                         },

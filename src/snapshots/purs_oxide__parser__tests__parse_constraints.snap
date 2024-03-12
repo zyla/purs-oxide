@@ -4,18 +4,33 @@ expression: "parse_type(\"Eq a => Show a => a\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 19,
     },
     Constrained {
         constraint: Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 0,
                 end: 4,
             },
             TypeApp(
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 0,
                         end: 2,
                     },
@@ -30,6 +45,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 3,
                         end: 4,
                     },
@@ -43,18 +63,33 @@ Located(
         ),
         body: Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 8,
                 end: 19,
             },
             Constrained {
                 constraint: Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 8,
                         end: 14,
                     },
                     TypeApp(
                         Located(
                             SourceSpan {
+                                decl: Module(
+                                    ModuleId {
+                                        name: "Test",
+                                    },
+                                ),
                                 start: 8,
                                 end: 12,
                             },
@@ -69,6 +104,11 @@ Located(
                         ),
                         Located(
                             SourceSpan {
+                                decl: Module(
+                                    ModuleId {
+                                        name: "Test",
+                                    },
+                                ),
                                 start: 13,
                                 end: 14,
                             },
@@ -82,6 +122,11 @@ Located(
                 ),
                 body: Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 18,
                         end: 19,
                     },

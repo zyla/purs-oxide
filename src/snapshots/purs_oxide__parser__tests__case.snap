@@ -4,6 +4,11 @@ expression: "parse_expr(indoc!(\"\n          case x of\n            C a b ->\n  
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 62,
     },
@@ -11,6 +16,11 @@ Located(
         exprs: [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 5,
                     end: 6,
                 },
@@ -29,6 +39,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 12,
                             end: 17,
                         },
@@ -42,6 +57,11 @@ Located(
                             [
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 14,
                                         end: 15,
                                     },
@@ -53,6 +73,11 @@ Located(
                                 ),
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 16,
                                         end: 17,
                                     },
@@ -69,6 +94,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 25,
                             end: 26,
                         },
@@ -84,6 +114,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 29,
                             end: 38,
                         },
@@ -97,6 +132,11 @@ Located(
                             [
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 31,
                                         end: 36,
                                     },
@@ -110,6 +150,11 @@ Located(
                                         [
                                             Located(
                                                 SourceSpan {
+                                                    decl: Module(
+                                                        ModuleId {
+                                                            name: "Test",
+                                                        },
+                                                    ),
                                                     start: 34,
                                                     end: 35,
                                                 },
@@ -124,6 +169,11 @@ Located(
                                 ),
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 37,
                                         end: 38,
                                     },
@@ -136,6 +186,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 42,
                             end: 43,
                         },
@@ -151,6 +206,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 46,
                             end: 47,
                         },
@@ -168,6 +228,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 51,
                             end: 52,
                         },
@@ -183,6 +248,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 55,
                             end: 56,
                         },
@@ -192,6 +262,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 60,
                             end: 61,
                         },

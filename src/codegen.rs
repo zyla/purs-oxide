@@ -226,6 +226,7 @@ pub fn scc_code(db: &dyn crate::Db, id: SccId) -> String {
 mod bundle_tests {
     use super::*;
     use crate::symbol::Symbol;
+    use crate::utils::tests::dummy_module;
     use crate::ModuleId;
     use indoc::indoc;
     use insta::*;
@@ -259,7 +260,9 @@ mod bundle_tests {
         let _ = env_logger::builder().is_test(true).try_init();
         let db = &mut crate::Database::new();
         let mut g = CodeGenerator::new(db, ReferenceMode::LocalConstant);
-        let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
+        let expr = crate::parser::parse_expr(db, expr_str, dummy_module(db))
+            .1
+            .unwrap();
         g.expr(&expr);
         g.code_buffer
     }

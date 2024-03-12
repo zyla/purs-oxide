@@ -32,6 +32,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 24,
                                     end: 25,
                                 },
@@ -47,6 +52,14 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
             },
         },
         classes: {},
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 18,
+        },
+        filename: "test.purs",
     },
     [],
 )

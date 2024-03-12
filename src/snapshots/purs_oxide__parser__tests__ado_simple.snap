@@ -4,6 +4,11 @@ expression: "parse_expr(indoc!(\"\n          ado\n            x <- f\n          
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 19,
     },
@@ -12,6 +17,11 @@ Located(
             Bind(
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 6,
                         end: 7,
                     },
@@ -23,6 +33,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 11,
                         end: 12,
                     },
@@ -39,6 +54,11 @@ Located(
         ],
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 18,
                 end: 19,
             },

@@ -4,6 +4,11 @@ expression: "parse_module(indoc!(\"\n          module Control.Applicative\n     
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Control.Applicative",
+            },
+        ),
         start: 0,
         end: 162,
     },
@@ -17,6 +22,11 @@ Located(
                 [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 31,
                             end: 48,
                         },
@@ -28,6 +38,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 53,
                             end: 57,
                         },
@@ -39,6 +54,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 62,
                             end: 81,
                         },
@@ -50,6 +70,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 86,
                             end: 92,
                         },
@@ -62,6 +87,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 97,
                             end: 104,
                         },
@@ -76,6 +106,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 109,
                             end: 129,
                         },
@@ -99,6 +134,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 134,
                             end: 138,
                         },
@@ -110,6 +150,11 @@ Located(
                     ),
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Control.Applicative",
+                                },
+                            ),
                             start: 143,
                             end: 152,
                         },

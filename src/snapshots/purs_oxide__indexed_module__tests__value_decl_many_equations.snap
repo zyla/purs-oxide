@@ -31,6 +31,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
                         pats: [
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 22,
                                     end: 23,
                                 },
@@ -44,6 +49,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 26,
                                     end: 27,
                                 },
@@ -59,8 +69,19 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
                         pats: [
                             Located(
                                 SourceSpan {
-                                    start: 32,
-                                    end: 33,
+                                    decl: Decl(
+                                        DeclId {
+                                            namespace: Value,
+                                            module: ModuleId {
+                                                name: "Test",
+                                            },
+                                            name: Symbol {
+                                                text: "foo",
+                                            },
+                                        },
+                                    ),
+                                    start: 14,
+                                    end: 15,
                                 },
                                 Literal(
                                     Integer(
@@ -72,6 +93,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 36,
                                     end: 37,
                                 },
@@ -87,6 +113,14 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo 1 = 
             },
         },
         classes: {},
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 18,
+        },
+        filename: "test.purs",
     },
     [],
 )

@@ -34,6 +34,14 @@ expression: "index_module(indoc!(\"\n        module Test where\n        data Foo
         },
         values: {},
         classes: {},
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 27,
+        },
+        filename: "test.purs",
     },
     [
         Diagnostic {

@@ -4,6 +4,11 @@ expression: "parse_expr(indoc!(\"\n        case x of\n            _ -> y\n      
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 39,
     },
@@ -11,6 +16,11 @@ Located(
         exprs: [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 5,
                     end: 6,
                 },
@@ -29,6 +39,11 @@ Located(
                 pats: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 14,
                             end: 15,
                         },
@@ -38,6 +53,11 @@ Located(
                 expr: Unconditional(
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 19,
                             end: 39,
                         },
@@ -45,6 +65,11 @@ Located(
                             decls: [
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 33,
                                         end: 38,
                                     },
@@ -59,6 +84,11 @@ Located(
                                                 expr: Unconditional(
                                                     Located(
                                                         SourceSpan {
+                                                            decl: Module(
+                                                                ModuleId {
+                                                                    name: "Test",
+                                                                },
+                                                            ),
                                                             start: 37,
                                                             end: 38,
                                                         },
@@ -76,6 +106,11 @@ Located(
                             ],
                             body: Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 19,
                                     end: 20,
                                 },

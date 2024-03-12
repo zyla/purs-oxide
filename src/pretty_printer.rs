@@ -334,10 +334,12 @@ pub fn pp<T: PrettyPrint>(db: &dyn crate::Db, x: T) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils::tests::*;
 
     fn pp_type(input: &str) -> String {
         let db = &crate::Database::new();
-        pp(db, crate::parser::parse_type(db, input).1.unwrap())
+        let module = dummy_module(db);
+        pp(db, crate::parser::parse_type(db, input, module).1.unwrap())
     }
 
     fn test_pp_type_roundtrip(input: &str) {

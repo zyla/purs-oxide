@@ -342,23 +342,24 @@ impl<'a> Typechecker<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::symbol::Symbol;
+    use crate::{symbol::Symbol, utils::tests::dummy_module};
 
     use super::*;
     use insta::assert_snapshot;
 
     fn test_infer(context: &[(&str, &str)], expr_str: &str) -> String {
         let db: &dyn crate::Db = &crate::Database::new();
+        let module = dummy_module(db);
         let local_context = context
             .iter()
             .map(|(var_name, type_str)| {
                 (
                     QualifiedName::new_unqualified(db, Symbol::new(db, var_name.to_string())),
-                    crate::parser::parse_type(db, type_str).1.unwrap(),
+                    crate::parser::parse_type(db, type_str, module).1.unwrap(),
                 )
             })
             .collect();
-        let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
+        let expr = crate::parser::parse_expr(db, expr_str, module).1.unwrap();
         let mut tc = Typechecker::new(db, local_context);
 
         let (elaborated, mut ty) = tc.infer(expr);
@@ -368,17 +369,18 @@ mod tests {
 
     fn test_check(context: &[(&str, &str)], expr_str: &str, type_str: &str) -> String {
         let db: &dyn crate::Db = &crate::Database::new();
+        let module = dummy_module(db);
         let local_context = context
             .iter()
             .map(|(var_name, type_str)| {
                 (
                     QualifiedName::new_unqualified(db, Symbol::new(db, var_name.to_string())),
-                    crate::parser::parse_type(db, type_str).1.unwrap(),
+                    crate::parser::parse_type(db, type_str, module).1.unwrap(),
                 )
             })
             .collect();
-        let expr = crate::parser::parse_expr(db, expr_str).1.unwrap();
-        let ty = crate::parser::parse_type(db, type_str).1.unwrap();
+        let expr = crate::parser::parse_expr(db, expr_str, module).1.unwrap();
+        let ty = crate::parser::parse_type(db, type_str, module).1.unwrap();
         let mut tc = Typechecker::new(db, local_context);
 
         let elaborated = tc.check(expr, &ty);

@@ -1,26 +1,6 @@
 use salsa::DebugWithDb;
 
-#[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
-pub struct SourceSpan {
-    pub start: usize,
-    pub end: usize,
-}
-
-impl SourceSpan {
-    pub fn new(start: usize, end: usize) -> Self {
-        Self { start, end }
-    }
-
-    pub fn unknown() -> Self {
-        // TODO: find a better representation?
-        Self { start: 0, end: 0 }
-    }
-
-    /// Alias for `unknown()`, but we can grep for it and gradually add sensible locations
-    pub fn todo() -> Self {
-        Self::unknown()
-    }
-}
+use crate::{renamed_module::DeclId, source_span::*};
 
 #[derive(Eq, PartialEq, Debug, Hash, Clone, DebugWithDb)]
 pub struct Located<T>(pub SourceSpan, pub T);
@@ -36,6 +16,13 @@ impl<T> Located<T> {
 
     pub fn span(&self) -> SourceSpan {
         self.0
+    }
+}
+
+impl<T> ToRelativeSourceSpan for Located<T> {
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
+        self.0.to_relative_span(decl_id, reference_loc);
+        self
     }
 }
 

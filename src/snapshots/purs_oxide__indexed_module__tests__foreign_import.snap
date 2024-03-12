@@ -28,8 +28,19 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foreign 
                 type_: Some(
                     Located(
                         SourceSpan {
-                            start: 40,
-                            end: 43,
+                            decl: Decl(
+                                DeclId {
+                                    namespace: Value,
+                                    module: ModuleId {
+                                        name: "Test",
+                                    },
+                                    name: Symbol {
+                                        text: "foo",
+                                    },
+                                },
+                            ),
+                            start: 22,
+                            end: 25,
                         },
                         TypeConstructor(
                             QualifiedName {
@@ -45,6 +56,14 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foreign 
             },
         },
         classes: {},
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 18,
+        },
+        filename: "test.purs",
     },
     [],
 )

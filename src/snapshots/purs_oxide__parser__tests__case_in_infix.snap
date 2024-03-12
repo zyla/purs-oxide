@@ -4,12 +4,22 @@ expression: "parse_expr(indoc!(\"\n            case x of\n                _ -> y
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 4,
         end: 61,
     },
     Infix(
         Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 4,
                 end: 31,
             },
@@ -17,6 +27,11 @@ Located(
                 exprs: [
                     Located(
                         SourceSpan {
+                            decl: Module(
+                                ModuleId {
+                                    name: "Test",
+                                },
+                            ),
                             start: 9,
                             end: 10,
                         },
@@ -35,6 +50,11 @@ Located(
                         pats: [
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 22,
                                     end: 23,
                                 },
@@ -44,6 +64,11 @@ Located(
                         expr: Unconditional(
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 27,
                                     end: 28,
                                 },
@@ -73,6 +98,11 @@ Located(
                 ),
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 36,
                         end: 61,
                     },
@@ -80,6 +110,11 @@ Located(
                         exprs: [
                             Located(
                                 SourceSpan {
+                                    decl: Module(
+                                        ModuleId {
+                                            name: "Test",
+                                        },
+                                    ),
                                     start: 41,
                                     end: 42,
                                 },
@@ -98,6 +133,11 @@ Located(
                                 pats: [
                                     Located(
                                         SourceSpan {
+                                            decl: Module(
+                                                ModuleId {
+                                                    name: "Test",
+                                                },
+                                            ),
                                             start: 54,
                                             end: 55,
                                         },
@@ -107,6 +147,11 @@ Located(
                                 expr: Unconditional(
                                     Located(
                                         SourceSpan {
+                                            decl: Module(
+                                                ModuleId {
+                                                    name: "Test",
+                                                },
+                                            ),
                                             start: 59,
                                             end: 60,
                                         },

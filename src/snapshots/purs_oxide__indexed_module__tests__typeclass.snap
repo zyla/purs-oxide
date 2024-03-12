@@ -43,12 +43,28 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                         },
                         r#type: Located(
                             SourceSpan {
-                                start: 48,
-                                end: 59,
+                                decl: Decl(
+                                    DeclId {
+                                        namespace: Class,
+                                        module: ModuleId {
+                                            name: "Test",
+                                        },
+                                        name: Symbol {
+                                            text: "Show",
+                                        },
+                                    },
+                                ),
+                                start: 29,
+                                end: 40,
                             },
                             FunctionType(
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 48,
                                         end: 49,
                                     },
@@ -60,6 +76,11 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                                 ),
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 53,
                                         end: 59,
                                     },
@@ -78,6 +99,14 @@ expression: "index_module(indoc!(\"\n        module Test where\n        \n      
                 ],
             },
         },
+        decls_ref_loc: {
+            DeclId(
+                Id {
+                    value: 1,
+                },
+            ): 19,
+        },
+        filename: "test.purs",
     },
     [],
 )

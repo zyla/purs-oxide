@@ -28,8 +28,19 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
                     params: [],
                     body: Located(
                         SourceSpan {
-                            start: 29,
-                            end: 32,
+                            decl: Decl(
+                                DeclId {
+                                    namespace: Type,
+                                    module: ModuleId {
+                                        name: "Test",
+                                    },
+                                    name: Symbol {
+                                        text: "Foo",
+                                    },
+                                },
+                            ),
+                            start: 11,
+                            end: 14,
                         },
                         TypeConstructor(
                             QualifiedName {
@@ -45,6 +56,8 @@ expression: "index_module(indoc!(\"\n        module Test where\n        type Foo
         },
         values: {},
         classes: {},
+        decls_ref_loc: {},
+        filename: "test.purs",
     },
     [],
 )

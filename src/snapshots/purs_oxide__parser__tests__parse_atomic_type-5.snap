@@ -4,6 +4,11 @@ expression: "parse_type(\"Prelude.Int\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 11,
     },

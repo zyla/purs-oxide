@@ -4,6 +4,11 @@ expression: "parse_expr(\"let x = 1 in x\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 14,
     },
@@ -11,6 +16,11 @@ Located(
         decls: [
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 4,
                     end: 9,
                 },
@@ -25,6 +35,11 @@ Located(
                             expr: Unconditional(
                                 Located(
                                     SourceSpan {
+                                        decl: Module(
+                                            ModuleId {
+                                                name: "Test",
+                                            },
+                                        ),
                                         start: 8,
                                         end: 9,
                                     },
@@ -42,6 +57,11 @@ Located(
         ],
         body: Located(
             SourceSpan {
+                decl: Module(
+                    ModuleId {
+                        name: "Test",
+                    },
+                ),
                 start: 13,
                 end: 14,
             },

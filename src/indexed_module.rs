@@ -6,6 +6,9 @@ use crate::ast::Declaration;
 use crate::ast::DeclarationKind;
 use crate::ast::Fundep;
 use crate::ast::Located;
+use crate::renamed_module::DeclId;
+use crate::renamed_module::Namespace;
+use crate::source_span::ToRelativeSourceSpan;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 use std::path::PathBuf;
@@ -69,14 +72,17 @@ struct ModuleIndexer<'a> {
     classes: FxHashMap<AbsoluteName, TypeClassDecl>,
     module_id: ModuleId,
     filename: PathBuf,
+    decls_ref_loc: FxHashMap<DeclId, usize>,
 }
 
 impl<'a> ModuleIndexer<'a> {
-    fn index(&mut self, module: &ParsedModule) {
+    fn index(&mut self, module: ParsedModule) {
         let db = self.db;
         let mut iter = module.ast.declarations.iter().peekable();
         while let Some(src_decl) = iter.peek().copied() {
             use DeclarationKind::*;
+
+            let ref_loc = src_decl.0.start;
 
             match &***src_decl {
                 Data {
@@ -87,6 +93,15 @@ impl<'a> ModuleIndexer<'a> {
                     constructors,
                 } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Type);
+
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
+
+                    let mut params = params.clone();
+                    params.to_relative_span(decl_id, ref_loc);
+
+                    let mut constructors = constructors.clone();
+                    constructors.to_relative_span(decl_id, ref_loc);
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -104,9 +119,9 @@ impl<'a> ModuleIndexer<'a> {
                             e.insert(TypeDecl::Data(DataDecl {
                                 type_: *type_,
                                 name: abs_name,
-                                params: params.clone(),
+                                params,
                                 kind: kind.clone(),
-                                constructors: constructors.clone(),
+                                constructors,
                             }));
                         }
                     }
@@ -115,6 +130,7 @@ impl<'a> ModuleIndexer<'a> {
 
                 TypeSynonym { name, params, body } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Type);
 
                     match self.types.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -129,10 +145,16 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut params = params.clone();
+                            params.to_relative_span(decl_id, ref_loc);
+
+                            let mut body = body.clone();
+                            body.to_relative_span(decl_id, ref_loc);
+
                             e.insert(TypeDecl::Type(TypeSynonymDecl {
                                 name: abs_name,
-                                params: params.clone(),
-                                body: body.clone(),
+                                params,
+                                body,
                             }));
                         }
                     }
@@ -150,6 +172,7 @@ impl<'a> ModuleIndexer<'a> {
                             self.parse_value_decl(
                                 &mut iter,
                                 Some(Located::new(src_decl.span(), sig.clone())),
+                                ref_loc,
                             );
                         }
                         _ => {
@@ -169,7 +192,7 @@ impl<'a> ModuleIndexer<'a> {
                     }
                 }
                 ValueDeclaration(_) => {
-                    self.parse_value_decl(&mut iter, None);
+                    self.parse_value_decl(&mut iter, None, ref_loc);
                 }
                 Destructuring { .. } => {
                     Diagnostics::push(
@@ -185,6 +208,9 @@ impl<'a> ModuleIndexer<'a> {
                 }
                 ForeignValue { name, type_ } => {
                     let abs_name = AbsoluteName::new(db, self.module_id, *name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Value);
+
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
 
                     match self.values.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -199,9 +225,12 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut type_ = type_.clone();
+                            type_.to_relative_span(decl_id, ref_loc);
+
                             e.insert(ValueDecl {
                                 name: abs_name,
-                                type_: Some(type_.clone()),
+                                type_: Some(type_),
                                 equations: vec![],
                             });
                         }
@@ -210,6 +239,8 @@ impl<'a> ModuleIndexer<'a> {
                 }
                 Class(type_class_decl) => {
                     let abs_name = AbsoluteName::new(db, self.module_id, type_class_decl.name);
+                    let decl_id = abs_name.to_decl_id(db, Namespace::Class);
+                    self.decls_ref_loc.insert(decl_id, ref_loc);
 
                     match self.classes.entry(abs_name) {
                         Entry::Occupied(_) => {
@@ -227,12 +258,21 @@ impl<'a> ModuleIndexer<'a> {
                             );
                         }
                         Entry::Vacant(e) => {
+                            let mut constraints = type_class_decl.constraints.clone();
+                            constraints.to_relative_span(decl_id, ref_loc);
+
+                            let mut params = type_class_decl.params.clone();
+                            params.to_relative_span(decl_id, ref_loc);
+
+                            let mut methods = type_class_decl.methods.clone();
+                            methods.to_relative_span(decl_id, ref_loc);
+
                             e.insert(TypeClassDecl {
                                 name: abs_name,
-                                constraints: type_class_decl.constraints.clone(),
-                                params: type_class_decl.params.clone(),
+                                constraints,
+                                params,
                                 fundeps: type_class_decl.fundeps.clone(),
-                                methods: type_class_decl.methods.clone(),
+                                methods,
                             });
                         }
                     }
@@ -249,6 +289,7 @@ impl<'a> ModuleIndexer<'a> {
         &mut self,
         iter: &mut Peekable<impl Iterator<Item = &'m Declaration>>,
         sig: Option<Located<TypeDeclarationData>>,
+        reference_loc: usize,
     ) {
         let db = self.db;
         let Some(first_decl) = iter.next() else {
@@ -259,12 +300,17 @@ impl<'a> ModuleIndexer<'a> {
         };
 
         let abs_name = AbsoluteName::new(db, self.module_id, first.ident);
+        let decl_id = abs_name.to_decl_id(db, Namespace::Value);
+
+        self.decls_ref_loc.insert(decl_id, reference_loc);
 
         let ty = match sig {
             None => None,
             Some(sig) => {
                 if sig.ident == first.ident {
-                    Some(sig.into_inner().r#type)
+                    let mut sig_ty = sig.into_inner().r#type;
+                    sig_ty.to_relative_span(decl_id, reference_loc);
+                    Some(sig_ty)
                 } else {
                     Diagnostics::push(
                         db,
@@ -283,6 +329,7 @@ impl<'a> ModuleIndexer<'a> {
             }
         };
         let mut equations = vec![first.clone().into()];
+
         while let Some(src_decl) = iter.peek() {
             let DeclarationKind::ValueDeclaration(decl) = &****src_decl else {
                 break;
@@ -291,7 +338,11 @@ impl<'a> ModuleIndexer<'a> {
                 // Start of another chain of equations
                 break;
             }
-            equations.push(decl.clone().into());
+
+            let mut branch: CaseBranch = decl.clone().into();
+            branch.to_relative_span(decl_id, reference_loc);
+
+            equations.push(branch);
             iter.next();
         }
 
@@ -324,39 +375,45 @@ pub struct IndexedModule {
     pub types: FxHashMap<AbsoluteName, TypeDecl>,
     pub values: FxHashMap<AbsoluteName, ValueDecl>,
     pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
+    pub decls_ref_loc: FxHashMap<DeclId, usize>,
+    pub filename: String,
 }
 
 #[salsa::tracked]
 pub fn indexed_module(db: &dyn Db, module_id: ModuleId) -> IndexedModule {
     let module = crate::parsed_module(db, module_id);
+    let filename = module.filename.clone();
+    let raw_filename = filename.to_string_lossy().to_string();
     let mut indexer = ModuleIndexer {
         db,
         types: Default::default(),
         values: Default::default(),
         classes: Default::default(),
         module_id,
-        filename: module.filename.clone(),
+        filename,
+        decls_ref_loc: Default::default(),
     };
-    indexer.index(&module);
-    // TODO: rewrite spans relative to declaration
+    indexer.index(module);
     IndexedModule {
         module_id,
         types: indexer.types,
         values: indexer.values,
         classes: indexer.classes,
+        decls_ref_loc: indexer.decls_ref_loc,
+        filename: raw_filename,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::tests::DropSalsaId;
+    use crate::utils::tests::*;
     use indoc::indoc;
     use insta::{self, assert_snapshot};
 
     fn index_module(input: &str) -> String {
         let db = &mut crate::Database::test_single_file_db(input);
-        let module_id = ModuleId::new(db, "Test".into());
+        let module_id = parse_module_id(input, db);
         format!(
             "{:#?}",
             (

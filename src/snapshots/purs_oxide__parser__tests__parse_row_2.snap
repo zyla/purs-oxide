@@ -4,6 +4,11 @@ expression: "parse_type(\"( foo :: Int | e )\")"
 ---
 Located(
     SourceSpan {
+        decl: Module(
+            ModuleId {
+                name: "Test",
+            },
+        ),
         start: 0,
         end: 18,
     },
@@ -15,6 +20,11 @@ Located(
                 },
                 Located(
                     SourceSpan {
+                        decl: Module(
+                            ModuleId {
+                                name: "Test",
+                            },
+                        ),
                         start: 9,
                         end: 12,
                     },
@@ -32,6 +42,11 @@ Located(
         rest: Some(
             Located(
                 SourceSpan {
+                    decl: Module(
+                        ModuleId {
+                            name: "Test",
+                        },
+                    ),
                     start: 15,
                     end: 16,
                 },

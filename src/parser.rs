@@ -10,6 +10,7 @@ use crate::errors::Error;
 use crate::lexer;
 use crate::symbol::Symbol;
 use crate::token::Token;
+use crate::ModuleId;
 use lalrpop_util::ErrorRecovery;
 use lalrpop_util::ParseError;
 
@@ -188,10 +189,14 @@ type ParseResult<'a, T> = (
     Result<T, ParseError<usize, Token, Error>>,
 );
 
-pub fn parse_module<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Module> {
+pub fn parse_module<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Module> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ModuleParser::new().parse(db, &mut errors, lexer);
+    let result = parser::ModuleParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
@@ -201,7 +206,8 @@ pub fn parse_lower_qualified_ident<'a>(
 ) -> ParseResult<'a, QualifiedName> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::LowerQualifiedIdentParser::new().parse(db, &mut errors, lexer);
+    let module = ModuleId::new(db, "Bundle".into());
+    let result = parser::LowerQualifiedIdentParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
@@ -223,23 +229,31 @@ pub fn parse_module_name(input: &str) -> Option<String> {
     }
 }
 
-pub fn parse_type<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Type> {
+pub fn parse_type<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Type> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::TypeParser::new().parse(db, &mut errors, lexer);
+    let result = parser::TypeParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
-pub fn parse_expr<'a>(db: &'a dyn crate::Db, input: &'a str) -> ParseResult<'a, Expr> {
+pub fn parse_expr<'a>(
+    db: &'a dyn crate::Db,
+    input: &'a str,
+    module: crate::ModuleId,
+) -> ParseResult<'a, Expr> {
     let mut errors = vec![];
     let lexer = lexer::lex(input);
-    let result = parser::ExprParser::new().parse(db, &mut errors, lexer);
+    let result = parser::ExprParser::new().parse(db, &mut errors, module, lexer);
     (errors, result)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::tests::DropSalsaId;
+    use crate::utils::tests::*;
     use indoc::indoc;
     use insta::{self, assert_debug_snapshot, assert_snapshot};
 
@@ -255,15 +269,18 @@ mod tests {
 
     fn parse_module(input: &str) -> String {
         let db = crate::Database::new();
-        expect_success(&db, super::parse_module(&db, input))
+        let module = parse_module_id(input, &db);
+        expect_success(&db, super::parse_module(&db, input, module))
     }
     fn parse_type(input: &str) -> String {
         let db = crate::Database::new();
-        expect_success(&db, super::parse_type(&db, input))
+        let module = dummy_module(&db);
+        expect_success(&db, super::parse_type(&db, input, module))
     }
     fn parse_expr(input: &str) -> String {
         let db = crate::Database::new();
-        expect_success(&db, super::parse_expr(&db, input))
+        let module = dummy_module(&db);
+        expect_success(&db, super::parse_expr(&db, input, module))
     }
 
     #[test]
