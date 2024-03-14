@@ -4,4 +4,4 @@ expression: "rename_mod(indoc!(\"\n        module Test where\n        \n        
 ---
 g = x
 
-[LegacyDiagnostic { name: Symbol(Id { value: 2 }), span: SourceSpan { decl: Module(ModuleId(Id { value: 2 })), start: 23, end: 24 }, error: "Unknown variable 'x'" }]
+[Diagnostic { span: SourceSpan { decl: Module(ModuleId(Id { value: 2 })), start: 23, end: 24 }, message: "Unknown variable 'x'" }]

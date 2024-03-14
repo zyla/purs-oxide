@@ -2,6 +2,7 @@ use crate::ast::AbsoluteName;
 use crate::ast::DeclarationRefConstructors;
 use crate::indexed_module::TypeClassDecl;
 use crate::indexed_module::TypeDecl;
+use crate::Diagnostics;
 use fxhash::FxHashMap;
 use std::collections::{HashMap, HashSet};
 
@@ -70,9 +71,21 @@ pub fn renamed_module(db: &dyn Db, module_id: ModuleId) -> RenamedModule {
     let mut imported = crate::renamed_module::imported_decls(db, module_id);
     let mut exported = crate::renamed_module::exported_decls(db, module_id);
 
+    let mut diagnostics = vec![];
+
     let module = crate::parsed_module(db, module_id);
 
-    rename_module(db, &mut indexed, &mut imported, &mut exported);
+    rename_module(
+        db,
+        &mut indexed,
+        &mut imported,
+        &mut exported,
+        &mut diagnostics,
+    );
+
+    diagnostics
+        .into_iter()
+        .for_each(|d| Diagnostics::push(db, d));
 
     let mut graph = DiGraph::<Declaration, ()>::new();
     let mut node_indices = HashMap::new();
