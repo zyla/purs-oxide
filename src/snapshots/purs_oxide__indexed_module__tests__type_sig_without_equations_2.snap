@@ -63,10 +63,18 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo :: I
     },
     [
         Diagnostic {
-            start: 18,
-            end: 28,
+            span: SourceSpan {
+                decl: Module(
+                    ModuleId(
+                        Id {
+                            value: 2,
+                        },
+                    ),
+                ),
+                start: 18,
+                end: 28,
+            },
             message: "Type signature of foo should be followed by its definition",
-            file: "test.purs",
         },
     ],
 )

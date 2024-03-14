@@ -50,46 +50,46 @@ pub struct Diagnostics(Diagnostic);
 
 #[derive(Clone, Debug, new)]
 pub struct Diagnostic {
-    pub start: usize,
-    pub end: usize,
+    pub span: SourceSpan,
     pub message: String,
-    pub file: String,
 }
 
 impl Diagnostic {
     fn from<T: std::fmt::Debug>(
         val: &lalrpop_util::ParseError<usize, T, Error>,
-        file: String,
+        module_id: ModuleId,
     ) -> Self {
         use lalrpop_util::ParseError::*;
 
         match val {
             InvalidToken { location } => {
-                Diagnostic::new(*location, *location, "invalid token".into(), file)
+                let source_span = SourceSpan::new_in_module(*location, *location, module_id);
+                Diagnostic::new(source_span, "invalid token".into())
             }
 
             UnrecognizedEOF { location, .. } => {
-                Diagnostic::new(*location, *location, "unexpected eof".into(), file)
+                let source_span = SourceSpan::new_in_module(*location, *location, module_id);
+                Diagnostic::new(source_span, "unexpected eof".into())
             }
 
             UnrecognizedToken {
                 token: (start, token, end),
                 ..
-            } => Diagnostic::new(
-                *start,
-                *end,
-                format!("unrecognized token {:?}", token),
-                file,
-            ),
+            } => {
+                let source_span = SourceSpan::new_in_module(*start, *end, module_id);
+                Diagnostic::new(source_span, format!("unrecognized token {:?}", token))
+            }
             ExtraToken {
                 token: (start, token, end),
-            } => Diagnostic::new(*start, *end, format!("extra token {:?}", token), file),
-            User { error } => Diagnostic::new(
-                error.loc.start,
-                error.loc.end,
-                format!("{}", error.kind),
-                file,
-            ),
+            } => {
+                let source_span = SourceSpan::new_in_module(*start, *end, module_id);
+                Diagnostic::new(source_span, format!("extra token {:?}", token))
+            }
+            User { error } => {
+                let source_span =
+                    SourceSpan::new_in_module(error.loc.start, error.loc.end, module_id);
+                Diagnostic::new(source_span, format!("{}", error.kind))
+            }
         }
     }
 }
@@ -148,10 +148,7 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
         filename: filename.clone(),
         ast: match result {
             Err(err) => {
-                Diagnostics::push(
-                    db,
-                    Diagnostic::from(&err, filename.to_string_lossy().to_string()),
-                );
+                Diagnostics::push(db, Diagnostic::from(&err, module));
 
                 declarations::corrupted(db, err.to_source_span(module))
             }

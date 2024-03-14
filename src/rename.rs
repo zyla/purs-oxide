@@ -1,15 +1,11 @@
-use derive_new::new;
-
-use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
-use crate::source_span::SourceSpan;
-use crate::symbol::Symbol;
-use crate::Db;
-use std::collections::{HashMap, HashSet};
-
 use crate::ast::*;
 use crate::indexed_module::IndexedModule;
+use crate::indexed_module::{TypeClassDecl, TypeDecl, ValueDecl};
 use crate::renamed_module::DeclId;
+use crate::symbol::Symbol;
 use crate::ModuleId;
+use crate::{Db, Diagnostic};
+use std::collections::{HashMap, HashSet};
 
 pub fn rename_module(
     db: &dyn Db,
@@ -39,18 +35,9 @@ pub fn rename_module(
         db,
         module_scope,
         local_scopes: vec![HashSet::new()],
-        diagnostics: vec![],
+        diagnostics,
     };
     module.rename(&mut r);
-
-    *diagnostics = r.diagnostics;
-}
-
-#[derive(Clone, Debug, new)]
-pub struct Diagnostic {
-    pub name: Symbol,
-    pub span: SourceSpan,
-    pub error: String,
 }
 
 struct Renamer<'db> {
@@ -58,7 +45,7 @@ struct Renamer<'db> {
     /// Maps from names as appear in source code to actual absolute names
     module_scope: HashMap<QualifiedName, AbsoluteName>,
     local_scopes: Vec<HashSet<Symbol>>,
-    diagnostics: Vec<Diagnostic>,
+    diagnostics: &'db mut Vec<Diagnostic>,
 }
 
 impl<'db> Renamer<'db> {
@@ -75,10 +62,6 @@ impl<'db> Renamer<'db> {
         self.local_scopes
             .last_mut()
             .expect("top_scope called when there are no scopes")
-    }
-
-    fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
-        self.diagnostics.push(diagnostic)
     }
 }
 
@@ -156,14 +139,10 @@ impl Rename for Type {
                 Some(abs) => {
                     *name = abs.to_qualified_name(db);
                 }
-                None => {
-                    let span = &self.0;
-                    r.push_diagnostic(Diagnostic::new(
-                        name.name(db),
-                        *span,
-                        format!("Unknown type '{}'", name.name(db).text(db)),
-                    ));
-                }
+                None => r.diagnostics.push(Diagnostic::new(
+                    self.0,
+                    format!("Unknown type '{}'", name.name(db).text(db)),
+                )),
             },
             TypeKind::FunctionType(ref mut a, ref mut b) => {
                 a.rename(r);
@@ -200,10 +179,8 @@ impl Rename for Located<PatKind> {
         match pat {
             PatKind::Var(v) => {
                 if !r.top_scope().insert(*v) {
-                    let span = &self.0;
-                    r.push_diagnostic(Diagnostic::new(
-                        *v,
-                        *span,
+                    r.diagnostics.push(Diagnostic::new(
+                        self.0,
                         format!("Duplicate variable '{}' in pattern", v.text(r.db)),
                     ));
                 }
@@ -223,15 +200,10 @@ impl Rename for Located<ExprKind> {
                 let is_local = v.module(db).is_none() && local_vars.contains(&v.name(db));
                 if !is_local {
                     match r.module_scope.get(v) {
-                        None => {
-                            let span = &self.0;
-                            r.push_diagnostic(Diagnostic::new(
-                                v.name(db),
-                                *span,
-                                format!("Unknown variable '{}'", v.name(db).text(db)),
-                            ));
-                        }
-
+                        None => r.diagnostics.push(Diagnostic::new(
+                            self.0,
+                            format!("Unknown variable '{}'", v.name(db).text(db)),
+                        )),
                         Some(abs) => {
                             *v = abs.to_qualified_name(db);
                             use salsa::DebugWithDb;
@@ -258,17 +230,13 @@ impl Rename for Located<ExprKind> {
             ExprKind::DataConstructor(constructor_name) => {
                 let db = r.db;
                 match r.module_scope.get(constructor_name) {
-                    None => {
-                        let span = &self.0;
-                        r.push_diagnostic(Diagnostic::new(
-                            constructor_name.name(db),
-                            *span,
-                            format!(
-                                "Unknown data constructor variable '{}'",
-                                constructor_name.name(db).text(db)
-                            ),
-                        ));
-                    }
+                    None => r.diagnostics.push(Diagnostic::new(
+                        self.0,
+                        format!(
+                            "Unknown data constructor variable '{}'",
+                            constructor_name.name(db).text(db)
+                        ),
+                    )),
 
                     Some(abs) => {
                         *constructor_name = abs.to_qualified_name(db);

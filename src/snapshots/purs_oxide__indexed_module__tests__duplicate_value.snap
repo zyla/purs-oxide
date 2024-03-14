@@ -109,10 +109,18 @@ expression: "index_module(indoc!(\"\n        module Test where\n        foo = 1\
     },
     [
         Diagnostic {
-            start: 34,
-            end: 41,
+            span: SourceSpan {
+                decl: Module(
+                    ModuleId(
+                        Id {
+                            value: 2,
+                        },
+                    ),
+                ),
+                start: 34,
+                end: 41,
+            },
             message: "Duplicate value declaration foo",
-            file: "test.purs",
         },
     ],
 )
