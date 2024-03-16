@@ -3,6 +3,8 @@ use crate::pretty_printer::pp;
 use crate::renamed_module::Namespace;
 use crate::scc::scc_of;
 use crate::symbol::Symbol;
+use crate::Diagnostic;
+use crate::Diagnostics;
 use crate::ModuleId;
 use salsa::DebugWithDb;
 
@@ -166,7 +168,16 @@ impl<'a> Typechecker<'a> {
                 let ty = self.local_context.get(&v).cloned().unwrap_or_else(|| {
                     match v.to_absolute_name(db) {
                         Some(name) => type_of_value(db, name),
-                        None => panic!("renamer left unknown local variable"),
+                        None => {
+                            Diagnostics::push(
+                                db,
+                                Diagnostic::new(
+                                    span,
+                                    format!("renamer left unknown local variable {:?}", v),
+                                ),
+                            );
+                            Located::new(span, TypeKind::Error)
+                        }
                     }
                 });
                 (Located::new(span, expr_kind), ty)

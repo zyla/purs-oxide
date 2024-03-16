@@ -25,7 +25,7 @@
 
 ```
 
-[ ] error reporting
+[x] error reporting
 
 ```
 #[derive(Eq, PartialEq, Debug, Hash, Clone, Copy, DebugWithDb)]
