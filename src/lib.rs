@@ -3,7 +3,6 @@ use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
 use source_span::{SourceSpan, ToSourceSpan};
-use std::fmt::Display;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -54,14 +53,37 @@ pub struct Diagnostic {
     pub message: String,
 }
 
-impl Diagnostic {
-    fn from<T: std::fmt::Debug>(
-        val: &lalrpop_util::ParseError<usize, T, Error>,
-        module_id: ModuleId,
-    ) -> Self {
+pub trait ToDiagnostic {
+    fn to_diagnostic(&self, module_id: ModuleId) -> Diagnostic;
+}
+
+impl<T: std::fmt::Debug, E: ToDiagnostic> ToDiagnostic
+    for lalrpop_util::ErrorRecovery<usize, T, E>
+{
+    fn to_diagnostic(&self, module_id: ModuleId) -> Diagnostic {
+        self.error.to_diagnostic(module_id)
+    }
+}
+
+impl ToDiagnostic for Error {
+    fn to_diagnostic(&self, module_id: ModuleId) -> Diagnostic {
+        let source_span = SourceSpan::new_in_module(self.loc.start, self.loc.end, module_id);
+        Diagnostic::new(source_span, format!("{}", self.kind))
+    }
+}
+
+impl ToDiagnostic for &str {
+    fn to_diagnostic(&self, module_id: ModuleId) -> Diagnostic {
+        let source_span = SourceSpan::new_in_module(0, 0, module_id);
+        Diagnostic::new(source_span, self.to_string())
+    }
+}
+
+impl<T: std::fmt::Debug, E: ToDiagnostic> ToDiagnostic for lalrpop_util::ParseError<usize, T, E> {
+    fn to_diagnostic(&self, module_id: ModuleId) -> Diagnostic {
         use lalrpop_util::ParseError::*;
 
-        match val {
+        match self {
             InvalidToken { location } => {
                 let source_span = SourceSpan::new_in_module(*location, *location, module_id);
                 Diagnostic::new(source_span, "invalid token".into())
@@ -85,11 +107,7 @@ impl Diagnostic {
                 let source_span = SourceSpan::new_in_module(*start, *end, module_id);
                 Diagnostic::new(source_span, format!("extra token {:?}", token))
             }
-            User { error } => {
-                let source_span =
-                    SourceSpan::new_in_module(error.loc.start, error.loc.end, module_id);
-                Diagnostic::new(source_span, format!("{}", error.kind))
-            }
+            User { error } => error.to_diagnostic(module_id),
         }
     }
 }
@@ -135,38 +153,20 @@ pub fn parsed_module(db: &dyn Db, module: ModuleId) -> ParsedModule {
         .as_ref()
         .unwrap_or_else(|| panic!("module not found: {:?}", module.name(db)));
     let (errs, result) = crate::parser::parse_module(db, input, module);
-    if !errs.is_empty() {
-        for err in errs.iter().take(1) {
-            println!(
-                "FAIL {} error: {}",
-                filename.to_string_lossy(),
-                fmt_error(&err.error)
-            );
-        }
-    }
+    errs.iter().for_each(|err| {
+        Diagnostics::push(db, err.to_diagnostic(module));
+    });
+
     ParsedModule {
         filename: filename.clone(),
         ast: match result {
             Err(err) => {
-                Diagnostics::push(db, Diagnostic::from(&err, module));
+                Diagnostics::push(db, err.to_diagnostic(module));
 
                 declarations::corrupted(db, err.to_source_span(module))
             }
             Ok(module) => module,
         },
-    }
-}
-
-fn fmt_error<T: std::fmt::Debug, E: Display>(e: &lalrpop_util::ParseError<usize, T, E>) -> String {
-    use lalrpop_util::ParseError::*;
-    match e {
-        InvalidToken { .. } => "invalid token".into(),
-        UnrecognizedEOF { .. } => "unexpected eof".into(),
-        UnrecognizedToken {
-            token: (_, t, _), ..
-        } => format!("unrecognized token {:?}", t),
-        ExtraToken { token: (_, t, _) } => format!("extra token {:?}", t),
-        User { error } => format!("{}", error),
     }
 }
 

@@ -12,13 +12,18 @@ use std::{fs::File, io::Read};
 #[command(version, about)]
 enum Command {
     Parse {
-        #[arg(value_name = "FILES")]
+        #[arg(value_name = "FILES", help = "The input .purs file(s).")]
         files: Vec<PathBuf>,
     },
     Bundle {
-        #[arg(value_name = "FILES")]
+        #[arg(value_name = "FILES", help = "The input .purs file(s)")]
         files: Vec<PathBuf>,
-        #[arg(short, long, value_name = "MODULE")]
+        #[arg(
+            short,
+            long,
+            value_name = "MODULE",
+            help = "Specify the qualified entrypoint function (e.g., App.main)"
+        )]
         entrypoint: String,
     },
 }
@@ -53,6 +58,9 @@ fn main() -> std::io::Result<()> {
         }
         Command::Bundle { files, entrypoint } => {
             load_files(files, &mut db);
+
+            //let (err, entry) = purs_oxide::parser::parse_lower_qualified_ident(&db, &entrypoint);
+
             let entrypoint = match purs_oxide::parser::parse_lower_qualified_ident(&db, &entrypoint)
                 .1
                 .unwrap()

@@ -5,4 +5,4 @@ test = do
   bar
 
 test2 :: Int
-test2 = 1333.333.33
+test2 = 1333.333
