@@ -5,6 +5,7 @@ use salsa::ParallelDatabase;
 use source_span::{SourceSpan, ToSourceSpan};
 use std::path::PathBuf;
 use std::sync::Arc;
+use thiserror::Error;
 
 use crate::ast::declarations;
 use crate::errors::Error;
@@ -31,6 +32,7 @@ pub struct Jar(
     crate::renamed_module::renamed_value_decl,
     crate::typecheck::typechecked_scc,
     crate::typecheck::type_of_value,
+    crate::typecheck::typecheck_module,
     crate::codegen::value_decl_code_acc,
     crate::codegen::scc_code_acc,
     crate::codegen::scc_code,
@@ -47,7 +49,7 @@ pub struct ModuleSource {
 #[salsa::accumulator]
 pub struct Diagnostics(Diagnostic);
 
-#[derive(Clone, Debug, new)]
+#[derive(Clone, Debug, new, PartialEq, Eq)]
 pub struct Diagnostic {
     pub span: SourceSpan,
     pub message: String,
@@ -180,7 +182,8 @@ pub struct Database {
     module_sources: Arc<DashMap<String, ModuleSource>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
+#[error("module name not specified")]
 pub struct ModuleNameNotSpecified;
 
 impl Default for Database {

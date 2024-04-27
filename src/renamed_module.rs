@@ -2,6 +2,7 @@ use crate::ast::AbsoluteName;
 use crate::ast::DeclarationRefConstructors;
 use crate::indexed_module::TypeClassDecl;
 use crate::indexed_module::TypeDecl;
+use crate::scc::SccId;
 use crate::Diagnostics;
 use fxhash::FxHashMap;
 use std::collections::{HashMap, HashSet};
@@ -46,6 +47,22 @@ pub struct RenamedModule {
     pub types: FxHashMap<AbsoluteName, TypeDecl>,
     pub values: FxHashMap<AbsoluteName, ValueDecl>,
     pub classes: FxHashMap<AbsoluteName, TypeClassDecl>,
+}
+
+impl RenamedModule {
+    pub fn sccs(&self, db: &dyn crate::Db) -> Vec<SccId> {
+        // For now we don't handle cycles at all, so we assume every declaration is in its own cycle
+        // TODO: this only handles values, we need also types and classes
+        self.values
+            .keys()
+            .map(|abs_name| {
+                SccId::new(
+                    db,
+                    DeclId::new(db, Namespace::Value, self.module_id, abs_name.name(db)),
+                )
+            })
+            .collect()
+    }
 }
 
 #[salsa::tracked]

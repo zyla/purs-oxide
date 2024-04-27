@@ -25,6 +25,7 @@ fxhash = "0.2.1"
 petgraph = "0.6.4"
 pretty = "0.12.3"
 clap = { version = "4.5.1", features = ["derive"] }
+thiserror = "1.0.59"
 
 [dev-dependencies]
 insta = "1.14.0"

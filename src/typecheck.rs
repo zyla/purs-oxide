@@ -1,5 +1,6 @@
 use crate::ast::Literal;
 use crate::pretty_printer::pp;
+use crate::renamed_module::renamed_module;
 use crate::renamed_module::Namespace;
 use crate::scc::scc_of;
 use crate::symbol::Symbol;
@@ -25,6 +26,15 @@ use crate::{
     renamed_module::DeclId,
 };
 use std::collections::HashMap;
+
+/// Returns typechecking errors from a module (in Salsa accumulator)
+#[salsa::tracked]
+pub fn typecheck_module(db: &dyn Db, id: ModuleId) {
+    let module = renamed_module(db, id);
+    for scc_id in module.sccs(db) {
+        typechecked_scc(db, scc_id);
+    }
+}
 
 // TODO: test this!
 #[salsa::tracked]
