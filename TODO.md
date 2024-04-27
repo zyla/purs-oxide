@@ -1,3 +1,9 @@
+- [ ] FFI support (for Effect.Console.log and "done"-tests)
+
+- [ ] add libs to test programs (via spago or submodules)
+
+- [ ] `compile_fail` tests
+
 - [x] SourceSpans relative to declaration
  
 ```
