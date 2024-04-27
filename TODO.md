@@ -2,7 +2,7 @@
 
 - [ ] add libs to test programs (via spago or submodules)
 
-- [ ] `compile_fail` tests
+- [ ] `compile_fail` tests (requires proper type error reporting)
 
 - [x] SourceSpans relative to declaration
  
