@@ -7,7 +7,6 @@ use crate::symbol::Symbol;
 use crate::Diagnostic;
 use crate::Diagnostics;
 use crate::ModuleId;
-use salsa::DebugWithDb;
 
 use crate::ast::AbsoluteName;
 use crate::ast::CaseBranch;
@@ -166,7 +165,7 @@ impl<'a> Typechecker<'a> {
         );
         // TODO: this is not really unification, it's a separate relation ("Figure 9. Algorithmic
         // subtyping" in the "very easy" paper)
-        self.unify(&mut a, &mut b);
+        self.unify(expr.span(), &mut a, &mut b);
         expr
     }
 
@@ -226,10 +225,12 @@ impl<'a> Typechecker<'a> {
                     f = Box::new(Located::new(span, App(f, vec![xs.remove(0)])));
                 }
                 let x = xs.remove(0);
+                let f_span = f.span();
                 let (elaborated_f, mut f_ty) = self.infer(*f);
                 let mut arg_ty = self.fresh_tv();
                 let result_ty = self.fresh_tv();
                 self.unify(
+                    f_span,
                     &mut f_ty,
                     &mut Located::new(
                         SourceSpan::todo(),
@@ -292,11 +293,11 @@ impl<'a> Typechecker<'a> {
     }
 
     #[allow(dead_code)] // TODO
-    pub fn apply_subst(&mut self, t: &mut Type) {
-        self.unify(t, &mut t.clone()); // TODO: don't clone...
+    pub fn apply_subst(&mut self, span: SourceSpan, t: &mut Type) {
+        self.unify(span, t, &mut t.clone()); // TODO: don't clone...
     }
 
-    fn unify(&mut self, t1: &mut Type, t2: &mut Type) {
+    fn unify(&mut self, span: SourceSpan, t1: &mut Type, t2: &mut Type) {
         log::debug!("unify({}, {})", pp(self.db, &t1), pp(self.db, &t2));
         self.shallow_apply_subst(t1);
         self.shallow_apply_subst(t2);
@@ -316,21 +317,28 @@ impl<'a> Typechecker<'a> {
                 TypeKind::FunctionType(ref mut f1, ref mut x1),
                 TypeKind::FunctionType(ref mut f2, ref mut x2),
             ) => {
-                self.unify(f1, f2);
-                self.unify(x1, x2);
+                self.unify(span, f1, f2);
+                self.unify(span, x1, x2);
             }
             (TypeKind::TypeConstructor(c1), TypeKind::TypeConstructor(c2)) => {
                 if *c1 != *c2 {
-                    todo!(
-                        "report error: can't unify {:?} and {:?}",
-                        c1.into_debug_all(self.db),
-                        c2.into_debug_all(self.db)
+                    // TODO: how to provide broader context (full type being unified/unification
+                    // stack?)
+                    self.report_error(
+                        span,
+                        format!("can't unify {} with {}", pp(self.db, &t1), pp(self.db, &t2)),
                     );
                 }
             }
             (TypeKind::Error, TypeKind::Error) => {}
             _ => todo!("unify {:?} {:?}", pp(self.db, &t1), pp(self.db, &t2)),
         }
+    }
+
+    fn report_error(&mut self, span: SourceSpan, message: String) {
+        // TODO: diagnostics should be collected in `Typechecker` - we might want
+        // to verify them in unit tests, outside salsa query
+        Diagnostics::push(self.db, Diagnostic::new(span, message));
     }
 
     #[allow(clippy::only_used_in_recursion)] // Note: clippy warns here, but we will be using `self` later to report errors
@@ -384,7 +392,7 @@ mod tests {
         let mut tc = Typechecker::new(db, local_context);
 
         let (elaborated, mut ty) = tc.infer(expr);
-        tc.apply_subst(&mut ty);
+        tc.apply_subst(SourceSpan::unknown(), &mut ty);
         format!("{}\n{}", pp(db, elaborated), pp(db, ty))
     }
 
