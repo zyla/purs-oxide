@@ -26,7 +26,7 @@ use crate::{
 };
 use std::collections::HashMap;
 
-/// Returns typechecking errors from a module (in Salsa accumulator)
+/// Returns type checking errors from a module (in Salsa accumulator)
 #[salsa::tracked]
 pub fn typecheck_module(db: &dyn Db, id: ModuleId) {
     let module = renamed_module(db, id);
@@ -55,6 +55,7 @@ pub fn type_of_value(db: &dyn Db, id: AbsoluteName) -> Type {
 
 #[salsa::tracked]
 pub fn typechecked_scc(db: &dyn Db, scc_id: SccId) -> Vec<(DeclId, Expr, Type)> {
+    let mut diagnostics: Vec<Diagnostic> = vec![];
     // TODO: merge decls_in_scc and renamed_value_decl?
     let decls = decls_in_scc(db, scc_id)
         .into_iter()
@@ -78,7 +79,7 @@ pub fn typechecked_scc(db: &dyn Db, scc_id: SccId) -> Vec<(DeclId, Expr, Type)> 
         })
         .collect::<HashMap<_, _>>();
 
-    decls
+    let typecheced_decls = decls
         .iter()
         .map(|(id, d)| {
             let ty = d
@@ -86,10 +87,17 @@ pub fn typechecked_scc(db: &dyn Db, scc_id: SccId) -> Vec<(DeclId, Expr, Type)> 
                 .as_ref()
                 .expect("typechecking stuff without type signatures not supported");
             // FIXME: clone (x2, especially context)
-            let expr = Typechecker::new(db, local_context.clone()).check(to_expr(d.clone()), ty);
+            let expr = Typechecker::new(db, local_context.clone(), &mut diagnostics)
+                .check(to_expr(d.clone()), ty);
             (*id, expr, ty.clone()) // FIXME: clone
         })
-        .collect()
+        .collect();
+
+    diagnostics
+        .into_iter()
+        .for_each(|d| Diagnostics::push(db, d));
+
+    typecheced_decls
 }
 
 // FIXME: this should be done already by the desugarer (separate desugared ValueDecl)
@@ -108,15 +116,21 @@ struct Typechecker<'a> {
     local_context: HashMap<QualifiedName, Type>,
     next_tv: u64,
     substitution: HashMap<u64, Type>,
+    diagnostics: &'a mut Vec<Diagnostic>,
 }
 
 impl<'a> Typechecker<'a> {
-    fn new(db: &'a dyn Db, local_context: HashMap<QualifiedName, Type>) -> Self {
+    fn new(
+        db: &'a dyn Db,
+        local_context: HashMap<QualifiedName, Type>,
+        diagnostics: &'a mut Vec<Diagnostic>,
+    ) -> Self {
         Self {
             db,
             local_context,
             next_tv: 1,
             substitution: HashMap::new(),
+            diagnostics,
         }
     }
 
@@ -178,12 +192,9 @@ impl<'a> Typechecker<'a> {
                     match v.to_absolute_name(db) {
                         Some(name) => type_of_value(db, name),
                         None => {
-                            Diagnostics::push(
-                                db,
-                                Diagnostic::new(
-                                    span,
-                                    format!("renamer left unknown local variable {:?}", v),
-                                ),
+                            self.report_error(
+                                span,
+                                format!("renamer left unknown local variable {:?}", v),
                             );
                             Located::new(span, TypeKind::Error)
                         }
@@ -336,9 +347,7 @@ impl<'a> Typechecker<'a> {
     }
 
     fn report_error(&mut self, span: SourceSpan, message: String) {
-        // TODO: diagnostics should be collected in `Typechecker` - we might want
-        // to verify them in unit tests, outside salsa query
-        Diagnostics::push(self.db, Diagnostic::new(span, message));
+        self.diagnostics.push(Diagnostic::new(span, message));
     }
 
     #[allow(clippy::only_used_in_recursion)] // Note: clippy warns here, but we will be using `self` later to report errors
@@ -379,6 +388,8 @@ mod tests {
     fn test_infer(context: &[(&str, &str)], expr_str: &str) -> String {
         let db: &dyn crate::Db = &crate::Database::new();
         let module = dummy_module(db);
+        let mut diagnostics = vec![];
+
         let local_context = context
             .iter()
             .map(|(var_name, type_str)| {
@@ -389,7 +400,7 @@ mod tests {
             })
             .collect();
         let expr = crate::parser::parse_expr(db, expr_str, module).1.unwrap();
-        let mut tc = Typechecker::new(db, local_context);
+        let mut tc = Typechecker::new(db, local_context, &mut diagnostics);
 
         let (elaborated, mut ty) = tc.infer(expr);
         tc.apply_subst(SourceSpan::unknown(), &mut ty);
@@ -399,6 +410,7 @@ mod tests {
     fn test_check(context: &[(&str, &str)], expr_str: &str, type_str: &str) -> String {
         let db: &dyn crate::Db = &crate::Database::new();
         let module = dummy_module(db);
+        let mut diagnostics = vec![];
         let local_context = context
             .iter()
             .map(|(var_name, type_str)| {
@@ -410,7 +422,7 @@ mod tests {
             .collect();
         let expr = crate::parser::parse_expr(db, expr_str, module).1.unwrap();
         let ty = crate::parser::parse_type(db, type_str, module).1.unwrap();
-        let mut tc = Typechecker::new(db, local_context);
+        let mut tc = Typechecker::new(db, local_context, &mut diagnostics);
 
         let elaborated = tc.check(expr, &ty);
         pp(db, elaborated)

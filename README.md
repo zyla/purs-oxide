@@ -11,7 +11,7 @@ We have provided a pre-commit hook to ensure consistent code formatting using `c
 2. Install the pre-commit hook by running:
 
     ```bash
-    bash hooks/install-hooks.sh
+    bash install-hooks.sh
     ```
 
 This will copy the pre-commit hook to your `.git/hooks` directory. Now, `cargo fmt` will automatically check your code before each commit.
