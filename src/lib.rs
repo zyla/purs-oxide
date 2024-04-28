@@ -2,7 +2,7 @@ use crate::prim::PRIM_SOURCE;
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
-use source_span::{SourceSpan, ToSourceSpan};
+use source_span::{SourceSpan, SpanDeclRef, ToSourceSpan};
 use std::path::PathBuf;
 use std::sync::Arc;
 use thiserror::Error;
@@ -53,6 +53,40 @@ pub struct Diagnostics(Diagnostic);
 pub struct Diagnostic {
     pub span: SourceSpan,
     pub message: String,
+}
+
+// TODO: Make to return Display
+impl Diagnostic {
+    pub fn pp(&self, db: &dyn Db) -> String {
+        match self.span.decl {
+            SpanDeclRef::Module(module) => {
+                let (filename, source) = &db
+                    .module_source(module)
+                    .contents(db)
+                    .as_ref()
+                    .unwrap_or_else(|| panic!("module not found: {:?}", module.name(db)));
+
+                let line_number = self.span.to_line_column(source);
+                let line = self.span.extract_line(source);
+
+                let offset: String = " ".repeat(line_number.1);
+
+                let message = format!("{}[33m^ {}[0m", offset, self.message);
+
+                format!(
+                    "Error found:\n in module [33m{}[0m\n at {}:{}:{}\n\n {}\n {}",
+                    module.name(db),
+                    filename.to_string_lossy(),
+                    line_number.0,
+                    line_number.1,
+                    line,
+                    message
+                )
+            }
+            SpanDeclRef::Decl(_decl_id) => todo!(),
+            SpanDeclRef::Unknown => todo!(),
+        }
+    }
 }
 
 pub trait ToDiagnostic {

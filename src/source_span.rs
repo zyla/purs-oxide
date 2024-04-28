@@ -69,6 +69,35 @@ impl SourceSpan {
             SpanDeclRef::Unknown => ("Unknown".into(), 0, 0),
         }
     }
+
+    pub fn to_line_column(&self, source: &str) -> (usize, usize) {
+        let mut line = 1;
+        let mut column = 1;
+
+        for (idx, ch) in source.chars().enumerate() {
+            if idx == self.start {
+                break;
+            }
+
+            if ch == '\n' {
+                line += 1;
+                column = 1;
+            } else {
+                column += 1;
+            }
+        }
+
+        (line, column)
+    }
+
+    pub fn extract_line(&self, source: &str) -> String {
+        let line = self.to_line_column(source).0;
+        source
+            .split('\n')
+            .nth(line - 1)
+            .expect("Source span doesn't match to source file")
+            .to_string()
+    }
 }
 
 pub trait ToSourceSpan {

@@ -10,9 +10,16 @@ fn test_compile_pass(input_filename: &str) -> anyhow::Result<()> {
     let db = &mut purs_oxide::Database::new();
 
     let module_id = db.add_source_file(input_filename.into(), source)?;
-    let errors = purs_oxide::typecheck::typecheck_module::accumulated::<Diagnostics>(db, module_id);
+    let errors: Vec<String> =
+        purs_oxide::typecheck::typecheck_module::accumulated::<Diagnostics>(db, module_id)
+            .iter()
+            .map(|d| d.pp(db))
+            .collect();
 
-    assert_eq!(errors, &[]);
+    errors.clone().into_iter().for_each(|d| println!("{}", d));
+    let expected: Vec<String> = vec![];
+
+    assert_eq!(errors, expected);
 
     Ok(())
 }
