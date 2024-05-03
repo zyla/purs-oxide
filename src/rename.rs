@@ -280,8 +280,13 @@ mod test {
         let types = module
             .types
             .values()
-            .map(|v| pp(db, v.clone()))
-            .chain(module.values.values().map(|v| pp(db, v.clone())))
+            .map(|v| format!("{}", pp(db, v.clone())))
+            .chain(
+                module
+                    .values
+                    .values()
+                    .map(|v| format!("{}", pp(db, v.clone()))),
+            )
             .collect::<Vec<_>>()
             .join("\n\n");
 

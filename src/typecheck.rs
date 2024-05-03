@@ -342,7 +342,7 @@ impl<'a> Typechecker<'a> {
                 }
             }
             (TypeKind::Error, TypeKind::Error) => {}
-            _ => todo!("unify {:?} {:?}", pp(self.db, &t1), pp(self.db, &t2)),
+            _ => todo!("unify {} {}", pp(self.db, &t1), pp(self.db, &t2)),
         }
     }
 
@@ -425,7 +425,7 @@ mod tests {
         let mut tc = Typechecker::new(db, local_context, &mut diagnostics);
 
         let elaborated = tc.check(expr, &ty);
-        pp(db, elaborated)
+        format!("{}", pp(db, elaborated))
     }
 
     #[test]
