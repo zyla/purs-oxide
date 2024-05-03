@@ -19,9 +19,13 @@ impl<T> Located<T> {
     }
 }
 
-impl<T> ToRelativeSourceSpan for Located<T> {
+impl<T> SourceSpanOps for Located<T> {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         self.0.to_relative_span(decl_id, reference_loc);
+        self
+    }
+    fn to_absolute_span(&mut self, module: crate::ModuleId, reference_loc: usize) -> &Self {
+        self.0.to_absolute_span(module, reference_loc);
         self
     }
 }

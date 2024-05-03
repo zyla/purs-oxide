@@ -2,7 +2,7 @@ use crate::prim::PRIM_SOURCE;
 use dashmap::{mapref::entry::Entry, DashMap};
 use derive_new::new;
 use salsa::ParallelDatabase;
-use source_span::{SourceSpan, SpanDeclRef, ToSourceSpan};
+use source_span::{SourceSpan, SourceSpanOps, SpanDeclRef, ToSourceSpan};
 use std::path::PathBuf;
 use std::sync::Arc;
 use thiserror::Error;
@@ -55,9 +55,39 @@ pub struct Diagnostic {
     pub message: String,
 }
 
-// TODO: Make to return Display
+#[derive(Clone, Debug, new, PartialEq, Eq)]
+pub struct DiagnosticFmt {
+    pub span: SourceSpan,
+    pub message: String,
+    pub filename: PathBuf,
+    pub source: String,
+    pub module_name: String,
+}
+
+impl std::fmt::Display for DiagnosticFmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let line_number = self.span.to_line_column(&self.source);
+        let line = self.span.extract_line(&self.source);
+
+        let offset: String = " ".repeat(line_number.1);
+
+        let message = format!("{}[33m^ {}[0m", offset, self.message);
+
+        write!(
+            f,
+            "Error found:\n in module [33m{}[0m\n at {}:{}:{}\n\n {}\n {}",
+            self.module_name,
+            self.filename.to_string_lossy(),
+            line_number.0,
+            line_number.1,
+            line,
+            message
+        )
+    }
+}
+
 impl Diagnostic {
-    pub fn pp(&self, db: &dyn Db) -> String {
+    pub fn pp(&mut self, db: &dyn Db) -> DiagnosticFmt {
         match self.span.decl {
             SpanDeclRef::Module(module) => {
                 let (filename, source) = &db
@@ -66,25 +96,41 @@ impl Diagnostic {
                     .as_ref()
                     .unwrap_or_else(|| panic!("module not found: {:?}", module.name(db)));
 
-                let line_number = self.span.to_line_column(source);
-                let line = self.span.extract_line(source);
-
-                let offset: String = " ".repeat(line_number.1);
-
-                let message = format!("{}[33m^ {}[0m", offset, self.message);
-
-                format!(
-                    "Error found:\n in module [33m{}[0m\n at {}:{}:{}\n\n {}\n {}",
+                DiagnosticFmt::new(
+                    self.span,
+                    self.message.to_string(),
+                    filename.to_path_buf(),
+                    source.clone(),
                     module.name(db),
-                    filename.to_string_lossy(),
-                    line_number.0,
-                    line_number.1,
-                    line,
-                    message
                 )
             }
-            SpanDeclRef::Decl(_decl_id) => todo!(),
-            SpanDeclRef::Unknown => todo!(),
+            SpanDeclRef::Decl(decl_id) => {
+                let (filename, source) = &db
+                    .module_source(decl_id.module(db))
+                    .contents(db)
+                    .as_ref()
+                    .unwrap_or_else(|| {
+                        panic!("module not found: {:?}", decl_id.module(db).name(db))
+                    });
+
+                let indexed = crate::indexed_module::indexed_module(db, decl_id.module(db));
+                let ref_loc = indexed.decls_ref_loc.get(&decl_id).unwrap();
+
+                DiagnosticFmt::new(
+                    *self.span.to_absolute_span(decl_id.module(db), *ref_loc),
+                    self.message.to_string(),
+                    filename.to_path_buf(),
+                    source.clone(),
+                    decl_id.module(db).name(db),
+                )
+            }
+            SpanDeclRef::Unknown => DiagnosticFmt::new(
+                self.span,
+                self.message.to_string(),
+                String::new().into(),
+                String::new(),
+                "UnknownModule".to_string(),
+            ),
         }
     }
 }

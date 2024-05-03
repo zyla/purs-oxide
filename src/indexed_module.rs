@@ -8,7 +8,7 @@ use crate::ast::Fundep;
 use crate::ast::Located;
 use crate::renamed_module::DeclId;
 use crate::renamed_module::Namespace;
-use crate::source_span::ToRelativeSourceSpan;
+use crate::source_span::SourceSpanOps;
 use salsa::DebugWithDb;
 use std::iter::Peekable;
 

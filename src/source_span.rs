@@ -104,47 +104,79 @@ pub trait ToSourceSpan {
     fn to_source_span(&self, module_id: ModuleId) -> SourceSpan;
 }
 
-pub trait ToRelativeSourceSpan {
+pub trait SourceSpanOps {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self;
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self;
 }
 
-impl ToRelativeSourceSpan for SourceSpan {
+impl SourceSpanOps for SourceSpan {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &SourceSpan {
         self.decl = SpanDeclRef::Decl(decl_id);
         self.start -= reference_loc;
         self.end -= reference_loc;
         self
     }
+
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self {
+        self.decl = SpanDeclRef::Module(module);
+        self.start += reference_loc;
+        self.end += reference_loc;
+        self
+    }
 }
 
-impl ToRelativeSourceSpan for (Symbol, Option<Type>) {
+impl SourceSpanOps for (Symbol, Option<Type>) {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         if let Some(typ) = &mut self.1 {
             typ.to_relative_span(decl_id, reference_loc);
         };
         self
     }
+
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self {
+        if let Some(typ) = &mut self.1 {
+            typ.to_absolute_span(module, reference_loc);
+        };
+        self
+    }
 }
 
-impl<A: ToRelativeSourceSpan> ToRelativeSourceSpan for Vec<A> {
+impl<A: SourceSpanOps> SourceSpanOps for Vec<A> {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         for item in self.iter_mut() {
             item.to_relative_span(decl_id, reference_loc);
         }
         self
     }
-}
 
-impl ToRelativeSourceSpan for TypeDeclarationData {
-    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
-        self.r#type.to_relative_span(decl_id, reference_loc);
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self {
+        for item in self.iter_mut() {
+            item.to_absolute_span(module, reference_loc);
+        }
         self
     }
 }
 
-impl ToRelativeSourceSpan for CaseBranch {
+impl SourceSpanOps for TypeDeclarationData {
+    fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
+        self.r#type.to_relative_span(decl_id, reference_loc);
+        self
+    }
+
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self {
+        self.r#type.to_absolute_span(module, reference_loc);
+        self
+    }
+}
+
+impl SourceSpanOps for CaseBranch {
     fn to_relative_span(&mut self, decl_id: DeclId, reference_loc: usize) -> &Self {
         self.pats.to_relative_span(decl_id, reference_loc);
+        self
+    }
+
+    fn to_absolute_span(&mut self, module: ModuleId, reference_loc: usize) -> &Self {
+        self.pats.to_absolute_span(module, reference_loc);
         self
     }
 }
