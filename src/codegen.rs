@@ -1,6 +1,7 @@
 use crate::ast::PatKind;
 use crate::ast::{Expr, ExprKind};
 use fxhash::FxHashSet;
+use std::path::PathBuf;
 
 use crate::ast::AbsoluteName;
 use crate::renamed_module::DeclId;
@@ -37,14 +38,29 @@ pub enum BundleMode {
     None,
 }
 
+/// Accumulates code in main source
 #[salsa::accumulator]
 pub struct CodeAccumulator(pub String);
+
+/// Accumulates FFI code (in separate files)
+#[salsa::accumulator]
+pub struct FfiAccumulator(pub FfiSourceFile);
+
+#[derive(Debug, Clone)]
+pub struct FfiSourceFile {
+    pub filename: PathBuf,
+    pub contents: String,
+}
 
 /// Generate a bundle of code which includes the specified entry point and its dependencies.
 /// Depending on `BundleMode`, it's either exported or called as `main()`.
 ///
 /// TODO: support multiple entry points for export mode
-pub fn bundle(db: &dyn crate::Db, bundle_mode: BundleMode, entrypoint: AbsoluteName) -> String {
+pub fn bundle(
+    db: &dyn crate::Db,
+    bundle_mode: BundleMode,
+    entrypoint: AbsoluteName,
+) -> (String, Vec<FfiSourceFile>) {
     let mut code = value_decl_code_acc::accumulated::<CodeAccumulator>(db, entrypoint).join("");
 
     match bundle_mode {
