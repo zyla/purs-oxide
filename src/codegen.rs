@@ -62,6 +62,7 @@ pub fn bundle(
     entrypoint: AbsoluteName,
 ) -> (String, Vec<FfiSourceFile>) {
     let mut code = value_decl_code_acc::accumulated::<CodeAccumulator>(db, entrypoint).join("");
+    let ffi = value_decl_ffi_code_acc::accumulated::<FfiAccumulator>(db, entrypoint);
 
     match bundle_mode {
         BundleMode::Export => {
@@ -75,7 +76,7 @@ pub fn bundle(
         }
         BundleMode::None => {}
     }
-    code
+    (code, ffi)
 }
 
 /// Generate code for the given value and its transitive dependencies, collecting it in the
@@ -83,6 +84,17 @@ pub fn bundle(
 #[salsa::tracked]
 pub fn value_decl_code_acc(db: &dyn crate::Db, id: AbsoluteName) {
     scc_code_acc(
+        db,
+        scc_of(
+            db,
+            DeclId::new(db, Namespace::Value, id.module(db), id.name(db)),
+        ),
+    )
+}
+
+#[salsa::tracked]
+pub fn value_decl_ffi_code_acc(db: &dyn crate::Db, id: AbsoluteName) {
+    scc_ffi_code_acc(
         db,
         scc_of(
             db,
@@ -126,6 +138,23 @@ pub fn scc_code_acc(db: &dyn crate::Db, id: SccId) {
         value_decl_code_acc(db, dep);
     }
     CodeAccumulator::push(db, cg.code_buffer);
+}
+
+#[salsa::tracked]
+pub fn scc_ffi_code_acc(db: &dyn crate::Db, id: SccId) {
+    for (id, _, _) in typechecked_scc(db, id) {
+        if let Some(ffi) = &db
+            .module_source(id.module(db))
+            .ffi_contents(db)
+            .as_ref()
+            .map(|(filename, contents)| FfiSourceFile {
+                filename: filename.to_path_buf(),
+                contents: contents.to_string(),
+            })
+        {
+            FfiAccumulator::push(db, ffi.clone());
+        }
+    }
 }
 
 struct CodeGenerator<'d> {
@@ -265,7 +294,8 @@ mod bundle_tests {
             ModuleId::new(db, entrypoint.0.to_string()),
             Symbol::new(db, entrypoint.1.to_string()),
         );
-        bundle(db, bundle_mode, entrypoint)
+        let (code, _ffi) = bundle(db, bundle_mode, entrypoint);
+        code
     }
 
     fn test_bundle(inputs: &[&str], entrypoint: (&str, &str)) -> String {

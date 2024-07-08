@@ -34,6 +34,8 @@ pub struct Jar(
     crate::typecheck::type_of_value,
     crate::typecheck::typecheck_module,
     crate::codegen::value_decl_code_acc,
+    crate::codegen::value_decl_ffi_code_acc,
+    crate::codegen::scc_ffi_code_acc,
     crate::codegen::scc_code_acc,
     crate::codegen::scc_code,
     crate::codegen::CodeAccumulator,
@@ -307,6 +309,7 @@ impl Database {
             source_file
                 .set_contents(self)
                 .to(Some((filename, contents)));
+            source_file.set_ffi_contents(self).to(ffi_contents);
             Ok(module_id)
         } else {
             Err(ModuleNameNotSpecified)

@@ -69,7 +69,7 @@ fn main() -> std::io::Result<()> {
                 Some(abs) => abs,
                 None => panic!("invalid entrypoint {}", entrypoint),
             };
-            let code = purs_oxide::codegen::bundle(&db, BundleMode::Export, entrypoint);
+            let (code, _ffi) = purs_oxide::codegen::bundle(&db, BundleMode::Export, entrypoint);
             println!("{}", code);
         }
     }
