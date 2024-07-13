@@ -289,6 +289,31 @@ impl Database {
         db
     }
 
+    pub fn new_with_prelude() -> Self {
+        let mut db = Self::new();
+        let prelude_path = std::env::current_dir()
+            .expect("Project should have current dir")
+            .join("prelude/src");
+
+        use walkdir::{DirEntry, WalkDir};
+        let files = WalkDir::new(prelude_path)
+            .into_iter()
+            .filter_entry(is_purs)
+            .filter_map(|e| e.ok().map(|e| e.into_path()))
+            .collect();
+
+        fn is_purs(entry: &DirEntry) -> bool {
+            entry
+                .file_name()
+                .to_str()
+                .map(|s| s.ends_with(".purs"))
+                .unwrap_or(false)
+        }
+
+        crate::utils::load_files(&mut db, files);
+        db
+    }
+
     pub fn add_source_file(
         &mut self,
         filename: PathBuf,

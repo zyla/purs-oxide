@@ -7,7 +7,7 @@ fn test_compile_pass(input_filename: &str) -> anyhow::Result<()> {
     env_logger::builder().is_test(true).try_init()?;
 
     let source = std::fs::read_to_string(input_filename)?;
-    let db = &mut purs_oxide::Database::new();
+    let db = &mut purs_oxide::Database::new_with_prelude();
 
     let module_id = db.add_source_file(input_filename.into(), source)?;
     let errors: Vec<_> =

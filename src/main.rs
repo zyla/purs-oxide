@@ -1,4 +1,3 @@
-use anyhow::format_err;
 use clap::Parser;
 use purs_oxide::codegen::BundleMode;
 use purs_oxide::{Diagnostic, Diagnostics};
@@ -6,7 +5,6 @@ use rayon::prelude::*;
 use salsa::ParallelDatabase;
 use std::fmt::Write;
 use std::path::PathBuf;
-use std::{fs::File, io::Read};
 
 #[derive(clap::Parser)]
 #[command(version, about)]
@@ -32,7 +30,7 @@ fn main() -> std::io::Result<()> {
     let mut db = purs_oxide::Database::new();
     match Command::parse() {
         Command::Parse { files } => {
-            load_files(files, &mut db);
+            purs_oxide::utils::load_files(&mut db, files);
             let db = db.snapshot();
             db.module_ids().par_iter().for_each_with(
                 purs_oxide::DbSnapshot(db.snapshot()),
@@ -57,7 +55,7 @@ fn main() -> std::io::Result<()> {
             );
         }
         Command::Bundle { files, entrypoint } => {
-            load_files(files, &mut db);
+            purs_oxide::utils::load_files(&mut db, files);
 
             //let (err, entry) = purs_oxide::parser::parse_lower_qualified_ident(&db, &entrypoint);
 
@@ -73,21 +71,5 @@ fn main() -> std::io::Result<()> {
             println!("{}", code);
         }
     }
-    Ok(())
-}
-
-fn load_files(files: Vec<PathBuf>, db: &mut purs_oxide::Database) {
-    for filename in files {
-        if let Err(err) = process_file(db, filename.clone()) {
-            println!("FAIL {} error: {}", filename.to_string_lossy(), err);
-        }
-    }
-}
-
-fn process_file(db: &mut purs_oxide::Database, filename: PathBuf) -> anyhow::Result<()> {
-    let mut contents = String::new();
-    File::open(&filename)?.read_to_string(&mut contents)?;
-    db.add_source_file(filename, contents)
-        .map_err(|_| format_err!("Invalid module name"))?;
     Ok(())
 }
