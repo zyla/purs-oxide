@@ -27,7 +27,7 @@ enum Command {
 }
 
 fn main() -> std::io::Result<()> {
-    let mut db = purs_oxide::Database::new();
+    let mut db = purs_oxide::Database::new_with_prelude();
     match Command::parse() {
         Command::Parse { files } => {
             purs_oxide::utils::load_files(&mut db, files);
