@@ -194,7 +194,10 @@ impl<'a> Typechecker<'a> {
                         None => {
                             self.report_error(
                                 span,
-                                format!("renamer left unknown local variable {:?}", v),
+                                format!(
+                                    "renamer left unknown local variable '{}'",
+                                    v.name(db).text(db)
+                                ),
                             );
                             Located::new(span, TypeKind::Error)
                         }
@@ -263,6 +266,11 @@ impl<'a> Typechecker<'a> {
                     Located::new(span, App(Box::new(elaborated_f), vec![elaborated_x])),
                     result_ty,
                 )
+            }
+            DataConstructor(qn) => {
+                // TODO: add proper inference for data constructor
+                let constructor_type = self.fresh_tv();
+                (Located::new(span, DataConstructor(qn)), constructor_type)
             }
             expr @ Literal(Literal::Integer(_)) => (
                 Located::new(span, expr),
@@ -345,7 +353,10 @@ impl<'a> Typechecker<'a> {
                     );
                 }
             }
-            (TypeKind::Error, TypeKind::Error) => {}
+            (TypeKind::Error, _) | (_, TypeKind::Error) => {
+                **t1 = TypeKind::Error;
+                **t2 = TypeKind::Error;
+            }
             _ => todo!("unify {} {}", pp(self.db, t1), pp(self.db, t2)),
         }
     }
@@ -369,6 +380,7 @@ impl<'a> Typechecker<'a> {
                 self.occurs_check(u, x);
             }
             TypeKind::TypeConstructor(_) => {}
+            TypeKind::Error => {}
             _ => todo!("occurs_check: type {t:?}"),
         }
     }
