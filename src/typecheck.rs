@@ -309,7 +309,7 @@ impl<'a> Typechecker<'a> {
     }
 
     fn unify(&mut self, span: SourceSpan, t1: &mut Type, t2: &mut Type) {
-        log::debug!("unify({}, {})", pp(self.db, &t1), pp(self.db, &t2));
+        log::debug!("unify({}, {})", pp(self.db, t1.clone()), pp(self.db, t2.clone()));
         self.shallow_apply_subst(t1);
         self.shallow_apply_subst(t2);
         match (&mut **t1, &mut **t2) {
@@ -337,12 +337,12 @@ impl<'a> Typechecker<'a> {
                     // stack?)
                     self.report_error(
                         span,
-                        format!("can't unify {} with {}", pp(self.db, &t1), pp(self.db, &t2)),
+                        format!("can't unify {} with {}", pp(self.db, t1), pp(self.db, t2)),
                     );
                 }
             }
             (TypeKind::Error, TypeKind::Error) => {}
-            _ => todo!("unify {} {}", pp(self.db, &t1), pp(self.db, &t2)),
+            _ => todo!("unify {} {}", pp(self.db, t1), pp(self.db, t2)),
         }
     }
 
