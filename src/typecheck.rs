@@ -309,7 +309,11 @@ impl<'a> Typechecker<'a> {
     }
 
     fn unify(&mut self, span: SourceSpan, t1: &mut Type, t2: &mut Type) {
-        log::debug!("unify({}, {})", pp(self.db, t1.clone()), pp(self.db, t2.clone()));
+        log::debug!(
+            "unify({}, {})",
+            pp(self.db, t1.clone()),
+            pp(self.db, t2.clone())
+        );
         self.shallow_apply_subst(t1);
         self.shallow_apply_subst(t2);
         match (&mut **t1, &mut **t2) {
