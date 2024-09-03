@@ -1,7 +1,8 @@
 -- @shouldWarnWith ScopeShadowing
+-- FIXME: Scope shadowing doesn't works properly
 module Main where
 
-import Prelude
+import Prelude as P
 
 -- No warning at the definition, only when the name is later resolved
 data Unit = Unit
@@ -10,4 +11,4 @@ data Unit = Unit
 -- named explicitly in an import list, then this reference to `Unit`
 -- would be a `ScopeConflict` error instead.
 test :: Unit
-test = const Unit unit
+test = P.const Unit P.unit
