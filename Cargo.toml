@@ -5,10 +5,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[profile.dev]
-debug = false
-strip = "debuginfo"
-
 [build-dependencies]
 lalrpop = "0.19.9"
 
@@ -19,9 +15,9 @@ num = "0.4.0"
 regex = "1"
 unicode-general-category = "0.6.0"
 
-derive-new = "0.7.0"
+derive-new = "0.5.9"
 salsa = { git = "https://github.com/zyla/salsa.git", branch = "derive-debug-withdb", package = "salsa-2022" }
-dashmap = "6.0.1"
+dashmap = "5.4.0"
 anyhow = "1.0.70"
 ordered-float = "3.6.0"
 rayon = "1.7.0"
@@ -36,8 +32,5 @@ walkdir = "2.5.0"
 insta = "1.14.0"
 indoc = "1.0"
 test-generator = "0.3.0"
-pretty_assertions = "1.4.0"
+pretty_assertions = "1.2.1"
 env_logger = "0.10.0"
-
-
-

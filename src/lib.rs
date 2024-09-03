@@ -291,11 +291,6 @@ impl Database {
             .expect("Error getting current directory")
             .join("prelude/src");
 
-        if !prelude_path.exists() {
-            eprintln!("Warning: Prelude path does not exist: {:?}", prelude_path);
-            return db;
-        }
-
         use walkdir::{DirEntry, WalkDir};
         let files: Vec<_> = WalkDir::new(&prelude_path)
             .into_iter()
@@ -316,7 +311,6 @@ impl Database {
             })
             .unwrap_or_else(|e| {
                 eprintln!("Error loading prelude source files: {}", e);
-
                 Vec::new()
             });
 
