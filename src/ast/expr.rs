@@ -158,5 +158,5 @@ pub enum Literal<T> {
 #[test]
 fn test_size() {
     // Note: it was 56 before adding multi-case.
-    assert_eq!(std::mem::size_of::<Expr>(), 80);
+    assert_eq!(std::mem::size_of::<Expr>(), 72);
 }
