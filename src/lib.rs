@@ -44,6 +44,7 @@ pub struct ModuleSource {
     id: ModuleId,
     #[return_ref]
     contents: Option<(PathBuf, String)>,
+    ffi_content: Option<(PathBuf, String)>,
 }
 
 #[salsa::accumulator]
@@ -350,6 +351,19 @@ impl Database {
         }
     }
 
+    pub fn add_foreign_file(
+        &mut self,
+        module_id: ModuleId,
+        filename: PathBuf,
+        ffi_contents: String,
+    ) {
+        let source_file = self.module_source(module_id);
+
+        source_file
+            .set_ffi_content(self)
+            .to(Some((filename, ffi_contents)));
+    }
+
     pub fn module_ids(&self) -> Vec<ModuleId> {
         self.module_sources
             .iter()
@@ -370,7 +384,7 @@ impl Db for Database {
     fn module_source(&self, module: ModuleId) -> ModuleSource {
         match self.module_sources.entry(module.name(self)) {
             Entry::Occupied(entry) => *entry.get(),
-            Entry::Vacant(entry) => *entry.insert(ModuleSource::new(self, module, None)),
+            Entry::Vacant(entry) => *entry.insert(ModuleSource::new(self, module, None, None)),
         }
     }
 }

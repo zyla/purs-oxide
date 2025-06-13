@@ -13,8 +13,47 @@ pub fn load_files(db: &mut crate::Database, files: Vec<PathBuf>) {
 pub fn process_file(db: &mut crate::Database, filename: PathBuf) -> anyhow::Result<()> {
     let mut contents = String::new();
     File::open(&filename)?.read_to_string(&mut contents)?;
-    db.add_source_file(filename, contents)
+    let foreign_path = get_foreign_file_path(&filename);
+    let module_id = db
+        .add_source_file(filename, contents)
         .map_err(|_| format_err!("Invalid module name"))?;
+
+    if let Some(foreign_path) = foreign_path {
+        process_foreign_file(db, module_id, foreign_path)?;
+    }
+    Ok(())
+}
+
+fn get_foreign_file_path(purs_path: &PathBuf) -> Option<PathBuf> {
+    if let Some(ext) = purs_path.extension() {
+        if ext == "purs" {
+            let mut js_path = purs_path.clone();
+            js_path.set_extension("js");
+            if js_path.exists() {
+                return Some(js_path);
+            }
+        }
+    }
+    None
+}
+
+pub fn process_foreign_file(
+    db: &mut crate::Database,
+    module_id: crate::ModuleId,
+    filename: PathBuf,
+) -> anyhow::Result<()> {
+    let mut contents = String::new();
+    File::open(&filename)?
+        .read_to_string(&mut contents)
+        .map_err(|err| {
+            format_err!(
+                "Foreign file {} not found: {}",
+                filename.to_string_lossy(),
+                err
+            )
+        })?;
+
+    db.add_foreign_file(module_id, filename, contents);
     Ok(())
 }
 
