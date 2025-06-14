@@ -291,16 +291,41 @@ impl Database {
 
     pub fn new_with_prelude() -> Self {
         let mut db = Self::new();
+
         let prelude_path = std::env::current_dir()
-            .expect("Project should have current dir")
+            .expect("Error getting current directory")
             .join("prelude/src");
 
+        if !prelude_path.exists() {
+            eprintln!("Warning: Prelude path does not exist: {:?}", prelude_path);
+            return db;
+        }
+
         use walkdir::{DirEntry, WalkDir};
-        let files = WalkDir::new(prelude_path)
+        let files: Vec<_> = WalkDir::new(&prelude_path)
             .into_iter()
-            .filter_entry(is_purs)
-            .filter_map(|e| e.ok().map(|e| e.into_path()))
-            .collect();
+            .collect::<Result<Vec<_>, _>>()
+            .map(|entries| {
+                entries
+                    .into_iter()
+                    .filter(is_purs)
+                    .filter_map(|e| {
+                        let path = e.into_path();
+                        if path.is_file() {
+                            Some(path)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect()
+            })
+            .unwrap_or_else(|e| {
+                eprintln!("Error loading prelude source files: {}", e);
+
+                Vec::new()
+            });
+
+        crate::utils::load_files(&mut db, files);
 
         fn is_purs(entry: &DirEntry) -> bool {
             entry
@@ -310,7 +335,6 @@ impl Database {
                 .unwrap_or(false)
         }
 
-        crate::utils::load_files(&mut db, files);
         db
     }
 

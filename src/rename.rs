@@ -148,6 +148,10 @@ impl Rename for Type {
                 a.rename(r);
                 b.rename(r);
             }
+            TypeKind::TypeApp(ref mut f, ref mut arg) => {
+                f.rename(r);
+                arg.rename(r);
+            }
             _ => todo!("renaming TypeKind {:?} not supported", self),
         }
     }

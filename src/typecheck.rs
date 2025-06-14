@@ -194,7 +194,10 @@ impl<'a> Typechecker<'a> {
                         None => {
                             self.report_error(
                                 span,
-                                format!("renamer left unknown local variable {:?}", v),
+                                format!(
+                                    "renamer left unknown local variable '{}'",
+                                    v.name(db).text(db)
+                                ),
                             );
                             Located::new(span, TypeKind::Error)
                         }
@@ -264,6 +267,11 @@ impl<'a> Typechecker<'a> {
                     result_ty,
                 )
             }
+            DataConstructor(qn) => {
+                // TODO: add proper inference for data constructor
+                let constructor_type = self.fresh_tv();
+                (Located::new(span, DataConstructor(qn)), constructor_type)
+            }
             expr @ Literal(Literal::Integer(_)) => (
                 Located::new(span, expr),
                 Located::new(
@@ -309,7 +317,11 @@ impl<'a> Typechecker<'a> {
     }
 
     fn unify(&mut self, span: SourceSpan, t1: &mut Type, t2: &mut Type) {
-        log::debug!("unify({}, {})", pp(self.db, &t1), pp(self.db, &t2));
+        log::debug!(
+            "unify({}, {})",
+            pp(self.db, t1.clone()),
+            pp(self.db, t2.clone())
+        );
         self.shallow_apply_subst(t1);
         self.shallow_apply_subst(t2);
         match (&mut **t1, &mut **t2) {
@@ -337,12 +349,15 @@ impl<'a> Typechecker<'a> {
                     // stack?)
                     self.report_error(
                         span,
-                        format!("can't unify {} with {}", pp(self.db, &t1), pp(self.db, &t2)),
+                        format!("can't unify {} with {}", pp(self.db, t1), pp(self.db, t2)),
                     );
                 }
             }
-            (TypeKind::Error, TypeKind::Error) => {}
-            _ => todo!("unify {} {}", pp(self.db, &t1), pp(self.db, &t2)),
+            (TypeKind::Error, _) | (_, TypeKind::Error) => {
+                **t1 = TypeKind::Error;
+                **t2 = TypeKind::Error;
+            }
+            _ => todo!("unify {} {}", pp(self.db, t1), pp(self.db, t2)),
         }
     }
 
@@ -365,6 +380,7 @@ impl<'a> Typechecker<'a> {
                 self.occurs_check(u, x);
             }
             TypeKind::TypeConstructor(_) => {}
+            TypeKind::Error => {}
             _ => todo!("occurs_check: type {t:?}"),
         }
     }
