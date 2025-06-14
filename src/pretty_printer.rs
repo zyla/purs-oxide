@@ -59,7 +59,7 @@ where
     }
 }
 
-impl<'a, T> PrettyPrint for &'a T
+impl<T> PrettyPrint for &T
 where
     T: PrettyPrint,
 {
@@ -77,7 +77,7 @@ where
     }
 }
 
-impl<'a, T> PrettyPrint for &'a mut T
+impl<T> PrettyPrint for &mut T
 where
     T: PrettyPrint,
 {
