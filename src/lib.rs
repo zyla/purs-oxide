@@ -36,6 +36,7 @@ pub struct Jar(
     crate::codegen::value_decl_code_acc,
     crate::codegen::value_decl_ffi_code_acc,
     crate::codegen::scc_ffi_code_acc,
+    crate::codegen::module_ffi_code_acc,
     crate::codegen::scc_code_acc,
     crate::codegen::scc_code,
     crate::codegen::CodeAccumulator,

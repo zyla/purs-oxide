@@ -94,6 +94,8 @@ pub fn value_decl_code_acc(db: &dyn crate::Db, id: AbsoluteName) {
 
 #[salsa::tracked]
 pub fn value_decl_ffi_code_acc(db: &dyn crate::Db, id: AbsoluteName) {
+    module_ffi_code_acc(db, id.module(db));
+
     scc_ffi_code_acc(
         db,
         scc_of(
@@ -154,6 +156,21 @@ pub fn scc_ffi_code_acc(db: &dyn crate::Db, id: SccId) {
         {
             FfiAccumulator::push(db, ffi.clone());
         }
+    }
+}
+
+#[salsa::tracked]
+pub fn module_ffi_code_acc(db: &dyn crate::Db, module_id: crate::ModuleId) {
+    if let Some(ffi) =
+        &db.module_source(module_id)
+            .ffi_contents(db)
+            .as_ref()
+            .map(|(filename, contents)| FfiSourceFile {
+                filename: filename.to_path_buf(),
+                contents: contents.to_string(),
+            })
+    {
+        FfiAccumulator::push(db, ffi.clone());
     }
 }
 
